@@ -106,6 +106,7 @@ $(function () {
             values[field.name] = field.value;
         });
 
+
         $('#pageloader').css('display', 'flex');;
         $('.btn').hide();
 

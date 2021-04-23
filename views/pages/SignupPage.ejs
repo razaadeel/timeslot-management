@@ -25,7 +25,9 @@
                     <img class="logo" src="/img/logo.png" alt="">
                 </div>
                 <div class="heading">
-                    <h3><%= channel %> Channel</h3>
+                    <h3>
+                        <%= channel %> Channel
+                    </h3>
                     <h4>Time Slot Claim Form</h4>
                 </div>
                 <div class="user-details">
@@ -40,14 +42,28 @@
                             required />
                     </div>
                     <div class="input-container">
+                        <label for="contactTitle" class="input-label">Contact title</label>
+                        <input type="text" class="input-field" name="contactTitle" id="contactTitle" placeholder="Last name"
+                            required />
+                    </div>
+                    <div class="input-container">
                         <label for="email" class="input-label">Contact Email</label>
                         <input type="text" class="input-field" name="email" id="email" placeholder="Contact Email"
                             required />
                     </div>
                     <div class="input-container">
-                        <label for="companyName" class="input-label">Company Name</label>
-                        <input type="text" class="input-field" name="companyName" id="companyName" placeholder="Company Name"
-                            required />
+                        <label for="organizationName" class="input-label">Organization name</label>
+                        <input type="text" class="input-field" name="organizationName" id="organizationName"
+                            placeholder="Organization Name" required />
+                    </div>
+                    <div class="input-container">
+                        <label for="phoneNumber" class="input-label">Phone Number</label>
+                        <input type="text" class="input-field" name="phoneNumber" id="phoneNumber"
+                            placeholder="Phone Number" required />
+                    </div>
+                    <div class="input-container">
+                        <label for="website" class="input-label">Website</label>
+                        <input type="text" class="input-field" name="website" id="website" placeholder="Website" />
                     </div>
                     <div class="input-container">
                         <label for="states" class="input-label">Select State</label>
@@ -82,12 +98,12 @@
                 <div class="input-container">
                     <label for="showDescription" class="input-label">Show Description</label>
                     <textarea id="showDescription" rows="5" maxlength="100" name="showDescription"
-                        placeholder="Description"></textarea>
+                        placeholder="Description" required></textarea>
                 </div>
 
                 <div class="checbox-container">
-                    <label for="addOn" class="checkboxes">
-                        <input type="checkbox" id="addOn" name="addOn" value="yes" class="checkboxes" />
+                    <label for="addon" class="checkboxes">
+                        <input type="checkbox" id="addon" name="addon" value="yes" class="checkboxes" />
                         I would like information on how to have advertising removed from my free time slot (This is
                         recommended if you would like to place your own ads in your program or show)
                     </label>

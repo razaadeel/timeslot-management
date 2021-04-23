@@ -11,11 +11,14 @@ exports.createUser = async (req, res) => {
             timeslotId,
             showName,
             showDescription,
-            addOn,
+            addon,
             slotExpansion,
-            companyName
+            organizationName,
+            website,
+            phoneNumber,
         } = req.body;
         let { channelId } = req.params;
+
         //checking if email is already exists
         let emailExists = await db.User.checkEmail(email);
         if (emailExists) {
@@ -24,12 +27,12 @@ exports.createUser = async (req, res) => {
 
         let user = await db.User.createUser({ firstName, lastName, email });
 
-        //Saving user booking 
+        // //Saving user booking 
         let booking = await db.BookedSlot.saveBooking({ channelId, cityId, dayId, timeslotId, userId: user.id });
 
         let bookingDetails = await db.BookedSlot.getBookingDetails(booking.id);
 
-        //spliting name into first and last name
+        // //spliting name into first and last name
         let userName = bookingDetails.userName.split(' ');
         bookingDetails.firstName = userName[0];
         bookingDetails.lastName = userName[1];
@@ -39,8 +42,12 @@ exports.createUser = async (req, res) => {
             ...bookingDetails,
             showName,
             showDescription,
-            companyName,
-            email
+            organizationName,
+            email,
+            addon: addon ? addon : 'no',
+            slotExpansion: slotExpansion ? slotExpansion : 'no',
+            website,
+            phoneNumber
         });
 
         return res.json('working');
