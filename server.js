@@ -25,31 +25,31 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //View Routes
 app.get('/community', (req, res) => {
-    res.render('pages/SignupPage');
+    res.render('pages/SignupPage', { channel: 'Community' });
 });
 app.get('/faith', (req, res) => {
-    res.render('pages/SignupPage');
+    res.render('pages/SignupPage', { channel: 'Faith' });
 });
 app.get('/electedOfficials', (req, res) => {
-    res.render('pages/SignupPage');
+    res.render('pages/SignupPage', { channel: 'Elected Officials' });
 });
 app.get('/public', (req, res) => {
-    res.render('pages/SignupPage');
+    res.render('pages/SignupPage', { channel: 'Public' });
 });
 app.get('/candidate', (req, res) => {
-    res.render('pages/SignupPage');
+    res.render('pages/SignupPage', { channel: 'Candidate' });
 });
 app.get('/business', (req, res) => {
-    res.render('pages/SignupPage');
+    res.render('pages/SignupPage', { channel: 'Business' });
 });
 app.get('/entertainment', (req, res) => {
-    res.render('pages/SignupPage');
+    res.render('pages/SignupPage', { channel: 'Entertainment' });
 });
 app.get('/news', (req, res) => {
-    res.render('pages/SignupPage');
+    res.render('pages/SignupPage', { channel: 'News' });
 });
 app.get('/sports', (req, res) => {
-    res.render('pages/SignupPage');
+    res.render('pages/SignupPage', { channel: 'Sports' });
 });
 
 
