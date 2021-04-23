@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="css/index.css" rel="stylesheet" type="text/css">
+    <!-- Font Awesome kit script -->
+    <script src="https://kit.fontawesome.com/a81368914c.js"></script>
+    <!-- Google Fonts Open Sans-->
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+    <!-- jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+    <title>TimeSlots</title>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="form-container">
+            <form id="timeslot_form">
+                <div class="logo-container">
+                    <img class="logo" src="/img/logo.png" alt="">
+                </div>
+                <div class="heading">
+                    <h3>Community Channel</h3>
+                    <h4>Time Slot Claim Form</h4>
+                </div>
+                <div class="user-details">
+                    <div class="input-container">
+                        <label for="firstName" class="input-label">First name</label>
+                        <input type="text" class="input-field" name="firstName" id="firstName" placeholder="First name"
+                            required />
+                    </div>
+                    <div class="input-container">
+                        <label for="lastName" class="input-label">Last name</label>
+                        <input type="text" class="input-field" name="lastName" id="lastName" placeholder="Last name"
+                            required />
+                    </div>
+                    <div class="input-container">
+                        <label for="email" class="input-label">Contact Email</label>
+                        <input type="text" class="input-field" name="email" id="email" placeholder="Contact Email"
+                            required />
+                    </div>
+                    <div class="input-container">
+                        <label for="companyName" class="input-label">Company Name</label>
+                        <input type="text" class="input-field" name="companyName" id="companyName" placeholder="Company Name"
+                            required />
+                    </div>
+                    <div class="input-container">
+                        <label for="states" class="input-label">Select State</label>
+                        <select class="input-field" id="states" name="state" title="Choose One" required>
+                            <option selected="true" value="0">Select State</option>
+                        </select>
+                    </div>
+                    <div class="input-container">
+                        <label for="city" class="input-label">City</label>
+                        <select class="input-field" id="city" name="cityId" title="Choose One" required>
+                            <option selected="true" disabled>Select City</option>
+                        </select>
+                    </div>
+                    <div class="input-container">
+                        <label for="day" class="input-label">Select Day</label>
+                        <select class="input-field" id="day" name="dayId" title="Choose One" required>
+                            <option selected="true" disabled>Select Day</option>
+                        </select>
+                    </div>
+                    <div class="input-container">
+                        <label for="timeslot" class="input-label">Select Timeslot</label>
+                        <select class="input-field" id="timeslot" name="timeslotId" title="Choose One" required>
+                            <option selected="true" disabled>Select Timeslot</option>
+                        </select>
+                    </div>
+                    <div class="input-container">
+                        <label for="showName" class="input-label">Show name</label>
+                        <input type="text" class="input-field" id="showName" name="showName" placeholder="Show name"
+                            required />
+                    </div>
+                </div>
+                <div class="input-container">
+                    <label for="showDescription" class="input-label">Show Description</label>
+                    <textarea id="showDescription" rows="5" maxlength="100" name="showDescription"
+                        placeholder="Description"></textarea>
+                </div>
+
+                <div class="checbox-container">
+                    <label for="addOn" class="checkboxes">
+                        <input type="checkbox" id="addOn" name="addOn" value="yes" class="checkboxes" />
+                        I would like information on how to have advertising removed from my free time slot (This is
+                        recommended if you would like to place your own ads in your program or show)
+                    </label>
+                </div>
+                <div class="checbox-container">
+                    <label for="slotExpansion" class="checkboxes">
+                        <input type="checkbox" id="slotExpansion" name="slotExpansion" value="yes" class="checkboxes" />
+                        I would like information on how to upgrade my free 28-minute time slot to a 60, 90, or
+                        120-minute slot.
+                    </label>
+                </div>
+
+                <!-- submit button -->
+                <input type="submit" class="btn" value="Create Account">
+                <div id="pageloader">
+                    <img src="http://cdnjs.cloudflare.com/ajax/libs/semantic-ui/0.16.1/images/loader-large.gif"
+                        alt="processing..." />
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- my scripts -->
+    <script src="js/index.js"></script>
+</body>
+
+</html>

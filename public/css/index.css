@@ -1,0 +1,245 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", sans-serif;
+    ;
+}
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* text-align: center; */
+    position: relative;
+    animation-name: left-to-right;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    justify-content: center;
+    align-items: center;
+    /* height: 100vh; */
+    background-image: linear-gradient(to right, #135BA8, #4d89c9, #135BA8);
+    padding: 20px 0;
+}
+
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.heading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.logo {
+    width: 100px;
+}
+
+.form-container {
+    background-color: #fff;
+    box-shadow: 2px 2px 15px 2px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.forgot {
+    padding-bottom: 10px;
+}
+
+form {
+    padding: 0.5rem 1.2rem;
+    width: 550px;
+}
+
+form h2 {
+    font-family: "Segoe UI", sans-serif;
+    font-size: 29px;
+    font-weight: bold;
+}
+
+input, label {
+    display: block;
+}
+
+.input-label {
+    font-size: 12px;
+    font-weight: 700;
+    padding-bottom: 5px;
+}
+
+.user-details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* flex-wrap: wrap;
+    justify-content: space-between; */
+}
+
+.input-field {
+    outline: none;
+    border: 1px solid #D9D9D9;
+    border-radius: 5px;
+    padding: 10px;
+    width: 90%;
+}
+
+.input-field:focus {
+    border-color: #135BA8;
+}
+
+textarea {
+    width: 95%;
+    outline: none;
+    border: 1px solid #D9D9D9;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+textarea:focus {
+    border-color: #135BA8;
+}
+
+.input-container {
+    /* width: calc(100% / 2 - 20px); */
+    margin-top: 20px;
+}
+
+.checbox-container {
+    margin-top: 20px;
+    width: 95%;
+}
+
+.checkboxes {
+    display: flex;
+    align-items: center;
+    vertical-align: text-bottom;
+    word-wrap: break-word;
+    font-size: 12px;
+    text-align: justify;
+    color: rgb(94, 94, 94);
+}
+
+input.checkboxes {
+    margin-right: 10px;
+}
+
+.btn {
+    display: block;
+    width: 80%;
+    height: 40px;
+    border-radius: 15px;
+    margin: 0.5rem auto;
+    font-size: 1rem;
+    background-image: linear-gradient(to right, #135BA8, #4d89c9, #135BA8);
+    color: #fff;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    font-family: "Open Sans", sans-serif;
+    background-size: 200%;
+    transition: 0.5s;
+    /* align-self: center; */
+}
+
+.btn:hover {
+    background-position: right;
+}
+
+#pageloader {
+    width: 80%;
+    height: 40px;
+    border-radius: 15px;
+    margin: 0.5rem auto;
+    background-image: linear-gradient(to right, #135BA8, #4d89c9, #135BA8);
+    color: #fff;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    font-family: "Open Sans", sans-serif;
+    background-size: 200%;
+    /* transition: 0.5s; */
+    align-items: center;
+    justify-content: center;
+    display: none;
+}
+
+#pageloader img {
+    width: 25px;
+}
+
+@media (max-width: 1050px) {
+    .container {
+        column-gap: 5rem;
+    }
+    form {
+        width: 350px;
+    }
+}
+
+@media (max-width: 1000px) {
+    form h2 {
+        font-size: 1.5rem;
+        margin: 8px 0;
+    }
+    .img img {
+        width: 400px;
+    }
+    .content {
+        width: 350px;
+    }
+}
+
+@media (max-width: 900px) {
+    .img {
+        display: none;
+    }
+    .container {
+        grid-template-columns: 1fr;
+        background-color: rgb(1, 186, 179);
+    }
+    .wave {
+        display: none;
+    }
+    .login-container {
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    .confirm-container {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 600px) {
+    form {
+        width: 300px;
+        padding: 0 1.2rem 1.2rem;
+    }
+    .terms {
+        margin: 0;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .terms a {
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+    }
+    .terms input {
+        margin-top: 5px;
+        align-self: start;
+    }
+    .content {
+        width: 300px;
+    }
+}
+
+@media (min-width: 600px) {
+    .terms a {
+        padding-left: 5px;
+    }
+}
