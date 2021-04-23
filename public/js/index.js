@@ -1,6 +1,9 @@
 $(function () {
 
-
+    let allChannels = { community: 1, faith: 2, electedOfficials: 3, public: 4, candidate: 5, business: 6, entertainment: 7, news: 8, sports: 9 };
+    let currentChannel = window.location.href.split('/');
+    currentChannel = currentChannel[currentChannel.length - 1];
+    let channelId = allChannels[currentChannel];
 
     const getStates = () => {
         $.ajax({
@@ -85,22 +88,6 @@ $(function () {
     $('#timeslot_form').submit(function (e) {
         e.preventDefault();
 
-        let allChannels = {
-            community: 1,
-            faith: 2,
-            electedOfficials: 3,
-            public: 4,
-            candidate: 5,
-            business: 6,
-            entertainment: 7,
-            news: 8,
-            sports: 9
-        };
-
-        let currentChannel = window.location.href.split('/');
-        currentChannel = currentChannel[currentChannel.length - 1];
-        let channelId = allChannels[currentChannel];
-
         let values = {};
         $.each($(this).serializeArray(), function (i, field) {
             values[field.name] = field.value;
@@ -121,10 +108,20 @@ $(function () {
         });
     });
 
+    
     const authSuccess = (data) => {
         $('#pageloader').hide();
         $('.btn').show();
         alert('Account Created Successfully.');
+        if (currentChannel === 'community') window.location.replace("https://thankyou.yourprogramontv.com/communitystvnetwork-time-slot-claim");
+        else if (currentChannel === 'faith') window.location.replace("https://thankyou.yourprogramontv.com/faithstvnetwork-time-slot-claim");
+        else if (currentChannel === 'electedOfficials') window.location.replace("https://thankyou.yourprogramontv.com/electedofficialstvnetwork-time-slot-claim");
+        else if (currentChannel === 'public') window.location.replace("https://thankyou.yourprogramontv.com/publicstvnetwork-time-slot-claim");
+        else if (currentChannel === 'candidate') window.location.replace("https://thankyou.yourprogramontv.com/candidatestvnetwork-time-slot-claim");
+        // else if (currentChannel === 'business') window.location.replace("http://stackoverflow.com");
+        // else if (currentChannel === 'entertainment') window.location.replace("http://stackoverflow.com");
+        // else if (currentChannel === 'news') window.location.replace("http://stackoverflow.com");
+        // else if (currentChannel === 'sports') window.location.replace("http://stackoverflow.com");
     }
 
     const authError = (error) => {
@@ -133,4 +130,6 @@ $(function () {
         alert(error.responseJSON?.message);
     }
 
+
+    //END OF MAIN $jquery
 });
