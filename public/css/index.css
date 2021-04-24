@@ -220,6 +220,10 @@ input.checkboxes {
         width: 300px;
         padding: 0 1.2rem 1.2rem;
     }
+    .user-details {
+        /* display: grid; */
+        grid-template-columns: 1fr;
+    }
     .terms {
         margin: 0;
         flex-wrap: wrap;
