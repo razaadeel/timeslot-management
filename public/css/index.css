@@ -112,12 +112,13 @@ textarea:focus {
 .checbox-container {
     margin-top: 20px;
     width: 95%;
+    display: flex;
 }
 
 .checkboxes {
     display: flex;
     align-items: center;
-    vertical-align: text-bottom;
+    /* vertical-align: text-bottom; */
     word-wrap: break-word;
     font-size: 12px;
     text-align: justify;
@@ -223,6 +224,12 @@ input.checkboxes {
     .user-details {
         /* display: grid; */
         grid-template-columns: 1fr;
+    }
+    .checbox-container {
+        margin-top: 20px;
+        width: 95%;
+        display: grid;
+        grid-template-columns: 1fr 11fr;
     }
     .terms {
         margin: 0;
