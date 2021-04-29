@@ -155,6 +155,7 @@
                     alert('Video Uploaded Successfully');
 
                     $("#customFile").val(null);
+                    $('#fileName').text('');
 
                     $('#loading-btn').hide();
                     $('.progress-loading').hide();
@@ -163,7 +164,7 @@
                 },
                 error: (e) => {
                     console.log(e);
-                    
+
                     $('#loading-btn').hide();
                     $('.progress-loading').hide();
                     $('#upload-btn').show();
