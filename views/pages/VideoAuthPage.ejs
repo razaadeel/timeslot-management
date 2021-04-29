@@ -55,39 +55,27 @@
 <body>
 
     <div class="login-form">
+        <div class="alert alert-danger" role="alert" id="loginAlert">
+            <p style="text-align: center;">Email not found!</p>
+        </div>
         <form id="form" action="/api/auth/user-by-email" method="POST">
             <h2 class="text-center">Log in</h2>
             <div class="form-group">
                 <input type="text" class="form-control" placeholder="Email" name="email" required>
             </div>
-            <%if (error) { %>
-                <p>
-                    <%= error %>
-                </p>
-                <% } %>
-
             <button class="btn btn-primary btn-block" type="submit">Sign In</button>
         </form>
     </div>
 
 
     <script>
-        // $('#form').submit(function (e) {
-        //     e.preventDefault();
-        //     console.log('working')
-        //     let email = $('.form-control').val()
-        //     $.ajax({
-        //         type: 'POST',
-        //         url: `/api/auth/user-by-email`,
-        //         data: JSON.stringify({ email }),
-        //         success: (data) => console.log(data),
-        //         error: (e) => alert(e.message),
-        //         contentType: "application/json"
-        //     }).done((response) => {
-        //         $('body').html(response);
-        //     })
 
-        // });
+        $('#loginAlert').hide();
+        const urlParams = new URLSearchParams(window.location.search);
+        const myParam = urlParams.get('error');
+        if (myParam) {
+            $('#loginAlert').show();
+        }
     </script>
 
 </body>

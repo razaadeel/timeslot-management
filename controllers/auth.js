@@ -69,7 +69,8 @@ exports.getUserByEmail = async (req, res) => {
         return res.render('pages/UploadVideoPage', { user });
     } catch (error) {
         console.log(error);
-        return res.redirect('/video-auth');
+        res.redirect('/video-auth?error=' + encodeURIComponent(error.message));
+        return false;
         // return res.status(500).json({
         //     message: "Something went wrong"
         // });

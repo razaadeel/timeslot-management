@@ -24,12 +24,15 @@ exports.uploadVideo = async (req, res) => {
                 let userId = req.body.userId;
 
                 let userBooking = await db.BookedSlot.getBookingByUserId(userId);
-                let day = userBooking.day.slice(0, 3);
+                
+                let day = userBooking.day.slice(0, 3); //Reducing day to 3 letters i.e Monday to Mon
+
                 let slotTime = `${userBooking.startTime}`.split(':');
+                if (Number(slotTime[0]) < 10) sslotTime[0] = `0${slotTime[0]}`;
                 slotTime = `${slotTime[0]}${slotTime[1]}`;
 
                 const destination = `stv-curated-data/${userBooking.stateCode}/${userBooking.cityName}/${userBooking.channelName}/${day}/${slotTime}`;
-                
+
                 res.json({ videoName });
 
                 //sending file for transcoding
