@@ -161,7 +161,9 @@
                     $('#upload-btn').show();
                     // window.location.replace('')
                 },
-                error: () => {
+                error: (e) => {
+                    console.log(e);
+                    
                     $('#loading-btn').hide();
                     $('.progress-loading').hide();
                     $('#upload-btn').show();
