@@ -1,6 +1,6 @@
 const router = require('express').Router();
 
-const dataController = require('../controllers/data');
+const dataController = require('../../controllers/data');
 
 //get days and states
 router.get('/initial-data', dataController.daysAndStates);

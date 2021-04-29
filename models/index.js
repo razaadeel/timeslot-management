@@ -7,8 +7,8 @@ const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
 
 const config = env === 'development' ?
-  require(__dirname + '/../config/configDev.js')[env] //import in dev 
-  : require(__dirname + '/../config/config.js')[env]; // imp in production
+  require(__dirname + '/../config/configDev.js')[env].database //import in dev 
+  : require(__dirname + '/../config/config.js')[env].database; // imp in production
 
 const db = {};
 

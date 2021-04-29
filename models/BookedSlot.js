@@ -30,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
         return booking;
     }
 
+    // get booking detials by booking id
     BookedSlot.getBookingDetails = async (id) => {
         let query = `select u."name" as "userName", ch."name" as "channelName", ct."cityName", ct."stateName", ts."startTime",ts."endTime", d."day"
         from "BookedSlots" bs
@@ -65,6 +66,21 @@ module.exports = (sequelize, DataTypes) => {
         let customerInfo = await sequelize.query(query, { type: sequelize.QueryTypes.INSERT });
 
         return customerInfo;
+    }
+
+    // get booking details by user id
+    BookedSlot.getBookingByUserId = async (userId) => {
+        let query = `select u."name" as "userName", ch."name" as "channelName", ct."cityName", ct."stateCode", ts."startTime",ts."endTime", d."day"
+        from "BookedSlots" bs
+        join "Users" u on bs."userId" = u.id
+        join "Channels" ch on bs."channelId" = ch.id
+        join "Timeslots" ts on bs."timeslotId" = ts.id
+        join "Days" d on bs."dayId" = d.id
+        join "Cities" ct on bs."cityId" = ct.id
+        where u.id = ${userId}`
+
+        let bookingDetails = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+        return bookingDetails[0];
     }
 
     return BookedSlot;

@@ -60,8 +60,18 @@ exports.createUser = async (req, res) => {
     }
 }
 
+// 
+exports.getUserByEmail = async (req, res) => {
+    try {
+        let { email } = req.body;
 
-exports.testFunction = async (req, res) => {
-    let bookingDetails = await db.BookedSlot.getBookingDetails(8);
-    res.json(bookingDetails)
+        let user = await db.User.userByEmail(email);
+        return res.render('pages/UploadVideoPage', { user });
+    } catch (error) {
+        console.log(error);
+        return res.redirect('/video-auth');
+        // return res.status(500).json({
+        //     message: "Something went wrong"
+        // });
+    }
 }
