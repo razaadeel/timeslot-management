@@ -21,17 +21,32 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 
     <style>
+        body {
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-image: url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80');
+        }
+
+        .background {
+            background-color: rgba(0, 61, 128, 0.7);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .login-form {
             width: 340px;
-            margin: 250px auto;
+            /* margin: 250px auto; */
             font-size: 15px;
         }
 
         .login-form form {
             margin-bottom: 15px;
-            background: #f7f7f7;
+            background: white;
             box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
             padding: 30px;
+            border-radius: 10px;
         }
 
         .login-form h2 {
@@ -53,23 +68,22 @@
 </head>
 
 <body>
-
-    <div class="login-form">
-        <div class="alert alert-danger" role="alert" id="loginAlert">
-            <p style="text-align: center;">Email not found!</p>
-        </div>
-        <form id="form" action="/api/auth/user-by-email" method="POST">
-            <h2 class="text-center">Log in</h2>
-            <div class="form-group">
-                <input type="text" class="form-control" placeholder="Email" name="email" required>
+    <div class="background">
+        <div class="login-form">
+            <div class="alert alert-danger" role="alert" id="loginAlert">
+                <p style="text-align: center;">Email not found!</p>
             </div>
-            <button class="btn btn-primary btn-block" type="submit">Sign In</button>
-        </form>
+            <form id="form" action="/api/auth/user-by-email" method="POST">
+                <h2 class="text-center">Verify your email!</h2>
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Email" name="email" required>
+                </div>
+                <button class="btn btn-primary btn-block" type="submit">Sign In</button>
+            </form>
+        </div>
     </div>
 
-
     <script>
-
         $('#loginAlert').hide();
         const urlParams = new URLSearchParams(window.location.search);
         const myParam = urlParams.get('error');

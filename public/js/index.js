@@ -74,7 +74,26 @@ $(function () {
                 // data: JSON.stringify(values),
                 success: data => {
                     data.forEach(item => {
-                        $('#timeslot').append(new Option(`${item.startTime}  - ${item.endTime}`, item.id));
+                        let startTime = `${item.startTime}`.split(':');
+                        let endTime = `${item.endTime}`.split(':');
+
+                        //below if else conditions are for making timeslots in 12hrs format
+
+                        if (Number(startTime[0]) >= 12) {
+                            if (startTime[0] != 12) startTime[0] = startTime[0] - 12
+                            startTime = `${startTime[0]}:${startTime[1]}pm`
+                        } else {
+                            startTime = `${startTime[0]}:${startTime[1]}am`
+                        }
+
+                        if (Number(endTime[0]) > 11) {
+                            if (endTime[0] != 12) endTime[0] = endTime[0] - 12
+                            endTime = `${endTime[0]}:${endTime[1]}pm`
+                        } else {
+                            endTime = `${endTime[0]}:${endTime[1]}am`
+                        }
+
+                        $('#timeslot').append(new Option(`${startTime} - ${endTime}`, item.id));
                     });
                 },
                 error: () => {
@@ -108,7 +127,7 @@ $(function () {
         });
     });
 
-    
+
     const authSuccess = (data) => {
         $('#pageloader').hide();
         $('.btn').show();
