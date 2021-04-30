@@ -30,8 +30,8 @@ module.exports = transocde = (videoUrl, destination) => {
                     // tag: "timeslotvideo",
                     framerate: "24",
                     keyframe: "2",
-                    // start_time: "0",
-                    // duration: "1680"
+                    start_time: "0",
+                    duration: "1680"
                 }
             ],
             encoder_version: "2",
