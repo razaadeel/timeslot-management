@@ -88,7 +88,9 @@ $(function () {
 
                         if (Number(endTime[0]) > 11) {
                             if (endTime[0] != 12) endTime[0] = endTime[0] - 12
+                            
                             endTime = `${endTime[0]}:${endTime[1]}pm`
+                            
                         } else {
                             if (endTime[0] == '00') endTime[0] = '12'
                             endTime = `${endTime[0]}:${endTime[1]}am`
