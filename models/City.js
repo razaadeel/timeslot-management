@@ -28,7 +28,8 @@ module.exports = (sequelize, DataTypes) => {
     City.cityByStateCode = async (stateCode) => {
         let cities = await City.findAll({
             attributes: ['id', 'cityName'],
-            where: { stateCode }
+            where: { stateCode },
+            order: [ ['cityName', 'ASC'] ]
         });
         return cities;
     }

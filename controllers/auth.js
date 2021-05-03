@@ -64,7 +64,6 @@ exports.createUser = async (req, res) => {
 exports.getUserByEmail = async (req, res) => {
     try {
         let { email } = req.body;
-
         let user = await db.User.userByEmail(email);
         return res.render('pages/UploadVideoPage', { user });
     } catch (error) {

@@ -34,6 +34,7 @@ router.get('/sports', (req, res) => {
 
 // Authentication Page for Video Upload
 router.get('/video-auth', (req, res) => {
+    // console.log(req.params)
     res.render('pages/VideoAuthPage', { error: '' });
 });
 
