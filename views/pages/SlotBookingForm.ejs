@@ -503,12 +503,14 @@
         });
 
         //function for getting cities based on state code
+        let cities;
         const getCities = (code) => {
             $.ajax({
                 type: 'GET',
                 url: `/api/data/cities/${code}`,
                 // data: JSON.stringify(values),
                 success: data => {
+                    cities = data;
                     data.forEach(item => {
                         $('#city').append(new Option(item.cityName, item.id));
                     });
@@ -521,6 +523,7 @@
         }
 
         // get available timeslots
+        let timeslots;
         const getTimeSlots = () => {
             let day = $('#day').val();
             let city = $('#city').val();
@@ -531,6 +534,7 @@
                     url: `/api/data/timeslots?day=${day}&city=${city}&channel=${channelId}`,
                     // data: JSON.stringify(values),
                     success: data => {
+                        timeslots = data;
                         data.forEach(item => {
                             let startTime = `${item.startTime}`.split(':');
                             let endTime = `${item.endTime}`.split(':');
@@ -573,20 +577,21 @@
             $.each($(this).serializeArray(), function (i, field) {
                 values[field.name] = field.value;
             });
-            console.log(values)
+
             $('#pageloader').css('display', 'block');
             $('#step3').hide();
             $('#submit').hide();
-            console.log(values)
+
+            authSuccess(values)
             // this endipont will create user and save booking details
-            $.ajax({
-                type: 'POST',
-                url: `/api/auth/create-user/${channelId}`,
-                data: JSON.stringify(values),
-                success: authSuccess,
-                error: authError,
-                contentType: "application/json"
-            });
+            // $.ajax({
+            //     type: 'POST',
+            //     url: `/api/auth/create-user/${channelId}`,
+            //     data: JSON.stringify(values),
+            //     success: () => authSuccess(values),
+            //     error: authError,
+            //     contentType: "application/json"
+            // });
 
         });
 
@@ -595,11 +600,35 @@
             $('#step3').show();
             $('#submit').show();
             alert('Account Created Successfully.');
-            if (currentChannel === 'community') window.location.replace("https://thankyou.yourprogramontv.com/communitystvnetwork-time-slot-claim");
-            else if (currentChannel === 'faith') window.location.replace("https://thankyou.yourprogramontv.com/faithstvnetwork-time-slot-claim");
-            else if (currentChannel === 'electedOfficials') window.location.replace("https://thankyou.yourprogramontv.com/electedofficialstvnetwork-time-slot-claim");
-            else if (currentChannel === 'public') window.location.replace("https://thankyou.yourprogramontv.com/publicstvnetwork-time-slot-claim");
-            else if (currentChannel === 'candidate') window.location.replace("https://thankyou.yourprogramontv.com/candidatestvnetwork-time-slot-claim");
+
+            let days = ["", "Monday", "Tuesday", "Wednesday", "Thursday", "Firday", "Saturday", "Sunday"]
+
+            let timeslot = timeslots.filter(item => item.id == data.timeslotId);
+            let startTime = `${timeslot[0].startTime}`.split(':');
+            let endTime = `${timeslot[0].endTime}`.split(':');
+            if (Number(startTime[0]) >= 12) {
+                if (startTime[0] != 12) startTime[0] = startTime[0] - 12
+                startTime = `${startTime[0]}:${startTime[1]}pm`
+            } else {
+                startTime = `${startTime[0]}:${startTime[1]}am`
+            }
+            if (Number(endTime[0]) > 11) {
+                if (endTime[0] != 12) endTime[0] = endTime[0] - 12
+                endTime = `${endTime[0]}:${endTime[1]}pm`
+            } else {
+                if (endTime[0] == '00') endTime[0] = '12'
+                endTime = `${endTime[0]}:${endTime[1]}am`
+            }
+
+            let city = cities.filter(item => item.id == data.cityId);
+            city = city[0];
+
+            if (currentChannel === 'community') window.location.replace(`https://thankyou.yourprogramontv.com/communitystvnetwork-time-slot-claim?First+Name=${data.firstName}&day=${days[data.dayId]}&time=${startTime + '-' + endTime}&program+name=${data.showName}&city=${city.cityName}&state=${city.stateName}&channel=<%=channel%>&email=${data.email}`);
+            else if (currentChannel === 'faith') window.location.replace(`https://thankyou.yourprogramontv.com/faithstvnetwork-time-slot-claim?First+Name=${data.firstName}&day=${days[data.dayId]}&time=${startTime + '-' + endTime}&program+name=${data.showName}&city=${city.cityName}&state=${city.stateName}&channel=<%=channel%>&email=${data.email}`);
+            else if (currentChannel === 'electedOfficials') window.location.replace(`https://thankyou.yourprogramontv.com/electedofficialstvnetwork-time-slot-claim?First+Name=${data.firstName}&day=${days[data.dayId]}&time=${startTime + '-' + endTime}&program+name=${data.showName}&city=${city.cityName}&state=${city.stateName}&channel=<%=channel%>&email=${data.email}`);
+            else if (currentChannel === 'public') window.location.replace(`https://thankyou.yourprogramontv.com/publicstvnetwork-time-slot-claim?First+Name=${data.firstName}&day=${days[data.dayId]}&time=${startTime + '-' + endTime}&program+name=${data.showName}&city=${city.cityName}&state=${city.stateName}&channel=<%=channel%>&email=${data.email}`);
+            else if (currentChannel === 'candidate') window.location.replace(`https://thankyou.yourprogramontv.com/candidatestvnetwork-time-slot-claim?First+Name=${data.firstName}&day=${days[data.dayId]}&time=${startTime + '-' + endTime}&program+name=${data.showName}&city=${city.cityName}&state=${city.stateName}&channel=<%=channel%>&email=${data.email}`);
+
             // else if (currentChannel === 'business') window.location.replace("http://stackoverflow.com");
             // else if (currentChannel === 'entertainment') window.location.replace("http://stackoverflow.com");
             // else if (currentChannel === 'news') window.location.replace("http://stackoverflow.com");
