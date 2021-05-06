@@ -49,19 +49,54 @@ module.exports = (sequelize, DataTypes) => {
 
     //saving customer info into respective channel tables eg: FaithChannel
     BookedSlot.saveCustomerInfo = async (data) => {
-        let query = `insert into "${data.channelName}Channel"(
+        let query = '';
+        if (data.channelName === 'Elected Officials') {
+            query = `insert into "ElectedChannel"(
+            "offcialTitle","officialFirstName","officialLastName",
+            "firstName", "lastName","email",
+            "assignChannel","state","city","day","timeslot",
+            "showName", "contactTitle","showDescription",
+            "addon", "slotExpansion", "Website", "phone"
+            )
+            values (
+                '${data.offcialTitle}','${data.officialFirstName}','${data.officialLastName}',
+                '${data.firstName}', '${data.lastName}', '${data.email}',
+                '${data.channelName}', '${data.stateName}',
+                '${data.cityName}', '${data.day}', '${data.timeslot}',
+                '${data.showName}', '${data.userName}', '${data.showDescription}',
+                '${data.addon}', '${data.slotExpansion}','${data.website}','${data.phoneNumber}'
+            )`;
+        } else if (data.channelName === 'Candidate') {
+            query = `insert into "CandidatesChannel"(
+                "candidateFirstName","candidateLastName",
+                "firstName", "lastName","email",
+                "assignChannel","state","city","day","timeslot",
+                "showName", "contactTitle","showDescription",
+                "addon", "slotExpansion", "Website", "phone"
+                )
+                values (
+                    '${data.candidateFirstName}','${data.candidateLastName}',
+                    '${data.firstName}', '${data.lastName}', '${data.email}',
+                    '${data.channelName}', '${data.stateName}',
+                    '${data.cityName}', '${data.day}', '${data.timeslot}',
+                    '${data.showName}', '${data.userName}', '${data.showDescription}',
+                    '${data.addon}', '${data.slotExpansion}','${data.website}','${data.phoneNumber}'
+                )`;
+        } else {
+            query = `insert into "${data.channelName}Channel"(
             "firstName", "lastName","email","organizationName",
             "assignChannel","state","city","day","timeslot",
             "showName", "contactTitle","showDescription",
             "addon", "slotExpansion", "Website", "phone"
-        )
-        values (
-            '${data.firstName}', '${data.lastName}', '${data.email}',
-            '${data.organizationName}', '${data.channelName}', '${data.stateName}',
-            '${data.cityName}', '${data.day}', '${data.timeslot}',
-            '${data.showName}', '${data.userName}', '${data.showDescription}',
-            '${data.addon}', '${data.slotExpansion}','${data.website}','${data.phoneNumber}'
-        )`;
+            )
+            values (
+                '${data.firstName}', '${data.lastName}', '${data.email}',
+                '${data.organizationName}', '${data.channelName}', '${data.stateName}',
+                '${data.cityName}', '${data.day}', '${data.timeslot}',
+                '${data.showName}', '${data.userName}', '${data.showDescription}',
+                '${data.addon}', '${data.slotExpansion}','${data.website}','${data.phoneNumber}'
+            )`;
+        }
 
         let customerInfo = await sequelize.query(query, { type: sequelize.QueryTypes.INSERT });
 

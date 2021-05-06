@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+
+</head>
+
+<style>
+    @import url(https://fonts.googleapis.com/css?family=Montserrat);
+
+    /*basic reset*/
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    html {
+        height: 100%;
+        /*Image only BG fallback*/
+
+        /*background = gradient + image pattern combo*/
+        background: linear-gradient(to right, #135BA8, #4d89c9, #135BA8);
+    }
+
+    body {
+        font-family: montserrat, arial, verdana;
+    }
+
+    .logo-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 30;
+        overflow: hidden;
+    }
+
+    .logo {
+        width: 100px;
+    }
+
+    /*form styles*/
+    #msform {
+        width: 400px;
+        margin: 20px auto;
+        text-align: center;
+        position: relative;
+    }
+
+    #msform fieldset {
+        background: white;
+        border: 0 none;
+        border-radius: 3px;
+        box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.4);
+        padding: 20px 30px;
+        box-sizing: border-box;
+        width: 80%;
+        margin: 0 10%;
+
+        /*stacking fieldsets above each other*/
+        position: relative;
+    }
+
+    /*Hide all except first fieldset*/
+    #msform fieldset:not(:first-of-type) {
+        display: none;
+    }
+
+    /*inputs*/
+    #msform input,
+    #msform textarea,
+    select {
+        outline: none;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        margin-bottom: 10px;
+        width: 100%;
+        box-sizing: border-box;
+        font-family: montserrat;
+        color: #2C3E50;
+        font-size: 13px;
+    }
+
+    /*buttons*/
+    #msform .action-button {
+        width: 100px;
+        background: #135BA8;
+        font-weight: bold;
+        color: white;
+        border: 0 none;
+        border-radius: 1px;
+        cursor: pointer;
+        padding: 10px 5px;
+        margin: 10px 5px;
+    }
+
+    #msform .action-button:hover,
+    #msform .action-button:focus {
+        box-shadow: 0 0 0 2px white, 0 0 0 3px #135BA8;
+    }
+
+    /*headings*/
+    .fs-title {
+        font-size: 15px;
+        text-transform: uppercase;
+        color: #2C3E50;
+        margin-bottom: 10px;
+    }
+
+    .fs-subtitle {
+        font-weight: normal;
+        font-size: 13px;
+        color: #666;
+        margin-bottom: 20px;
+    }
+
+    /*progressbar*/
+    #progressbar {
+        margin: 20px 0;
+        overflow: hidden;
+        /*CSS counters to number the steps*/
+        counter-reset: step;
+    }
+
+    #progressbar li {
+        list-style-type: none;
+        color: white;
+        text-transform: uppercase;
+        font-size: 9px;
+        width: 33.33%;
+        float: left;
+        position: relative;
+    }
+
+    #progressbar li:before {
+        content: counter(step);
+        counter-increment: step;
+        width: 20px;
+        line-height: 20px;
+        display: block;
+        font-size: 10px;
+        color: #333;
+        background: white;
+        border-radius: 3px;
+        margin: 0 auto 5px auto;
+    }
+
+    /*progressbar connectors*/
+    #progressbar li:after {
+        content: '';
+        width: 100%;
+        height: 2px;
+        background: white;
+        position: absolute;
+        left: -50%;
+        top: 9px;
+        z-index: -1;
+        /*put it behind the numbers*/
+    }
+
+    #progressbar li:first-child:after {
+        /*connector not needed before the first step*/
+        content: none;
+    }
+
+    /*marking active/completed steps green*/
+    /*The number of the step and the connector before it = green*/
+    #progressbar li.active:before,
+    #progressbar li.active:after {
+        background: #135BA8;
+        color: white;
+    }
+
+    input[type="text"]:focus {
+        border: 1px solid #135BA8;
+        box-shadow: 0 1px #f5f5f5 inset, 0 0 8px #5fa5f0;
+        outline: 0 none;
+    }
+
+    .checbox-container {
+        margin-top: 20px;
+        width: 95%;
+        display: grid;
+        grid-template-columns: 1fr 11fr;
+    }
+
+    .checkboxes {
+        display: flex;
+        /* align-items: center; */
+        vertical-align: text-bottom;
+        word-wrap: break-word;
+        font-size: 12px;
+        text-align: justify;
+        color: rgb(94, 94, 94);
+    }
+
+    input.checkboxes {
+        margin-right: 5px;
+    }
+
+    #pageloader {
+        display: none;
+        margin-top: 20px;
+    }
+</style>
+
+<body>
+    <!-- multistep form -->
+    <form id="msform">
+        <!-- logo -->
+        <div class="logo-container">
+            <img class="logo" src="/img/logo.png" alt="">
+        </div>
+        <!-- progressbar -->
+        <ul id="progressbar">
+            <li class="active">Contact Details</li>
+            <li>Select Timeslot</li>
+            <li>Program Details</li>
+        </ul>
+        <!-- fieldsets -->
+        <fieldset>
+            <h2 class="fs-title">Contact Details</h2>
+            <!-- <h3 class="fs-subtitle">All fields are required</h3> -->
+
+            <% if(channel==='Elected Officials' ) {%>
+                <input type="text" id="officialFirstName" name="officialFirstName" placeholder="Officials First Name"
+                    required />
+                <input type="text" id="officialLastName" name="officialLastName" placeholder="Officials Last Name"
+                    required />
+                <input type="text" id="offcialTitle" name="offcialTitle" placeholder="Elected Officials Title"
+                    required />
+                <% } else if(channel==="Candidate" ){%>
+                    <input type="text" id="candidateFirstName" name="candidateFirstName"
+                        placeholder="Candidates First Name" required />
+                    <input type="text" id="candidateLastName" name="candidateLastName"
+                        placeholder="Candidates Last Name" required />
+                    <% } else{%>
+                        <input type="text" id="organizationName" name="organizationName"
+                            placeholder="<%- channel !== 'Entertainment'?'Organization Name':'Org / Business / Individual Name' %>"
+                            required />
+                        <% }%>
+
+
+                            <input type="text" id="firstName" name="firstName" placeholder="Contact First Name"
+                                id="First Name" required />
+                            <input type="text" id="lastName" name="lastName" placeholder="Contact Last Name" required />
+                            <input type="text" id="contactTitle" name="contactTitle" placeholder="Contact Title"
+                                required />
+                            <input type="text" id="email" name="email" placeholder="Contact Email" required />
+                            <input type="text" id="phoneNumber" name="phoneNumber" placeholder="Phone Number"
+                                required />
+                            <input type="text" id="website" name="website" placeholder="Website" />
+                            <input type="button" id="step1" name="next" class="next action-button" value="Next" />
+        </fieldset>
+
+        <fieldset>
+            <h2 class="fs-title">Select Timeslot</h2>
+            <h3 class="fs-subtitle">All fields are required</h3>
+            <select id="states" name="state" title="Choose One" required>
+                <option selected="true" value="0">Select State</option>
+            </select>
+            <select id="city" name="cityId" title="Choose One" required>
+                <option selected="true" value="0">Select City</option>
+            </select>
+            <select id="day" name="dayId" title="Choose One" required>
+                <option selected="true" value="0">Select Day</option>
+            </select>
+            <select id="timeslot" name="timeslotId" title="Choose One" required>
+                <option selected="true" value="0">Select Timeslot</option>
+            </select>
+
+            <input type="button" name="previous" class="previous action-button" value="Previous" />
+            <input type="button" id="step2" name="next" class="next action-button" value="Next" />
+
+        </fieldset>
+
+        <fieldset>
+            <h2 class="fs-title">Program Details</h2>
+            <h3 class="fs-subtitle"></h3>
+            <input type="text" id=" showName" name="showName" placeholder="Program Name" required />
+            <textarea rows="5" maxlength="100" name="showDescription" id="showDescription"
+                placeholder="Description"></textarea>
+
+            <div class="checbox-container">
+                <input type="checkbox" id="addon" name="addon" value="yes" class="checkboxes" />
+                <label for="addon" class="checkboxes">
+                    I would like information on how to have advertising removed from my free time slot (This is
+                    recommended if you would like to place your own ads in your program or show)
+                </label>
+            </div>
+            <div class="checbox-container">
+                <input type="checkbox" id="slotExpansion" name="slotExpansion" value="yes" class="checkboxes" />
+                <label for="slotExpansion" class="checkboxes">
+                    I would like information on how to upgrade my free 28-minute time slot to a 60, 90, or
+                    120-minute slot.
+                </label>
+            </div>
+
+            <input type="button" id="step3" name="previous" class="previous action-button" value="Previous" />
+            <input type="submit" id="submit" name="submit" class="submit action-button" value="Submit" />
+            <div id="pageloader">
+                <img src="http://cdnjs.cloudflare.com/ajax/libs/semantic-ui/0.16.1/images/loader-large.gif"
+                    alt="processing..." />
+            </div>
+        </fieldset>
+    </form>
+
+    <script>
+
+        // enable/disable step1 button
+        $('#step1').attr('disabled', 'disabled');
+        $('#step2').attr('disabled', 'disabled');
+
+        if ('<%= channel %>' === "Elected Officials") {
+            $('#officialFirstName, #officialLastName, #offcialTitle, #firstName, #lastName, #contactTitle, #email, #phoneNumber, #website').on('input', function (e) {
+                let officialFirstName = $('#officialFirstName').val();
+                let officialLastName = $('#officialLastName').val();
+                let offcialTitle = $('#offcialTitle').val();
+                let firstName = $('#firstName').val();
+                let lastName = $('#lastName').val();
+                let contactTitle = $('#contactTitle').val();
+                let email = $('#email').val();
+                let phoneNumber = $('#phoneNumber').val();
+
+                if (officialFirstName && officialLastName && offcialTitle && firstName && lastName && contactTitle && email && phoneNumber) {
+                    $('#step1').removeAttr('disabled');
+                } else {
+                    $('#step1').attr('disabled', 'disabled');
+                }
+            });
+
+        } else if ('<%= channel %>' === "Candidate") {
+            $('#candidateFirstName, #candidateLastName, #firstName, #lastName, #contactTitle, #email, #phoneNumber, #website').on('input', function (e) {
+                let candidateFirstName = $('#candidateFirstName').val();
+                let candidateLastName = $('#candidateLastName').val();
+                let firstName = $('#firstName').val();
+                let lastName = $('#lastName').val();
+                let contactTitle = $('#contactTitle').val();
+                let email = $('#email').val();
+                let phoneNumber = $('#phoneNumber').val();
+
+                if (candidateFirstName && candidateLastName && firstName && lastName && contactTitle && email && phoneNumber) {
+                    $('#step1').removeAttr('disabled');
+                } else {
+                    $('#step1').attr('disabled', 'disabled');
+                }
+            });
+        } else {
+            $('organizationName, #firstName, #lastName, #contactTitle, #email, #phoneNumber, #website').on('input', function (e) {
+                let organizationName = $('#organizationName').val();
+                let firstName = $('#firstName').val();
+                let lastName = $('#lastName').val();
+                let contactTitle = $('#contactTitle').val();
+                let email = $('#email').val();
+                let phoneNumber = $('#phoneNumber').val();
+
+                if (organizationName && firstName && lastName && contactTitle && email && phoneNumber) {
+                    $('#step1').removeAttr('disabled');
+                } else {
+                    $('#step1').attr('disabled', 'disabled');
+                }
+            });
+        }
+
+        $('#states, #city, #day, #timeslot').on('change', function (e) {
+            let states = $('#states').val();
+            let city = $('#city').val();
+            let day = $('#day').val();
+            let timeslot = $('#timeslot').val();
+            if (states && city && day && timeslot) {
+                $('#step2').removeAttr('disabled');
+            } else {
+                $('#step2').attr('disabled', 'disabled');
+            }
+        });
+
+        let current_fs, next_fs, previous_fs; //fieldsets
+        let left, opacity, scale; //fieldset properties which we will animate
+        let animating; //flag to prevent quick multi-click glitches
+        $(".next").click(function () {
+            if (animating) return false;
+            animating = true;
+
+            current_fs = $(this).parent();
+            next_fs = $(this).parent().next();
+
+            //activate next step on progressbar using the index of next_fs
+            $("#progressbar li").eq($("fieldset").index(next_fs)).addClass("active");
+
+            //show the next fieldset
+            next_fs.show();
+            //hide the current fieldset with style
+            current_fs.animate({ opacity: 0 }, {
+                step: function (now, mx) {
+                    //as the opacity of current_fs reduces to 0 - stored in "now"
+                    //1. scale current_fs down to 80%
+                    scale = 1 - (1 - now) * 0.2;
+                    //2. bring next_fs from the right(50%)
+                    left = (now * 50) + "%";
+                    //3. increase opacity of next_fs to 1 as it moves in
+                    opacity = 1 - now;
+                    current_fs.css({
+                        'transform': 'scale(' + scale + ')',
+                        'position': 'absolute'
+                    });
+                    next_fs.css({ 'left': left, 'opacity': opacity });
+                },
+                duration: 800,
+                complete: function () {
+                    current_fs.hide();
+                    animating = false;
+                },
+                //this comes from the custom easing plugin
+                easing: 'easeInOutBack'
+            });
+        });
+
+        $(".previous").click(function () {
+            if (animating) return false;
+            animating = true;
+
+            current_fs = $(this).parent();
+            previous_fs = $(this).parent().prev();
+
+            //de-activate current step on progressbar
+            $("#progressbar li").eq($("fieldset").index(current_fs)).removeClass("active");
+
+            //show the previous fieldset
+            previous_fs.show();
+            //hide the current fieldset with style
+            current_fs.animate({ opacity: 0 }, {
+                step: function (now, mx) {
+                    //as the opacity of current_fs reduces to 0 - stored in "now"
+                    //1. scale previous_fs from 80% to 100%
+                    scale = 0.8 + (1 - now) * 0.2;
+                    //2. take current_fs to the right(50%) - from 0%
+                    left = ((1 - now) * 50) + "%";
+                    //3. increase opacity of previous_fs to 1 as it moves in
+                    opacity = 1 - now;
+                    current_fs.css({ 'left': left });
+                    previous_fs.css({ 'transform': 'scale(' + scale + ')', 'opacity': opacity });
+                },
+                duration: 800,
+                complete: function () {
+                    current_fs.hide();
+                    animating = false;
+                },
+                //this comes from the custom easing plugin
+                easing: 'easeInOutBack'
+            });
+        });
+        // animation of forms end
+
+        let allChannels = { community: 1, faith: 2, electedOfficials: 3, public: 4, candidate: 5, business: 6, entertainment: 7, news: 8, sports: 9 };
+        let currentChannel = window.location.href.split('/');
+        currentChannel = currentChannel[currentChannel.length - 1];
+        let channelId = allChannels[currentChannel];
+
+        const getStates = () => {
+            $.ajax({
+                type: 'GET',
+                url: '/api/data/initial-data',
+                // data: JSON.stringify(values),
+                success: setDaysAndStates,
+                error: () => {
+                    alert('Something went wrong!');
+                },
+                contentType: "application/json"
+            });
+        }
+
+        const setDaysAndStates = (data) => {
+            let { days, states } = data;
+            days.forEach(item => {
+                $('#day').append(new Option(item.day, item.id));
+            });
+            states.forEach(item => {
+                $('#states').append(new Option(item.state, item.code));
+            });
+        }
+
+        // function will be called on document load 
+        getStates();
+
+        $('#states').on('change', function () {
+            $('#day').val('');
+            $('#timeslot').empty();
+            $('#city').empty();
+            getCities(this.value);
+        });
+        $('#city').on('change', function () {
+            getTimeSlots();
+        });
+        $('#day').on('change', function () {
+            getTimeSlots();
+        });
+
+        //function for getting cities based on state code
+        const getCities = (code) => {
+            $.ajax({
+                type: 'GET',
+                url: `/api/data/cities/${code}`,
+                // data: JSON.stringify(values),
+                success: data => {
+                    data.forEach(item => {
+                        $('#city').append(new Option(item.cityName, item.id));
+                    });
+                },
+                error: () => {
+                    alert('Something went wrong!');
+                },
+                contentType: "application/json"
+            });
+        }
+
+        // get available timeslots
+        const getTimeSlots = () => {
+            let day = $('#day').val();
+            let city = $('#city').val();
+            if (day && city) {
+                $('#timeslot').empty();
+                $.ajax({
+                    type: 'GET',
+                    url: `/api/data/timeslots?day=${day}&city=${city}&channel=${channelId}`,
+                    // data: JSON.stringify(values),
+                    success: data => {
+                        data.forEach(item => {
+                            let startTime = `${item.startTime}`.split(':');
+                            let endTime = `${item.endTime}`.split(':');
+
+                            //below if else conditions are for making timeslots in 12hrs format
+
+                            if (Number(startTime[0]) >= 12) {
+                                if (startTime[0] != 12) startTime[0] = startTime[0] - 12
+                                startTime = `${startTime[0]}:${startTime[1]}pm`
+                            } else {
+                                startTime = `${startTime[0]}:${startTime[1]}am`
+                            }
+
+                            if (Number(endTime[0]) > 11) {
+                                if (endTime[0] != 12) endTime[0] = endTime[0] - 12
+
+                                endTime = `${endTime[0]}:${endTime[1]}pm`
+
+                            } else {
+                                if (endTime[0] == '00') endTime[0] = '12'
+                                endTime = `${endTime[0]}:${endTime[1]}am`
+                            }
+
+                            $('#timeslot').append(new Option(`${startTime} - ${endTime}`, item.id));
+                        });
+                    },
+                    error: () => {
+                        alert('Something went wrong!');
+                    },
+                    // contentType: "application/json"
+                });
+            }
+        }
+
+
+        $("#msform").submit(function (e) {
+            e.preventDefault();
+
+            let values = {};
+            $.each($(this).serializeArray(), function (i, field) {
+                values[field.name] = field.value;
+            });
+            console.log(values)
+            $('#pageloader').css('display', 'block');
+            $('#step3').hide();
+            $('#submit').hide();
+            console.log(values)
+            // this endipont will create user and save booking details
+            $.ajax({
+                type: 'POST',
+                url: `/api/auth/create-user/${channelId}`,
+                data: JSON.stringify(values),
+                success: authSuccess,
+                error: authError,
+                contentType: "application/json"
+            });
+
+        });
+
+        const authSuccess = (data) => {
+            $('#pageloader').hide();
+            $('#step3').show();
+            $('#submit').show();
+            alert('Account Created Successfully.');
+            if (currentChannel === 'community') window.location.replace("https://thankyou.yourprogramontv.com/communitystvnetwork-time-slot-claim");
+            else if (currentChannel === 'faith') window.location.replace("https://thankyou.yourprogramontv.com/faithstvnetwork-time-slot-claim");
+            else if (currentChannel === 'electedOfficials') window.location.replace("https://thankyou.yourprogramontv.com/electedofficialstvnetwork-time-slot-claim");
+            else if (currentChannel === 'public') window.location.replace("https://thankyou.yourprogramontv.com/publicstvnetwork-time-slot-claim");
+            else if (currentChannel === 'candidate') window.location.replace("https://thankyou.yourprogramontv.com/candidatestvnetwork-time-slot-claim");
+            // else if (currentChannel === 'business') window.location.replace("http://stackoverflow.com");
+            // else if (currentChannel === 'entertainment') window.location.replace("http://stackoverflow.com");
+            // else if (currentChannel === 'news') window.location.replace("http://stackoverflow.com");
+            // else if (currentChannel === 'sports') window.location.replace("http://stackoverflow.com");
+        }
+
+        const authError = (error) => {
+            $('#pageloader').hide();
+            $('#step3').show();
+            $('#submit').show();
+            alert(error.responseJSON?.message);
+        }
+
+    </script>
+
+</body>
+
+</html>

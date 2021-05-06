@@ -3,19 +3,15 @@ const db = require('../models');
 exports.createUser = async (req, res) => {
     try {
         let {
-            firstName,
-            lastName,
-            email,
-            cityId,
-            dayId,
-            timeslotId,
-            showName,
-            showDescription,
-            addon,
-            slotExpansion,
-            organizationName,
-            website,
-            phoneNumber,
+            firstName, lastName,
+            email, cityId,
+            dayId, timeslotId, showName,
+            showDescription, addon,
+            slotExpansion, organizationName,
+            website, phoneNumber,
+            offcialTitle, officialFirstName,
+            officialLastName, candidateFirstName,
+            candidateLastName
         } = req.body;
         let { channelId } = req.params;
 
@@ -27,30 +23,48 @@ exports.createUser = async (req, res) => {
 
         let user = await db.User.createUser({ firstName, lastName, email });
 
-        // //Saving user booking 
+        //Saving user booking 
         let booking = await db.BookedSlot.saveBooking({ channelId, cityId, dayId, timeslotId, userId: user.id });
 
         let bookingDetails = await db.BookedSlot.getBookingDetails(booking.id);
 
-        // //spliting name into first and last name
+        //spliting name into first and last name
         let userName = bookingDetails.userName.split(' ');
         bookingDetails.firstName = userName[0];
         bookingDetails.lastName = userName[1];
-        bookingDetails.timeslot = `${bookingDetails.startTime} - ${bookingDetails.endTime}`;
+
+        let startTime = `${bookingDetails.startTime}`.split(':');
+        let endTime = `${bookingDetails.endTime}`.split(':');
+        //below if else conditions are for making timeslots in 12hrs format
+        if (Number(startTime[0]) >= 12) {
+            if (startTime[0] != 12) startTime[0] = startTime[0] - 12
+            startTime = `${startTime[0]}:${startTime[1]}pm`
+        } else {
+            startTime = `${startTime[0]}:${startTime[1]}am`
+        }
+        if (Number(endTime[0]) > 11) {
+            if (endTime[0] != 12) endTime[0] = endTime[0] - 12
+            endTime = `${endTime[0]}:${endTime[1]}pm`
+        } else {
+            if (endTime[0] == '00') endTime[0] = '12'
+            endTime = `${endTime[0]}:${endTime[1]}am`
+        }
+
+        bookingDetails.timeslot = `${startTime} - ${endTime}`;
 
         await db.BookedSlot.saveCustomerInfo({
             ...bookingDetails,
-            showName,
-            showDescription,
-            organizationName,
-            email,
+            showName, showDescription,
+            organizationName, email,
             addon: addon ? addon : 'no',
             slotExpansion: slotExpansion ? slotExpansion : 'no',
-            website,
-            phoneNumber
+            website, phoneNumber,
+            offcialTitle, officialFirstName,
+            officialLastName, candidateFirstName,
+            candidateLastName
         });
 
-        return res.json('working');
+        return res.json('successful');
 
     } catch (error) {
         console.log(error);

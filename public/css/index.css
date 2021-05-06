@@ -31,6 +31,10 @@ body {
     align-items: center;
 }
 
+.logo {
+    width: 100px;
+}
+
 .heading {
     display: flex;
     align-items: center;
@@ -38,9 +42,6 @@ body {
     flex-direction: column;
 }
 
-.logo {
-    width: 100px;
-}
 
 .form-container {
     background-color: #fff;
@@ -75,7 +76,7 @@ input, label {
 
 .user-details {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     /* flex-wrap: wrap;
     justify-content: space-between; */
 }

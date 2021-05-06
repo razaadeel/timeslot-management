@@ -116,7 +116,7 @@ $(function () {
         });
 
 
-        $('#pageloader').css('display', 'flex');;
+        $('#pageloader').css('display', 'flex');
         $('.btn').hide();
 
         //this endipont will create user and save booking details
