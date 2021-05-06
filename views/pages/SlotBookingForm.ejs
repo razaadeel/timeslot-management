@@ -582,16 +582,15 @@
             $('#step3').hide();
             $('#submit').hide();
 
-            authSuccess(values)
             // this endipont will create user and save booking details
-            // $.ajax({
-            //     type: 'POST',
-            //     url: `/api/auth/create-user/${channelId}`,
-            //     data: JSON.stringify(values),
-            //     success: () => authSuccess(values),
-            //     error: authError,
-            //     contentType: "application/json"
-            // });
+            $.ajax({
+                type: 'POST',
+                url: `/api/auth/create-user/${channelId}`,
+                data: JSON.stringify(values),
+                success: () => authSuccess(values),
+                error: authError,
+                contentType: "application/json"
+            });
 
         });
 
