@@ -11,5 +11,6 @@ module.exports = {
     "accessKeyId": process.env.ACCESS_KEY_ID,
     "secretAccessKey": process.env.SECRET_ACCESS_KEY
   },
-  "qencodeApiKey": process.env.QENCODE_API_KEY
+  "qencodeApiKey": process.env.QENCODE_API_KEY,
+  "chargifyAPIKey": process.env.CHARGIFY_API_KEY
 }
