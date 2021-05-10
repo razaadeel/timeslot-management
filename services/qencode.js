@@ -3,12 +3,12 @@ const QencodeApiClient = require('qencode-api');
 const env = process.env.NODE_ENV || 'development';
 
 const config = env === 'development' ?
-    require(__dirname + '/../config/configDev.js')[env] //import in dev 
-    : require(__dirname + '/../config/config.js')[env]; // import in prod
+    require(__dirname + '/../config/configDev.js')//import in dev 
+    : require(__dirname + '/../config/config.js'); // import in prod
 
 const qencode = new QencodeApiClient(config.qencodeApiKey);
 
-module.exports = transocde = (videoUrl, destination) => {
+module.exports = transcode = async (videoUrl, destination, userId) => {
     try {
         let transcodingParams = {
             format: [
@@ -18,7 +18,7 @@ module.exports = transocde = (videoUrl, destination) => {
                     height: "720",
                     audio_bitrate: 128,
                     destination: {
-                        url: `s3://s3.us-east-1.amazonaws.com/${destination}/video.mp4`,
+                        url: `s3://s3.us-east-1.amazonaws.com/${destination}/program-${userId}-28-a-[adins].mp4`,
                         key: config.aws.accessKeyId,
                         secret: config.aws.secretAccessKey,
                         permissions: "public-read"
@@ -39,9 +39,20 @@ module.exports = transocde = (videoUrl, destination) => {
         }
 
         let task = qencode.CreateTask();
-        task.StartCustom(transcodingParams);
-        console.log("Status URL: ", task.statusUrl);
-
+        let i = 0;
+        while (true) {
+            if (i < 2) {
+                let transcode = await task.StartCustom(transcodingParams);
+                i++;
+                if (transcode.error == 0) {
+                    console.log('video upload successfull')
+                    break;
+                }
+            }
+            else {
+                break;
+            }
+        }
     } catch (error) {
         console.log(error);
     }

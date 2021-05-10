@@ -1,4 +1,5 @@
 const db = require('../models');
+const chargify = require('../services/chargify');
 
 exports.createUser = async (req, res) => {
     try {

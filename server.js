@@ -6,12 +6,15 @@ app.use(express.json());
 
 //Database 
 const db = require('./models');
-// db.authenticate()
-//     .then(() => console.log('database connected...'))
-//     .catch(err => console.log("database error:", err));
-db.sequelize.sync()
+// // connnect database
+db.sequelize.authenticate()
     .then(() => console.log('database connected...'))
     .catch(err => console.log("database error:", err));
+
+// //connect and sync database in realtime
+// db.sequelize.sync()
+//     .then(() => console.log('database connected...'))
+//     .catch(err => console.log("database error:", err));
 
 //Set view engine to ejs
 app.set('view engine', 'ejs');

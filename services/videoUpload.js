@@ -6,8 +6,8 @@ const path = require('path');
 const env = process.env.NODE_ENV || 'development';
 
 const config = env === 'development' ?
-    require(__dirname + '/../config/configDev.js')[env].aws //import in dev 
-    : require(__dirname + '/../config/config.js')[env].aws; // imp in production
+    require(__dirname + '/../config/configDev.js').aws //import in dev 
+    : require(__dirname + '/../config/config.js').aws; // imp in production
 
 //initializing s3 bucket
 const s3 = new aws.S3({

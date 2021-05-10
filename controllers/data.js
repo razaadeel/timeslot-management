@@ -1,4 +1,5 @@
 const db = require('../models');
+const chargify = require('../services/chargify');
 
 // sending intial data i.e states and days
 exports.daysAndStates = async (req, res) => {
@@ -34,6 +35,19 @@ exports.getAvailableTimeslots = async (req, res) => {
         // getAvailableSlots func created in Timeslot model
         const timeslots = await db.Timeslot.getAvailableSlots(day, city, channel);
         return res.json(timeslots);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Something went wrong"
+        });
+    }
+}
+
+exports.getChargifyUser = async (req, res) => {
+    try {
+        let { customerId } = req.query
+        let user = await chargify.getCustomer(customerId);
+        res.json(user);
     } catch (error) {
         console.log(error);
         return res.status(500).json({

@@ -314,6 +314,31 @@
 
     <script>
 
+        // success function for chargify user api
+        const setChargifyUserValues = (data) => {
+            $('#firstName').val(data.first_name);
+            $('#lastName').val(data.last_name);
+            $('#email').val(data.email);
+            $('#phoneNumber').val(data.phone);
+            $('#organizationName').val(data.organization);
+        }
+
+        //checking for params (if coming from chargify form)
+        let url_string = window.location.href;
+        let url = new URL(url_string);
+        let customerId = url.searchParams.get("customer_id");
+        if (customerId) {
+            $.ajax({
+                type: 'GET',
+                url: `/api/data/chargify-user?customerId=${customerId}`,
+                success: setChargifyUserValues,
+                error: () => {
+                    alert('Something went wrong!');
+                },
+                contentType: "application/json"
+            });
+        }
+
         // enable/disable step1 button
         $('#step1').attr('disabled', 'disabled');
         $('#step2').attr('disabled', 'disabled');
@@ -360,7 +385,7 @@
                 let contactTitle = $('#contactTitle').val();
                 let email = $('#email').val();
                 let phoneNumber = $('#phoneNumber').val();
-
+                console.log(firstName)
                 if (organizationName && firstName && lastName && contactTitle && email && phoneNumber) {
                     $('#step1').removeAttr('disabled');
                 } else {

@@ -24,7 +24,7 @@ exports.uploadVideo = async (req, res) => {
                 let userId = req.body.userId;
 
                 let userBooking = await db.BookedSlot.getBookingByUserId(userId);
-                
+
                 let day = userBooking.day.slice(0, 3); //Reducing day to 3 letters i.e Monday to Mon
 
                 let slotTime = `${userBooking.startTime}`.split(':');
@@ -36,7 +36,7 @@ exports.uploadVideo = async (req, res) => {
                 res.json({ videoName });
 
                 //sending file for transcoding
-                transocde(videoLocation, destination);
+                transcode(videoLocation, destination, userId);
                 return true;
             }
         }
