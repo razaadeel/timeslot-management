@@ -7,7 +7,7 @@ const config = env === 'development' ?
 
 exports.getCustomer = async (customerId) => {
     try {
-        let res = await axios.get('https://streaming-television-inc.chargify.com/customers/43830776.json', {
+        let res = await axios.get(`https://streaming-television-inc.chargify.com/customers/${customerId}.json`, {
             auth: {
                 username: config.chargifyAPIKey,
                 password: ''
