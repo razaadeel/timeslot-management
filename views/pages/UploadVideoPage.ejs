@@ -16,6 +16,7 @@
 
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
@@ -29,9 +30,7 @@
     }
 
     body {
-        background: #00B4DB;
-        background: -webkit-linear-gradient(to right, #0083B0, #00B4DB);
-        background: linear-gradient(to right, #0083B0, #00B4DB);
+        background: linear-gradient(to right, #135BA8, #4d89c9, #135BA8);
         height: 100vh;
     }
 
@@ -55,11 +54,113 @@
     .progress-loading {
         display: none;
     }
+
+    /* modal css start */
+    .modal-confirm {
+        color: #434e65;
+        width: 525px;
+    }
+
+    .modal-confirm .modal-content {
+        padding: 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: none;
+    }
+
+    .modal-confirm .error-modal-header {
+        background: #e85e6c;
+        border-bottom: none;
+        position: relative;
+        text-align: center;
+        margin: -20px -20px 0;
+        border-radius: 5px 5px 0 0;
+        padding: 35px;
+    }
+
+    .modal-confirm .success-modal-header {
+        background: #47c9a2;
+        border-bottom: none;
+        position: relative;
+        text-align: center;
+        margin: -20px -20px 0;
+        border-radius: 5px 5px 0 0;
+        padding: 35px;
+    }
+
+    .modal-confirm h4 {
+        text-align: center;
+        font-size: 36px;
+        margin: 10px 0;
+    }
+
+    .modal-confirm .form-control,
+    .modal-confirm .btn {
+        min-height: 40px;
+        border-radius: 3px;
+    }
+
+    .modal-confirm .close {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        color: #fff;
+        text-shadow: none;
+        opacity: 0.5;
+    }
+
+    .modal-confirm .close:hover {
+        opacity: 0.8;
+    }
+
+    .modal-confirm .icon-box {
+        color: #fff;
+        width: 95px;
+        height: 95px;
+        display: inline-block;
+        border-radius: 50%;
+        z-index: 9;
+        border: 5px solid #fff;
+        padding: 15px;
+        text-align: center;
+    }
+
+    .modal-confirm .icon-box i {
+        font-size: 58px;
+        margin: -2px 0 0 -2px;
+    }
+
+    .modal-confirm.modal-dialog {
+        margin-top: 80px;
+    }
+
+    .modal-confirm .btn,
+    .modal-confirm .btn:active {
+        color: #fff;
+        border-radius: 4px;
+        background: #eeb711 !important;
+        text-decoration: none;
+        transition: all 0.4s;
+        line-height: normal;
+        border-radius: 30px;
+        margin-top: 10px;
+        padding: 6px 20px;
+        min-width: 150px;
+        border: none;
+    }
+
+    .modal-confirm .btn:hover,
+    .modal-confirm .btn:focus {
+        background: #eda645 !important;
+        outline: none;
+    }
+
+    /* modal css end */
 </style>
 
 <body>
     <div class="container p-5">
-        <div class="row mb-5 text-center text-white">
+        <!-- <div class="row mb-5 text-center text-white">
             <div class="col-lg-10 mx-auto">
                 <h1 class="display-4">Welcome <%= user.name %>
                 </h1>
@@ -67,12 +168,12 @@
                     <%= user.email %>
                 </p>
             </div>
-        </div>
+        </div> -->
         <div class="row">
             <div class="col-lg-5 mx-auto">
-                <div class="p-5 bg-white shadow rounded-lg"><img
-                        src="https://pp.netclipart.com/pp/s/251-2515071_upload-button-clipart-circle-upload-button.png" alt="" width="200"
-                        class="d-block mx-auto mb-4 rounded-pill">
+                <div class="p-5 bg-white shadow rounded-lg">
+                    <img src="https://pp.netclipart.com/pp/s/251-2515071_upload-button-clipart-circle-upload-button.png"
+                        alt="" width="100" class="d-block mx-auto mb-4 rounded-pill">
 
                     <!-- Default bootstrap file upload-->
 
@@ -111,13 +212,52 @@
         </div>
     </div>
 
+
+    <!--Error Modal HTML -->
+    <div id="errorModal" class="modal fade">
+        <div class="modal-dialog modal-confirm">
+            <div class="modal-content">
+                <div class="error-modal-header justify-content-center">
+                    <div class="icon-box">
+                        <i class="material-icons">&#xE5CD;</i>
+                    </div>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body text-center">
+                    <h4>Ooops!</h4>
+                    <p>Something went wrong.</p>
+                    <button class="btn btn-success" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal HTML -->
+    <div id="successModal" class="modal fade">
+        <div class="modal-dialog modal-confirm">
+            <div class="modal-content">
+                <div class="success-modal-header justify-content-center">
+                    <div class="icon-box">
+                        <i class="material-icons">&#xE876;</i>
+                    </div>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body text-center">
+                    <h4>Great!</h4>
+                    <p>Video uploaded successfully.</p>
+                    <button class="btn btn-success" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         $('#customFile').change(function (e) {
             var fileName = e.target.files[0].name;
             $('#fileName').text(fileName);
         });
 
-        $('button').on('click', () => {
+        $('#upload-btn').on('click', () => {
 
             let userId = `<%= user.id %>`
             let video = $("#customFile")[0].files[0];
@@ -152,7 +292,6 @@
                     return xhr;
                 },
                 success: data => {
-                    alert('Video Uploaded Successfully');
 
                     $("#customFile").val(null);
                     $('#fileName').text('');
@@ -160,6 +299,8 @@
                     $('#loading-btn').hide();
                     $('.progress-loading').hide();
                     $('#upload-btn').show();
+                    $('#successModal').modal('show');
+                    // alert('Video Uploaded Successfully');
                     // window.location.replace('https://timeslot.citystvnetwork.com/dashboard');
                 },
                 error: (e) => {
@@ -168,9 +309,10 @@
                     $('#loading-btn').hide();
                     $('.progress-loading').hide();
                     $('#upload-btn').show();
-                    alert('Something went wrong while upload video');
+                    // alert('Something went wrong while upload video');
+                    $('#errorModal').modal('show');
                 },
-            })
+            });
         });
 
     </script>
