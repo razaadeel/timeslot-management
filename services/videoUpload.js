@@ -20,7 +20,7 @@ const s3 = new aws.S3({
 // uploading temprory video before transcoding 
 function checkFileType(file, cb) {
     // Allowed ext
-    const filetypes = /mp4|webm/;
+    const filetypes = /mp4|webm|mov|m4v|webm|ogv/;
     // Check ext
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
     // Check mime

@@ -230,33 +230,35 @@
             <!-- <h3 class="fs-subtitle">All fields are required</h3> -->
 
             <% if(channel==='Elected Officials' ) {%>
-                <input type="text" id="officialFirstName" name="officialFirstName" placeholder="Officials First Name"
-                    required />
-                <input type="text" id="officialLastName" name="officialLastName" placeholder="Officials Last Name"
-                    required />
-                <input type="text" id="offcialTitle" name="offcialTitle" placeholder="Elected Officials Title"
-                    required />
+                <input type="text" id="officialFirstName" name="officialFirstName"
+                    placeholder="Officials First Name (required)" required />
+                <input type="text" id="officialLastName" name="officialLastName"
+                    placeholder="Officials Last Name (required)" required />
+                <input type="text" id="offcialTitle" name="offcialTitle"
+                    placeholder="Elected Officials Title (required)" required />
                 <% } else if(channel==="Candidate" ){%>
                     <input type="text" id="candidateFirstName" name="candidateFirstName"
-                        placeholder="Candidates First Name" required />
+                        placeholder="Candidates First Name (required)" required />
                     <input type="text" id="candidateLastName" name="candidateLastName"
-                        placeholder="Candidates Last Name" required />
+                        placeholder="Candidates Last Name (required)" required />
                     <% } else{%>
                         <input type="text" id="organizationName" name="organizationName"
-                            placeholder="<%- channel !== 'Entertainment'?'Organization Name':'Org / Business / Individual Name' %>"
+                            placeholder="<%- channel !== 'Entertainment'?'Organization Name (required)':'Org / Business / Individual Name (required)' %>"
                             required />
                         <% }%>
 
 
-                            <input type="text" id="firstName" name="firstName" placeholder="Contact First Name"
-                                id="First Name" required />
-                            <input type="text" id="lastName" name="lastName" placeholder="Contact Last Name" required />
-                            <input type="text" id="contactTitle" name="contactTitle" placeholder="Contact Title"
+                            <input type="text" id="firstName" name="firstName"
+                                placeholder="Contact First Name (required)" id="First Name" required />
+                            <input type="text" id="lastName" name="lastName" placeholder="Contact Last Name (required)"
                                 required />
-                            <input type="text" id="email" name="email" placeholder="Contact Email" required />
-                            <input type="text" id="phoneNumber" name="phoneNumber" placeholder="Phone Number"
+                            <input type="text" id="contactTitle" name="contactTitle"
+                                placeholder="Contact Title (optional)" required />
+                            <input type="text" id="email" name="email" placeholder="Contact Email (required)"
                                 required />
-                            <input type="text" id="website" name="website" placeholder="Website" />
+                            <input type="text" id="phoneNumber" name="phoneNumber" placeholder="Phone Number (required)"
+                                required />
+                            <input type="text" id="website" name="website" placeholder="Website (optional)" />
                             <input type="button" id="step1" name="next" class="next action-button" value="Next" />
         </fieldset>
 
@@ -284,9 +286,9 @@
         <fieldset>
             <h2 class="fs-title">Program Details</h2>
             <h3 class="fs-subtitle"></h3>
-            <input type="text" id=" showName" name="showName" placeholder="Program Name" required />
+            <input type="text" id=" showName" name="showName" placeholder="Program Name (required)" required />
             <textarea rows="5" maxlength="100" name="showDescription" id="showDescription"
-                placeholder="Description"></textarea>
+                placeholder="Description (required)"></textarea>
 
             <div class="checbox-container">
                 <input type="checkbox" id="addon" name="addon" value="yes" class="checkboxes" />
@@ -344,7 +346,7 @@
         $('#step2').attr('disabled', 'disabled');
 
         if ('<%= channel %>' === "Elected Officials") {
-            $('#officialFirstName, #officialLastName, #offcialTitle, #firstName, #lastName, #contactTitle, #email, #phoneNumber, #website').on('input', function (e) {
+            $('#officialFirstName, #officialLastName, #offcialTitle, #firstName, #lastName, #email, #phoneNumber, #website').on('input', function (e) {
                 let officialFirstName = $('#officialFirstName').val();
                 let officialLastName = $('#officialLastName').val();
                 let offcialTitle = $('#offcialTitle').val();
@@ -354,7 +356,7 @@
                 let email = $('#email').val();
                 let phoneNumber = $('#phoneNumber').val();
 
-                if (officialFirstName && officialLastName && offcialTitle && firstName && lastName && contactTitle && email && phoneNumber) {
+                if (officialFirstName && officialLastName && offcialTitle && firstName && lastName && email && phoneNumber) {
                     $('#step1').removeAttr('disabled');
                 } else {
                     $('#step1').attr('disabled', 'disabled');
@@ -371,7 +373,7 @@
                 let email = $('#email').val();
                 let phoneNumber = $('#phoneNumber').val();
 
-                if (candidateFirstName && candidateLastName && firstName && lastName && contactTitle && email && phoneNumber) {
+                if (candidateFirstName && candidateLastName && firstName && lastName && email && phoneNumber) {
                     $('#step1').removeAttr('disabled');
                 } else {
                     $('#step1').attr('disabled', 'disabled');
@@ -386,7 +388,7 @@
                 let email = $('#email').val();
                 let phoneNumber = $('#phoneNumber').val();
                 console.log(firstName)
-                if (organizationName && firstName && lastName && contactTitle && email && phoneNumber) {
+                if (organizationName && firstName && lastName && email && phoneNumber) {
                     $('#step1').removeAttr('disabled');
                 } else {
                     $('#step1').attr('disabled', 'disabled');
