@@ -20,11 +20,13 @@ const s3 = new aws.S3({
 // uploading temprory video before transcoding 
 function checkFileType(file, cb) {
     // Allowed ext
-    const filetypes = /mp4|webm|mov|m4v|webm|ogv/;
+    const filetypes = /mp4|webm|mov|webm|ogv|flv|m4v/;
     // Check ext
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
     // Check mime
-    const mimetype = filetypes.test(file.mimetype); if (mimetype && extname) {
+    const mimetype = filetypes.test(file.mimetype); //it is giving false for mov file types
+    // console.log(extname, mimetype)
+    if (extname) {
         return cb(null, true);
     } else {
         cb('Error: videos Only!');

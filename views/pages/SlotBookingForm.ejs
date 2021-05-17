@@ -229,7 +229,7 @@
             <h2 class="fs-title">Contact Details</h2>
             <!-- <h3 class="fs-subtitle">All fields are required</h3> -->
 
-            <% if(channel==='Elected Officials' ) {%>
+            <% if(channel==='electedOfficials' ) {%>
                 <input type="text" id="officialFirstName" name="officialFirstName"
                     placeholder="Officials First Name (required)" required />
                 <input type="text" id="officialLastName" name="officialLastName"
@@ -253,7 +253,7 @@
                             <input type="text" id="lastName" name="lastName" placeholder="Contact Last Name (required)"
                                 required />
                             <input type="text" id="contactTitle" name="contactTitle"
-                                placeholder="Contact Title (optional)" required />
+                                placeholder="Contact Title (optional)" />
                             <input type="text" id="email" name="email" placeholder="Contact Email (required)"
                                 required />
                             <input type="text" id="phoneNumber" name="phoneNumber" placeholder="Phone Number (required)"
@@ -345,7 +345,7 @@
         $('#step1').attr('disabled', 'disabled');
         $('#step2').attr('disabled', 'disabled');
 
-        if ('<%= channel %>' === "Elected Officials") {
+        if ('<%= channel %>' === "electedOfficials") {
             $('#officialFirstName, #officialLastName, #offcialTitle, #firstName, #lastName, #email, #phoneNumber, #website').on('input', function (e) {
                 let officialFirstName = $('#officialFirstName').val();
                 let officialLastName = $('#officialLastName').val();
@@ -485,11 +485,14 @@
         });
         // animation of forms end
 
-        let allChannels = { community: 1, faith: 2, electedOfficials: 3, public: 4, candidate: 5, business: 6, entertainment: 7, news: 8, sports: 9 };
+        let allChannels = { Community: 1, Faith: 2, electedOfficials: 3, Public: 4, Candidate: 5, Business: 6, Entertainment: 7, News: 8, Sports: 9 };
         // let currentChannel = window.location.href.split('/');
         // currentChannel = currentChannel[currentChannel.length - 1];
-        let currentChannel = '<%= channel %>'.toLowerCase();
+        let currentChannel = '<%= channel %>';
         let channelId = allChannels[currentChannel];
+        console.log(allChannels);
+        console.log(currentChannel);
+        console.log(channelId);
 
         const getStates = () => {
             $.ajax({
