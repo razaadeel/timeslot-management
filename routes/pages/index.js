@@ -10,7 +10,7 @@ router.get('/faith', (req, res) => {
     res.render('pages/SlotBookingForm', { channel: 'Faith' });
 });
 router.get('/electedOfficials', (req, res) => {
-    res.render('pages/SlotBookingForm', { channel: 'electedOfficials' });
+    res.render('pages/SlotBookingForm', { channel: 'ElectedOfficials' });
 });
 router.get('/public', (req, res) => {
     res.render('pages/SlotBookingForm', { channel: 'Public' });

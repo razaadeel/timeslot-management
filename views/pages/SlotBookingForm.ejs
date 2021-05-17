@@ -229,7 +229,7 @@
             <h2 class="fs-title">Contact Details</h2>
             <!-- <h3 class="fs-subtitle">All fields are required</h3> -->
 
-            <% if(channel==='electedOfficials' ) {%>
+            <% if(channel==='ElectedOfficials' ) {%>
                 <input type="text" id="officialFirstName" name="officialFirstName"
                     placeholder="Officials First Name (required)" required />
                 <input type="text" id="officialLastName" name="officialLastName"
@@ -345,7 +345,7 @@
         $('#step1').attr('disabled', 'disabled');
         $('#step2').attr('disabled', 'disabled');
 
-        if ('<%= channel %>' === "electedOfficials") {
+        if ('<%= channel %>' === "ElectedOfficials") {
             $('#officialFirstName, #officialLastName, #offcialTitle, #firstName, #lastName, #email, #phoneNumber, #website').on('input', function (e) {
                 let officialFirstName = $('#officialFirstName').val();
                 let officialLastName = $('#officialLastName').val();
@@ -485,7 +485,7 @@
         });
         // animation of forms end
 
-        let allChannels = { Community: 1, Faith: 2, electedOfficials: 3, Public: 4, Candidate: 5, Business: 6, Entertainment: 7, News: 8, Sports: 9 };
+        let allChannels = { Community: 1, Faith: 2, ElectedOfficials: 3, Public: 4, Candidate: 5, Business: 6, Entertainment: 7, News: 8, Sports: 9 };
         // let currentChannel = window.location.href.split('/');
         // currentChannel = currentChannel[currentChannel.length - 1];
         let currentChannel = '<%= channel %>';
@@ -653,11 +653,11 @@
             let city = cities.filter(item => item.id == data.cityId);
             city = city[0];
 
-            if (currentChannel === 'community') window.location.replace(`https://thankyou.yourprogramontv.com/communitystvnetwork-time-slot-claim?First+Name=${data.firstName}&day=${days[data.dayId]}&time=${startTime + '-' + endTime}&program+name=${data.showName}&city=${city.cityName}&state=${city.stateName}&channel=<%=channel%>&email=${data.email}`);
-            else if (currentChannel === 'faith') window.location.replace(`https://thankyou.yourprogramontv.com/faithstvnetwork-time-slot-claim?First+Name=${data.firstName}&day=${days[data.dayId]}&time=${startTime + '-' + endTime}&program+name=${data.showName}&city=${city.cityName}&state=${city.stateName}&channel=<%=channel%>&email=${data.email}`);
-            else if (currentChannel === 'electedOfficials') window.location.replace(`https://thankyou.yourprogramontv.com/electedofficialstvnetwork-time-slot-claim?First+Name=${data.firstName}&day=${days[data.dayId]}&time=${startTime + '-' + endTime}&program+name=${data.showName}&city=${city.cityName}&state=${city.stateName}&channel=<%=channel%>&email=${data.email}`);
-            else if (currentChannel === 'public') window.location.replace(`https://thankyou.yourprogramontv.com/publicstvnetwork-time-slot-claim?First+Name=${data.firstName}&day=${days[data.dayId]}&time=${startTime + '-' + endTime}&program+name=${data.showName}&city=${city.cityName}&state=${city.stateName}&channel=<%=channel%>&email=${data.email}`);
-            else if (currentChannel === 'candidate') window.location.replace(`https://thankyou.yourprogramontv.com/candidatestvnetwork-time-slot-claim?First+Name=${data.firstName}&day=${days[data.dayId]}&time=${startTime + '-' + endTime}&program+name=${data.showName}&city=${city.cityName}&state=${city.stateName}&channel=<%=channel%>&email=${data.email}`);
+            if (currentChannel === 'Community') window.location.replace(`https://thankyou.yourprogramontv.com/communitystvnetwork-time-slot-claim?First+Name=${data.firstName}&day=${days[data.dayId]}&time=${startTime + '-' + endTime}&program+name=${data.showName}&city=${city.cityName}&state=${city.stateName}&channel=<%=channel%>&email=${data.email}`);
+            else if (currentChannel === 'Faith') window.location.replace(`https://thankyou.yourprogramontv.com/faithstvnetwork-time-slot-claim?First+Name=${data.firstName}&day=${days[data.dayId]}&time=${startTime + '-' + endTime}&program+name=${data.showName}&city=${city.cityName}&state=${city.stateName}&channel=<%=channel%>&email=${data.email}`);
+            else if (currentChannel === 'ElectedOfficials') window.location.replace(`https://thankyou.yourprogramontv.com/electedofficialstvnetwork-time-slot-claim?First+Name=${data.firstName}&day=${days[data.dayId]}&time=${startTime + '-' + endTime}&program+name=${data.showName}&city=${city.cityName}&state=${city.stateName}&channel=<%=channel%>&email=${data.email}`);
+            else if (currentChannel === 'Public') window.location.replace(`https://thankyou.yourprogramontv.com/publicstvnetwork-time-slot-claim?First+Name=${data.firstName}&day=${days[data.dayId]}&time=${startTime + '-' + endTime}&program+name=${data.showName}&city=${city.cityName}&state=${city.stateName}&channel=<%=channel%>&email=${data.email}`);
+            else if (currentChannel === 'Candidate') window.location.replace(`https://thankyou.yourprogramontv.com/candidatestvnetwork-time-slot-claim?First+Name=${data.firstName}&day=${days[data.dayId]}&time=${startTime + '-' + endTime}&program+name=${data.showName}&city=${city.cityName}&state=${city.stateName}&channel=<%=channel%>&email=${data.email}`);
 
             // else if (currentChannel === 'business') window.location.replace("http://stackoverflow.com");
             // else if (currentChannel === 'entertainment') window.location.replace("http://stackoverflow.com");
