@@ -50,13 +50,17 @@ module.exports = (sequelize, DataTypes) => {
         let user = await User.findOne({
             where: { email: email }
         });
-
         if (!user) {
             throw new Error("Email not found");
         }
-
         return user
+    }
 
+    User.userById = async (id) => {
+        let user = await User.findOne({
+            where: { id: id },
+        });
+        return user;
     }
 
     return User;

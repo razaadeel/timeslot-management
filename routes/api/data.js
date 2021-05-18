@@ -2,6 +2,8 @@ const router = require('express').Router();
 
 const dataController = require('../../controllers/data');
 
+const db = require('../../models/index');
+
 //get days and states
 router.get('/initial-data', dataController.daysAndStates);
 

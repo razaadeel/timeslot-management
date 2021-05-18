@@ -8,7 +8,7 @@ const config = env === 'development' ?
 
 const qencode = new QencodeApiClient(config.qencodeApiKey);
 
-module.exports = transcode = async (videoUrl, destination, userId) => {
+module.exports = transcode = async (videoUrl, destination, outputVideoName) => {
     try {
         let transcodingParams = {
             format: [
@@ -18,7 +18,7 @@ module.exports = transcode = async (videoUrl, destination, userId) => {
                     height: "720",
                     audio_bitrate: 128,
                     destination: {
-                        url: `s3://s3.us-east-1.amazonaws.com/${destination}/program-${userId}-28-a-[adins].mp4`,
+                        url: `s3://s3.us-east-1.amazonaws.com/${destination}/${outputVideoName}`,
                         key: config.aws.accessKeyId,
                         secret: config.aws.secretAccessKey,
                         permissions: "public-read"

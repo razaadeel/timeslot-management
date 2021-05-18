@@ -266,16 +266,16 @@
             <h2 class="fs-title">Select Timeslot</h2>
             <h3 class="fs-subtitle">All fields are required</h3>
             <select id="states" name="state" title="Choose One" required>
-                <option selected="true" value="0">Select State</option>
+                <option selected="true" disabled value="0">Select State</option>
             </select>
             <select id="city" name="cityId" title="Choose One" required>
                 <option selected="true" value="0">Select City</option>
             </select>
             <select id="day" name="dayId" title="Choose One" required>
-                <option selected="true" value="0">Select Day</option>
+                <option selected="true" disabled value="0">Select Day</option>
             </select>
             <select id="timeslot" name="timeslotId" title="Choose One" required>
-                <option selected="true" value="0">Select Timeslot</option>
+                <option selected="true" disabled value="0">Select Timeslot</option>
             </select>
 
             <input type="button" name="previous" class="previous action-button" value="Previous" />
@@ -342,7 +342,7 @@
         }
 
         // enable/disable step1 button
-        $('#step1').attr('disabled', 'disabled');
+        // $('#step1').attr('disabled', 'disabled');
         $('#step2').attr('disabled', 'disabled');
 
         if ('<%= channel %>' === "ElectedOfficials") {

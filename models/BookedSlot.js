@@ -118,5 +118,13 @@ module.exports = (sequelize, DataTypes) => {
         return bookingDetails[0];
     }
 
+    BookedSlot.getBookingDetailsByEmail = async (email, channel) => {
+        let query = `select * from "${channel}Channel"
+        where "email"='${email}'`;
+
+        let bookingDetails = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+        return bookingDetails[0];
+    }
+
     return BookedSlot;
 }
