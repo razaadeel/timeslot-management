@@ -1,13 +1,13 @@
 const db = require('../models');
 
-const s3Upload = require('../services/videoUpload');
+const s3 = require('../services/aws-s3');
 const transocde = require('../services/qencode');
 
 
 
 exports.uploadVideo = async (req, res) => {
     // service created to upload videos to aws s3
-    s3Upload(req, res, async (error) => {
+    s3.videoUpload(req, res, async (error) => {
         if (error) {
             console.log('errors', error);
             return res.status(400).json({ error: error });
@@ -39,10 +39,14 @@ exports.uploadVideo = async (req, res) => {
 
                 const destination = `stv-curated-data/${userBooking.stateCode}/${userBooking.cityName}/${userBooking.channelName}/${day}/${slotTime}`;
                 const outputVideoName = `${bookingDetails.showName}-${userId}-28-a-[adins].mp4`
-                res.json({ videoName });
+                res.json({ message: 'successful' });
 
                 //sending file for transcoding
                 transcode(videoLocation, destination, outputVideoName);
+
+                //for uploading crawl file to aws
+                s3.fileUpload(bookingDetails.showName, destination);
+
                 return true;
             }
         }

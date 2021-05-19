@@ -269,7 +269,7 @@
                 <option selected="true" disabled value="0">Select State</option>
             </select>
             <select id="city" name="cityId" title="Choose One" required>
-                <option selected="true" value="0">Select City</option>
+                <option selected="true" value="" disabled>Select City</option>
             </select>
             <select id="day" name="dayId" title="Choose One" required>
                 <option selected="true" disabled value="0">Select Day</option>
@@ -288,7 +288,7 @@
             <h3 class="fs-subtitle"></h3>
             <input type="text" id=" showName" name="showName" placeholder="Program Name (required)" required />
             <textarea rows="5" maxlength="100" name="showDescription" id="showDescription"
-                placeholder="Description (required)"></textarea>
+                placeholder="Description (required)" required></textarea>
 
             <div class="checbox-container">
                 <input type="checkbox" id="addon" name="addon" value="yes" class="checkboxes" />
@@ -387,7 +387,6 @@
                 let contactTitle = $('#contactTitle').val();
                 let email = $('#email').val();
                 let phoneNumber = $('#phoneNumber').val();
-                console.log(firstName)
                 if (organizationName && firstName && lastName && email && phoneNumber) {
                     $('#step1').removeAttr('disabled');
                 } else {
@@ -490,9 +489,6 @@
         // currentChannel = currentChannel[currentChannel.length - 1];
         let currentChannel = '<%= channel %>';
         let channelId = allChannels[currentChannel];
-        console.log(allChannels);
-        console.log(currentChannel);
-        console.log(channelId);
 
         const getStates = () => {
             $.ajax({
@@ -522,8 +518,13 @@
 
         $('#states').on('change', function () {
             $('#day').val('');
-            $('#timeslot').empty();
             $('#city').empty();
+            $('#timeslot').empty();
+
+            //Adding defualt select
+            $('#timeslot').append(new Option(`Select Timeslot`, '', true));
+            $("#timeslot option:selected").attr('disabled', 'disabled');
+
             getCities(this.value);
         });
         $('#city').on('change', function () {
@@ -566,6 +567,11 @@
                     // data: JSON.stringify(values),
                     success: data => {
                         timeslots = data;
+
+                        //Adding defualt select
+                        $('#timeslot').append(new Option(`Select Timeslot`, '', true));
+                        $("#timeslot option:selected").attr('disabled', 'disabled');
+
                         data.forEach(item => {
                             let startTime = `${item.startTime}`.split(':');
                             let endTime = `${item.endTime}`.split(':');

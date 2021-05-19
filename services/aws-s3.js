@@ -2,6 +2,7 @@ const aws = require('aws-sdk');
 const multerS3 = require('multer-s3');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
 const env = process.env.NODE_ENV || 'development';
 
@@ -13,7 +14,7 @@ const config = env === 'development' ?
 const s3 = new aws.S3({
     accessKeyId: config.accessKeyId,
     secretAccessKey: config.secretAccessKey,
-    Bucket: 'video-for-qencode'
+    // Bucket: 'video-for-qencode'
 });
 
 
@@ -33,7 +34,7 @@ function checkFileType(file, cb) {
     }
 }
 
-const s3Upload = multer({
+exports.videoUpload = multer({
     storage: multerS3({
         s3: s3,
         bucket: 'video-for-qencode',
@@ -48,4 +49,21 @@ const s3Upload = multer({
     }
 }).single('video');
 
-module.exports = s3Upload;
+
+exports.fileUpload = (showName, bucket) => {
+    console.log(showName)
+    let params = {
+        Key: 'crawl.text',
+        Body: showName,
+        Bucket: bucket
+    };
+
+    s3.upload(params, (err, data) => {
+        if (err) {
+            throw new Error(err);
+        }
+        console.log(data)
+        return true
+    });
+
+}

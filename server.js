@@ -33,6 +33,9 @@ app.use('/api/data', require('./routes/api/data'));
 app.use('/api/auth', require('./routes/api/auth'));
 app.use('/api/video', require('./routes/api/video'));
 
+//router for testing purpose
+app.use('/test', require('./routes/api/test'));
+
 let port = process.env.PORT || 5000;
 app.listen(port, () => {
     console.log("server running on", port);
