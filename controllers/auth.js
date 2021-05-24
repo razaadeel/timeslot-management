@@ -1,5 +1,6 @@
 const db = require('../models');
 const chargify = require('../services/chargify');
+const leaddyno = require('../services/leaddyno');
 
 exports.createUser = async (req, res) => {
     try {
@@ -12,7 +13,8 @@ exports.createUser = async (req, res) => {
             website, phoneNumber,
             offcialTitle, officialFirstName,
             officialLastName, candidateFirstName,
-            candidateLastName
+            candidateLastName,
+            chargify_customerId, chargify_subscriptionId
         } = req.body;
         let { channelId } = req.params;
 
@@ -22,7 +24,7 @@ exports.createUser = async (req, res) => {
             return res.status(409).json({ message: 'Email already exists' });
         }
 
-        let user = await db.User.createUser({ firstName, lastName, email });
+        let user = await db.User.createUser({ firstName, lastName, email, chargify_customerId, chargify_subscriptionId });
 
         //Saving user booking 
         let booking = await db.BookedSlot.saveBooking({ channelId, cityId, dayId, timeslotId, userId: user.id });
@@ -64,6 +66,22 @@ exports.createUser = async (req, res) => {
             officialLastName, candidateFirstName,
             candidateLastName
         });
+
+        //checking if user has referral code
+        if (chargify_customerId) {
+            let metadata = await chargify.getCustomerMetadata(chargify_customerId);
+            let referralObj = metadata.find(obj => obj.name === 'Referral Code');
+            if (referralObj) {
+
+                //geting user subscription type
+                let subscription = await chargify.getCustomerSubscription(chargify_customerId);
+
+                //create a customer in leaddyno if subscription is "ads removed"
+                if (subscription.handle.includes('ads_removed')) {
+                    leaddyno.createLead(email, referralObj.value);
+                }
+            }
+        }
 
         return res.json('successful');
 

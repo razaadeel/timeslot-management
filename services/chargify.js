@@ -17,7 +17,43 @@ exports.getCustomer = async (customerId) => {
         return res.data.customer;
 
     } catch (error) {
-        console.log(error.message);
+        console.log(error);
+        throw new Error(error);
+    }
+}
+
+exports.getCustomerSubscription = async (customerId) => {
+    try {
+        let res = await axios.get(`https://streaming-television-inc.chargify.com/customers/${customerId}/subscriptions.json`, {
+            auth: {
+                username: config.chargifyAPIKey,
+                password: ''
+            }
+        });
+
+        return res.data[0].subscription.product;
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(error);
+    }
+}
+
+// metatdata = additional fields on chargify forms
+exports.getCustomerMetadata = async (customerId) => {
+    try {
+        let res = await axios.get(`https://streaming-television-inc.chargify.com/customers/${customerId}/metadata.json`, {
+            auth: {
+                username: config.chargifyAPIKey,
+                password: ''
+            }
+        });
+
+        //returns array of metadata fields with values
+        return res.data.metadata;
+
+    } catch (error) {
+        console.log(error);
         throw new Error(error);
     }
 }

@@ -329,6 +329,8 @@
         let url_string = window.location.href;
         let url = new URL(url_string);
         let customerId = url.searchParams.get("customer_id");
+        let subscriptionId = url.searchParams.get("subscription_id");
+        console.log(customerId, subscriptionId)
         if (customerId) {
             $.ajax({
                 type: 'GET',
@@ -614,6 +616,9 @@
             $.each($(this).serializeArray(), function (i, field) {
                 values[field.name] = field.value;
             });
+
+            values.chargify_customerId = customerId;
+            values.chargify_subscriptionId = subscriptionId;
 
             $('#pageloader').css('display', 'block');
             $('#step3').hide();

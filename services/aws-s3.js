@@ -18,7 +18,9 @@ const s3 = new aws.S3({
 });
 
 
-// uploading temprory video before transcoding 
+// uploading temprory video before transcoding
+
+//
 function checkFileType(file, cb) {
     // Allowed ext
     const filetypes = /mp4|webm|mov|webm|ogv|flv|m4v/;

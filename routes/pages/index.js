@@ -12,9 +12,6 @@ router.get('/faith', (req, res) => {
 router.get('/electedOfficials', (req, res) => {
     res.render('pages/SlotBookingForm', { channel: 'ElectedOfficials' });
 });
-router.get('/public', (req, res) => {
-    res.render('pages/SlotBookingForm', { channel: 'Public' });
-});
 router.get('/candidate', (req, res) => {
     res.render('pages/SlotBookingForm', { channel: 'Candidate' });
 });

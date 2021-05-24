@@ -7,6 +7,13 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false
         },
+        chargifyCustomerId: {
+            type: DataTypes.STRING,
+            // allowNull: false
+        },
+        chargifySubscriptionId: {
+            type: DataTypes.STRING,
+        },
         createdAt: {
             allowNull: false,
             defaultValue: sequelize.fn('now'),
@@ -40,7 +47,9 @@ module.exports = (sequelize, DataTypes) => {
     User.createUser = async (data) => {
         let user = await User.create({
             name: data.firstName + ' ' + data.lastName,
-            email: data.email
+            email: data.email,
+            chargifyCustomerId: data.chargify_customerId,
+            chargifySubscriptionId: data.chargify_subscriptionId
         });
         return user
     }
