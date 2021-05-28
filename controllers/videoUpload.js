@@ -1,9 +1,7 @@
 const db = require('../models');
 
 const s3 = require('../services/aws-s3');
-const transocde = require('../services/qencode');
-
-
+const chargify = require('../services/chargify');
 
 exports.uploadVideo = async (req, res) => {
     try {
@@ -51,8 +49,23 @@ exports.uploadVideo = async (req, res) => {
                         destination = `stv-curated-data/${userBooking.stateCode}/${userBooking.cityName}/${userBooking.channelName}/${day}/${slotTime}`;
                     }
 
+                    let outputVideoName;
+                    if (user.chargifyCustomerId) {
 
-                    let outputVideoName = `${bookingDetails.showName}-${userId}-28-a-[adins].mp4`
+                        //geting user subscription type
+                        let subscription = await chargify.getCustomerSubscription(user.chargifyCustomerId);
+
+                        //adding [adins] in outputVideoName if subscription is not "ads removed"
+                        if (subscription.handle.includes('ads_removed')) {
+                            outputVideoName = `${bookingDetails.showName}-${userId}-28-a.mp4`
+                        } else {
+                            outputVideoName = `${bookingDetails.showName}-${userId}-28-a-[adins].mp4`
+                        }
+
+                    } else {
+                        outputVideoName = `${bookingDetails.showName}-${userId}-28-a-[adins].mp4`
+                    }
+
                     res.json({ message: 'successful' });
 
                     //sending file for transcoding
