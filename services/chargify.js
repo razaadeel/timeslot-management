@@ -39,6 +39,41 @@ exports.getCustomerSubscription = async (customerId) => {
     }
 }
 
+//get customer by subscription id
+exports.getCustomerBySubID = async (subscriptionId) => {
+    try {
+        let res = await axios.get(`https://streaming-television-inc.chargify.com/subscriptions/${subscriptionId}.json`, {
+            auth: {
+                username: config.chargifyAPIKey,
+                password: ''
+            }
+        });
+
+        return res.data.subscription.customer;
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(error);
+    }
+}
+
+exports.getComponentPrice = async (componentId) => {
+    try {
+        let res = await axios.get(`https://streaming-television-inc.chargify.com/components/${componentId}/price_points.json`, {
+            auth: {
+                username: config.chargifyAPIKey,
+                password: ''
+            }
+        });
+
+        return res.data.price_points[0].prices[0].unit_price;
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(error);
+    }
+}
+
 // metatdata = additional fields on chargify forms
 exports.getCustomerMetadata = async (customerId) => {
     try {

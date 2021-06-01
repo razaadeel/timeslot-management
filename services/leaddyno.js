@@ -22,12 +22,23 @@ exports.createLead = async (email, referalCode) => {
         await api.post('/leads', { email, code: referalCode });
 
         //converting above lead into customer at leaddyno
-        await api.post('/leads', { email, purchase_amount: "50.0" });
+        await api.post('/purchases', { email, purchase_amount: "50.0" });
 
         return true;
 
     } catch (error) {
         console.log(error);
         return true;
+    }
+};
+
+exports.createPurchase = async (email, amount) => {
+    try {
+        console.log(email, amount);
+        await api.post('/purchases', { email, purchase_amount: amount });
+        return true;
+
+    } catch (error) {
+        console.log(error)
     }
 }

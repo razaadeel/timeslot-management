@@ -2,6 +2,7 @@ const db = require('../models');
 
 const s3 = require('../services/aws-s3');
 const chargify = require('../services/chargify');
+const transcode = require('../services/qencode');
 
 exports.uploadVideo = async (req, res) => {
     try {
