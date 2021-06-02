@@ -67,6 +67,14 @@ exports.uploadVideo = async (req, res) => {
                         outputVideoName = `${bookingDetails.showName}-${userId}-28-a-[adins].mp4`
                     }
 
+                    //saving video data to ContentVideoUpload
+                    db.ContentVideoUpload.saveVideoDetails({
+                        userId,
+                        inputName: req.file.key,
+                        outputName: outputVideoName,
+                        destination: destination
+                    });
+
                     res.json({ message: 'successful' });
 
                     //sending file for transcoding

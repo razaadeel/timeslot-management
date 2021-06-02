@@ -30,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
         User.hasMany(models.BookedSlot, {
             foreignKey: "userId"
         });
+        User.hasMany(models.ContentVideoUpload, { as: 'videos', foreignKey: "userId" });
     }
 
     User.checkEmail = async (email) => {
