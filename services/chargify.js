@@ -17,7 +17,6 @@ exports.getCustomer = async (customerId) => {
         return res.data.customer;
 
     } catch (error) {
-        console.log(error);
         throw new Error(error);
     }
 }
@@ -34,7 +33,6 @@ exports.getCustomerSubscription = async (customerId) => {
         return res.data[0].subscription.product;
 
     } catch (error) {
-        console.log(error);
         throw new Error(error);
     }
 }
@@ -52,7 +50,6 @@ exports.getCustomerBySubID = async (subscriptionId) => {
         return res.data.subscription.customer;
 
     } catch (error) {
-        console.log(error);
         throw new Error(error);
     }
 }
@@ -69,7 +66,6 @@ exports.getComponentPrice = async (componentId) => {
         return res.data.price_points[0].prices[0].unit_price;
 
     } catch (error) {
-        console.log(error);
         throw new Error(error);
     }
 }
@@ -88,7 +84,6 @@ exports.getCustomerMetadata = async (customerId) => {
         return res.data.metadata;
 
     } catch (error) {
-        console.log(error);
         throw new Error(error);
     }
 }

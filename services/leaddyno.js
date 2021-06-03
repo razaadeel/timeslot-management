@@ -27,7 +27,8 @@ exports.createLead = async (email, referalCode) => {
         return true;
 
     } catch (error) {
-        console.log(error);
+        console.log(error)
+console.error(error, 'testing error');;
         return true;
     }
 };
@@ -40,5 +41,6 @@ exports.createPurchase = async (email, amount) => {
 
     } catch (error) {
         console.log(error)
+console.error(error, 'testing error');
     }
 }

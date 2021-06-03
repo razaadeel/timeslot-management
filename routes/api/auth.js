@@ -15,7 +15,8 @@ router.get('/chargify', async (req, res) => {
         let customer = await chargify.getCustomer();
         return res.json(customer)
     } catch (error) {
-        console.log(error);
+        console.log(error)
+        console.error(error, 'testing error');;
         return res.status(400).json({ message: 'Internal server error' });
     }
 })

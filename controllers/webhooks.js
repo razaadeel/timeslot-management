@@ -21,7 +21,8 @@ exports.subscriptionComponentUpdate = async (req, res) => {
         return true;
 
     } catch (error) {
-        console.log(error);
+        console.log(error)
+console.error(error, 'testing error');;
         res.status(400).json({ message: error.message });
     }
 };

@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+require('./utils/slack_logs');
 
 const app = express();
 app.use(express.json());

@@ -88,7 +88,8 @@ exports.uploadVideo = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
+        console.log(error)
+console.error(error, 'testing error');;
         return res.status(401).json({ message: 'something went wrong' });
     }
 }
