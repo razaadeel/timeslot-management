@@ -89,7 +89,7 @@ exports.uploadVideo = async (req, res) => {
 
     } catch (error) {
         console.log(error)
-console.error(error, 'testing error');;
+        console.error(error, 'Error in video upload rotue');;
         return res.status(401).json({ message: 'something went wrong' });
     }
 }

@@ -87,7 +87,7 @@ exports.createUser = async (req, res) => {
 
     } catch (error) {
         console.log(error)
-console.error(error, 'testing error');;
+        console.error(error, 'testing error');;
         return res.status(500).json({
             message: "Something went wrong"
         });
@@ -102,7 +102,7 @@ exports.getUserByEmail = async (req, res) => {
         return res.render('pages/UploadVideoPage', { user });
     } catch (error) {
         console.log(error)
-console.error(error, 'testing error');;
+        console.error(error, 'Error while creating new user');;
         res.redirect('/video-auth?error=' + encodeURIComponent(error.message));
         return false;
         // return res.status(500).json({

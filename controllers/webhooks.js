@@ -5,7 +5,7 @@ const leaddyno = require('../services/leaddyno');
 exports.subscriptionComponentUpdate = async (req, res) => {
     try {
         res.json({ message: 'success' });
-        
+
         let data = req.body;
         let newAllocation = data.payload.new_allocation; // '0' for OFF and '1' for ON
 
@@ -21,8 +21,8 @@ exports.subscriptionComponentUpdate = async (req, res) => {
         return true;
 
     } catch (error) {
-        console.log(error)
-console.error(error, 'testing error');;
+        console.log(error);
+        console.error(error, 'Error in subscription update / LeadDyno webhook');;
         res.status(400).json({ message: error.message });
     }
 };

@@ -9,7 +9,7 @@ exports.daysAndStates = async (req, res) => {
         res.json({ days, states })
     } catch (error) {
         console.log(error)
-console.error(error, 'testing error');;
+        console.error(error, 'testing error');;
         return res.status(500).json({
             message: "Something went wrong"
         });
@@ -23,7 +23,7 @@ exports.citiesOfState = async (req, res) => {
         return res.json(cities);
     } catch (error) {
         console.log(error)
-console.error(error, 'testing error');;
+        console.error(error, 'testing error');;
         return res.status(500).json({
             message: "Something went wrong"
         });
@@ -39,7 +39,7 @@ exports.getAvailableTimeslots = async (req, res) => {
         return res.json(timeslots);
     } catch (error) {
         console.log(error)
-console.error(error, 'testing error');;
+        console.error(error, 'Error while getting available timeslots');;
         return res.status(500).json({
             message: "Something went wrong"
         });
@@ -53,7 +53,7 @@ exports.getChargifyUser = async (req, res) => {
         res.json(user);
     } catch (error) {
         console.log(error)
-console.error(error, 'testing error');;
+        console.error(error, 'testing error');;
         return res.status(500).json({
             message: "Something went wrong"
         });
