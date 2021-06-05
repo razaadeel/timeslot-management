@@ -40,5 +40,9 @@ router.get('/video-auth', (req, res) => {
     res.render('pages/VideoAuthPage', { error: '' });
 });
 
+router.get('/auth-billing-portal', (req, res) => {
+    res.render('pages/BillingAuthPage', { error: '' });
+});
+
 
 module.exports = router;

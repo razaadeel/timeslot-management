@@ -1,5 +1,5 @@
 const db = require('../models');
-// const chargify = require('../services/chargify');
+const chargify = require('../services/chargify');
 // const leaddyno = require('../services/leaddyno');
 
 exports.createUser = async (req, res) => {
@@ -104,6 +104,27 @@ exports.getUserByEmail = async (req, res) => {
         console.log(error)
         console.error(error, 'Error while creating new user');;
         res.redirect('/video-auth?error=' + encodeURIComponent(error.message));
+        return false;
+        // return res.status(500).json({
+        //     message: "Something went wrong"
+        // });
+    }
+}
+
+exports.getBillingPortal = async (req, res) => {
+    try {
+        let { email } = req.body;
+        let user = await db.User.userByEmail(email);
+        if (user.chargifyCustomerId) {
+            let portalURL = await chargify.getBillingPortalLink(user.chargifyCustomerId);
+            return res.redirect(portalURL);
+        } else {
+            res.redirect('/auth-billing-portal?error=User not registered on Chargify');
+        }
+    } catch (error) {
+        console.log(error)
+        console.error(error, 'Error while creating new user');;
+        res.redirect('/auth-billing-portal?error=' + encodeURIComponent(error.message));
         return false;
         // return res.status(500).json({
         //     message: "Something went wrong"

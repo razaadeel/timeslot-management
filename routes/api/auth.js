@@ -10,6 +10,8 @@ router.post('/create-user/:channelId', authController.createUser);
 // video upload auth
 router.post('/user-by-email', authController.getUserByEmail);
 
+router.post('/billing-portal', authController.getBillingPortal);
+
 router.get('/chargify', async (req, res) => {
     try {
         let customer = await chargify.getCustomer();

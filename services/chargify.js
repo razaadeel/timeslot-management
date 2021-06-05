@@ -87,3 +87,18 @@ exports.getCustomerMetadata = async (customerId) => {
         throw new Error(error);
     }
 }
+
+exports.getBillingPortalLink = async (customerId) => {
+    try {
+        let res = await axios.get(`https://streaming-television-inc.chargify.com/portal/customers/${customerId}/management_link.json`, {
+            auth: {
+                username: config.chargifyAPIKey,
+                password: ''
+            }
+        });
+
+        return res.data.url;
+    } catch (error) {
+        throw new Error(error);
+    }
+}

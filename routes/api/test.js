@@ -116,7 +116,7 @@ router.get('/', async (req, res) => {
         res.json('asd');
     } catch (error) {
         console.log(error)
-console.error(error, 'testing error');;
+        console.error(error, 'testing error');;
         res.status(400).json({ message: error.message });
     }
 });
@@ -125,12 +125,10 @@ router.post('/', async (req, res) => {
     try {
         // await s3.fileUpload();
         // let subscription = await chargify.getCustomerSubscription(44322954);
-        throw new Error('Something went wrong');
+        console.log(req.body)
         res.json({ message: 'success' });
     } catch (error) {
-        console.log(error)
-console.error(error, 'testing error');;
-        console.error(error, 'testing error');
+        console.log(error);
         res.status(400).json({ message: error.message });
     }
 });

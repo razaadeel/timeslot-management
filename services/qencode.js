@@ -55,6 +55,6 @@ module.exports = transcode = async (videoUrl, destination, outputVideoName) => {
         }
     } catch (error) {
         console.log(error)
-console.error(error, 'testing error');;
+        console.error(error, 'testing error');;
     }
 }
