@@ -89,7 +89,7 @@ exports.uploadVideo = async (req, res) => {
 
     } catch (error) {
         console.log(error)
-        console.error(error, 'Error in video upload rotue');;
+        console.error(error, 'Error in video upload route');;
         return res.status(401).json({ message: 'something went wrong' });
     }
 }
