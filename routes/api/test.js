@@ -1,31 +1,28 @@
 const router = require('express').Router();
-
-const QencodeApiClient = require('qencode-api');
-
-const env = process.env.NODE_ENV || 'development';
-
-const config = env === 'development' ?
-    require(__dirname + '/../../config/configDev.js')//import in dev 
-    : require(__dirname + '/../../config/config.js'); // import in prod
-
-const qencode = new QencodeApiClient(config.qencodeApiKey);
+// const s3 = require('../../services/aws-s3');
+const db = require('../../models/index');
 
 router.get('/', async (req, res) => {
     try {
+
         res.json({ message: 'success' });
     } catch (error) {
         console.log(error)
-        console.error(error, 'testing error');;
+        // console.error(error, 'testing error');
         res.status(400).json({ message: error.message });
     }
 });
 
 router.post('/', async (req, res) => {
     try {
-        // await s3.fileUpload();
-        // let subscription = await chargify.getCustomerSubscription(44322954);
-        console.log(req.body)
-        res.json({ message: 'success' });
+        let status = JSON.parse(req.body.status);
+        if (status.error == 0) {
+            console.log(req.body)
+            console.log(req.query)
+            res.json({ message: 'success' });
+        } else {
+            throw new Error('Video transcoding fail');
+        }
     } catch (error) {
         console.log(error);
         res.status(400).json({ message: error.message });

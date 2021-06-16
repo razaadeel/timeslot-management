@@ -1,18 +1,18 @@
 const express = require('express');
 const path = require('path');
+
 require('./utils/slack_logs');
 
 const app = express();
-app.use(express.json());
 
 //Database 
 const db = require('./models');
-// // connnect database
+// connnect database
 // db.sequelize.authenticate()
 //     .then(() => console.log('database connected...'))
 //     .catch(err => console.log("database error:", err));
 
-//connect and sync database in realtime
+// //connect and sync database in realtime
 db.sequelize.sync()
     .then(() => console.log('database connected...'))
     .catch(err => console.log("database error:", err));

@@ -1,12 +1,19 @@
 const Slack = require('slack-node');
 
+
+const env = process.env.NODE_ENV || 'development';
+
+const config = env === 'development' ?
+    require(__dirname + '/../config/configDev.js').slack_webhook //import in dev 
+    : require(__dirname + '/../config/config.js').slack_webhook;
+
 const slack = new Slack();
-slack.setWebhook('https://hooks.slack.com/services/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');
+slack.setWebhook(config);
 
 console.error = (err, title,) => {
     try {
         slack.webhook({
-            channel: "#errors-logs",
+            channel: "#errors-log",
             username: "webhookbot",
             text: err.message,
             attachments: [{
@@ -16,10 +23,9 @@ console.error = (err, title,) => {
                 text: err.stack,
             }]
         }, function (err, response) {
-            console.log(response);
+            // console.log(response);
         });
     } catch (error) {
         console.log(error)
-console.error(error, 'testing error');;
     }
 }

@@ -7,20 +7,31 @@ const fs = require('fs');
 const env = process.env.NODE_ENV || 'development';
 
 const config = env === 'development' ?
-    require(__dirname + '/../config/configDev.js').aws //import in dev 
-    : require(__dirname + '/../config/config.js').aws; // imp in production
+    require(__dirname + '/../config/configDev.js') //import in dev 
+    : require(__dirname + '/../config/config.js'); // imp in production
 
-//initializing s3 bucket
+// //initializing s3 bucket
+// const s3 = new aws.S3({
+//     accessKeyId: config.aws.accessKeyId,
+//     secretAccessKey: config.aws.secretAccessKey,
+//     region: 'us-east-1'
+// });
+
+// initialzing wasabi s3 bucket
+const wasabiEndpoint = new aws.Endpoint('s3.us-east-1.wasabisys.com');
 const s3 = new aws.S3({
-    accessKeyId: config.accessKeyId,
-    secretAccessKey: config.secretAccessKey,
-    // Bucket: 'video-for-qencode'
+    endpoint: wasabiEndpoint,
+    accessKeyId: config.wasabi.accessKeyId,
+    secretAccessKey: config.wasabi.secretAccessKey
+});
+
+const AwsS3 = new aws.S3({
+    accessKeyId: config.aws.accessKeyId,
+    secretAccessKey: config.aws.secretAccessKey
 });
 
 
-// uploading temprory video before transcoding
-
-//
+// file type handler
 function checkFileType(file, cb) {
     // Allowed ext
     const filetypes = /mp4|webm|mov|webm|ogv|flv|m4v/;
@@ -53,19 +64,59 @@ exports.videoUpload = multer({
 
 
 exports.fileUpload = (showName, bucket) => {
-    console.log(showName)
     let params = {
         Key: 'crawl.text',
         Body: showName,
         Bucket: bucket
     };
 
-    s3.upload(params, (err, data) => {
+    AwsS3.upload(params, (err, data) => {
         if (err) {
             throw new Error(err);
         }
         console.log(data)
         return true
     });
+}
 
+exports.mediaConvertUpload = multer({
+    storage: multerS3({
+        s3: s3,
+        bucket: 'stv-raw-data',
+        acl: 'bucket-owner-full-control',
+        key: function (req, file, cb) {
+            cb(null, path.basename(file.originalname, path.extname(file.originalname)) + '-' + Date.now() + path.extname(file.originalname))
+        },
+        metadata: function (req, file, cb) {
+            cb(null, { destination: req.destination });
+        },
+    }),
+    // limits: { fileSize: 2000000 }, // In bytes: 2000000 bytes = 2 MB
+    fileFilter: function (req, file, cb) {
+        checkFileType(file, cb);
+    }
+}).single('video');
+
+
+exports.getBucketObjects = async (bucketPath) => {
+    // let params = {
+    //     Bucket: 'stv-curated-data',
+    //     Delimiter: '/',
+    //     Prefix: bucketPath
+    // }
+    let params = {
+        Bucket: 'temporary-ads-run',
+        Delimiter: '/',
+        Prefix: bucketPath
+    }
+
+    return new Promise(function (resolve, reject) {
+        s3.listObjects(params, (err, data) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(data.Contents);
+            }
+        });
+    });
 }

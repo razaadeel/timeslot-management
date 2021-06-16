@@ -8,13 +8,17 @@ module.exports = (sequelize, DataTypes) => {
         },
         cityName: {
             type: DataTypes.STRING
-        },
+        }
     }, {
         timestamps: false
     });
 
     City.associate = models => {
         City.hasMany(models.BookedSlot, {
+            foreignKey: "cityId"
+        });
+
+        City.hasMany(models.CityChannelStatus, {
             foreignKey: "cityId"
         });
     }
@@ -28,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
     City.cityByStateCode = async (stateCode) => {
         let cities = await City.findAll({
             where: { stateCode },
-            order: [ ['cityName', 'ASC'] ]
+            order: [['cityName', 'ASC']]
         });
         return cities;
     }

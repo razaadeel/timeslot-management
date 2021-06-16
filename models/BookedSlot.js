@@ -105,7 +105,7 @@ module.exports = (sequelize, DataTypes) => {
 
     // get booking details by user id
     BookedSlot.getBookingByUserId = async (userId) => {
-        let query = `select u."name" as "userName", ch."name" as "channelName", ct."cityName", ct."stateCode", ts."startTime",ts."endTime", d."day"
+        let query = `select u."name" as "userName", ch."name" as "channelName", ct."cityName", ct."stateCode", ct."id" as "cityId" , ts."startTime",ts."endTime", d."day"
         from "BookedSlots" bs
         join "Users" u on bs."userId" = u.id
         join "Channels" ch on bs."channelId" = ch.id
