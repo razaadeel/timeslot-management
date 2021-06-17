@@ -15,16 +15,14 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        let status = JSON.parse(req.body.status);
-        if (status.error == 0) {
-            console.log(req.body)
-            console.log(req.query)
-            res.json({ message: 'success' });
+        // console.log(req.body.error)
+        if (req.body.error) {
+            throw new Error('Testing slack error log');
         } else {
-            throw new Error('Video transcoding fail');
+            res.json({ message: 'success' });
         }
     } catch (error) {
-        console.log(error);
+        console.error(error, 'testing error');
         res.status(400).json({ message: error.message });
     }
 });

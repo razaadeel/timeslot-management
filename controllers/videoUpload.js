@@ -86,7 +86,7 @@ exports.uploadVideo = async (req, res) => {
 
                             // for uploading crawl file to aws
                             s3.fileUpload(bookingDetails.showName, destination);
-                            
+
                         } else {
                             //sending file for transcoding for manual system
                             transcode.manualSystem(videoLocation, destination, outputVideoName, userId);
@@ -115,9 +115,7 @@ exports.qencodeRequest = async (req, res) => {
     try {
 
         let status = JSON.parse(req.body.status);
-        console.log(status);
         if (status.error == 0 && req.body.event === 'saved') {
-
             // //spliting destination string to get state,city,channel
             // let adsBucket = req.query.destination.split('/');
 

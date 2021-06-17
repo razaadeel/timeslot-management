@@ -3,15 +3,15 @@ const QencodeApiClient = require('qencode-api');
 const env = process.env.NODE_ENV || 'development';
 
 const config = env === 'development' ?
-require(__dirname + '/../config/configDev.js')//import in dev 
-: require(__dirname + '/../config/config.js'); // import in prod
+    require(__dirname + '/../config/configDev.js')//import in dev 
+    : require(__dirname + '/../config/config.js'); // import in prod
 
 
 //manual system (video will upload directly to aws s3 after transcoding)
 exports.automatedSystem = async (videoUrl, destination, outputVideoName) => {
     try {
         const qencode = new QencodeApiClient(config.qencodeApiKey);
-        
+
         let transcodingParams = {
             format: [
                 {
@@ -47,7 +47,7 @@ exports.automatedSystem = async (videoUrl, destination, outputVideoName) => {
                 let transcode = await task.StartCustom(transcodingParams);
                 i++;
                 if (transcode.error == 0) {
-                    console.log('video upload successfull')
+                    console.log('video sent for transcoding');
                     break;
                 }
             }
@@ -134,7 +134,7 @@ exports.manualSystem = async (videoUrl, destination, outputVideoName, userId) =>
                 let transcode = await task.StartCustom(transcodingParams);
                 i++;
                 if (transcode.error == 0) {
-                    console.log('video upload successfull')
+                    console.log('video sent for spliting');
                     break;
                 }
             }
@@ -214,7 +214,7 @@ exports.stitchVideos = async (destination, ftp, outputVideoName, firstAdSlot, se
                 let transcode = await task.StartCustom(transcodingParams);
                 i++;
                 if (transcode.error == 0) {
-                    console.log('video upload successfull')
+                    console.log('video sent for stitching');
                     break;
                 }
             }
