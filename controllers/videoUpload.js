@@ -215,6 +215,43 @@ exports.qencodeRequest = async (req, res) => {
     }
 }
 
+
+//ADS upload controller
+exports.uploadAdVideo = async (req, res) => {
+    try {
+        // service created to upload videos to wasabi s3
+        s3.videoAdUpload(req, res, async (error) => {
+            if (error) {
+                console.log('errors', error);
+                return res.status(400).json({ error: error });
+            } else {
+                // If File not found
+                if (req.file === undefined) {
+                    console.log('Error: No File Selected!');
+                    return res.status(400).json('Error: No File Selected');
+                } else {
+                    // If Success
+                    const videoName = req.file.key;
+                    const videoLocation = req.file.location;
+                    const videoDuration = req.body.duration;
+
+                    let outputVideoName = `${videoName}-${videoDuration}.mp4`
+                    res.json({ message: 'successful' });
+
+                    //sending file for transcoding
+                    transcode.uploadAds(videoLocation, outputVideoName, videoDuration);
+
+                    return true;
+                }
+            }
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(401).json({ message: 'something went wrong' });
+    }
+}
+
+
 exports.uploadVideoMediaConvert = async (req, res) => {
     try {
         req.destination = 'AL/Albertville/Community/Mon/0700'
@@ -228,7 +265,6 @@ exports.uploadVideoMediaConvert = async (req, res) => {
                     console.log('Error: No File Selected!');
                     return res.status(400).json('Error: No File Selected');
                 } else {
-
                     res.json({ message: 'success' })
                 }
             }

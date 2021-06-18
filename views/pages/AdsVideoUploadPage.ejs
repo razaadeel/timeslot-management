@@ -168,15 +168,6 @@
 
 <body>
     <div class="container p-5">
-        <!-- <div class="row mb-5 text-center text-white">
-            <div class="col-lg-10 mx-auto">
-                <h1 class="display-4">Welcome <%= user.name %>
-                </h1>
-                <p class="lead">
-                    <%= user.email %>
-                </p>
-            </div>
-        </div> -->
         <div class="row">
             <div class="col-lg-5 mx-auto">
                 <div class="p-5 bg-white shadow rounded-lg">
@@ -189,7 +180,7 @@
                         Choose the file to upload.
                     </h6>
 
-                    <div class="custom-file overflow-hidden rounded-pill mb-5">
+                    <div class="custom-file overflow-hidden rounded-pill">
                         <input id="customFile" type="file" accept="video/*" class="custom-file-input rounded-pill">
                         <label for="customFile" class="custom-file-label rounded-pill">Choose file</label>
                     </div>
@@ -213,7 +204,14 @@
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-center">
+                    <div>
+                        <input type="radio" id="30sec" name="duration" value="30">
+                        <label for="30sec">30 sec</label><br>
+                        <input type="radio" id="60sec" name="duration" value="60">
+                        <label for="60sec">60 sec</label><br>
+                    </div>
+
+                    <div class="d-flex justify-content-center mt-3">
                         <button class="btn btn-success" id="upload-btn">Upload</button>
 
                         <button class="btn btn-primary" type="button" id="loading-btn" disabled>
@@ -302,75 +300,83 @@
         })();
 
         $('#upload-btn').on('click', () => {
-            var displayMessage = function (message, isError) {
-                var element = document.querySelector('#message');
-                element.innerHTML = message;
-                element.className = isError ? 'error' : 'errInfo';
 
-            }
+            let duration = $('input[name="duration"]:checked').val();
+            console.log(duration)
+            if (duration) {
 
-            if (vid.duration > 900) {
-                // var message = `Video length is ${parseInt(vid.duration/60)} minutes, Good`;
-                var message = ``;
-                var isError = false;
-                displayMessage(message, isError);
+                var displayMessage = function (message, isError) {
+                    var element = document.querySelector('#message');
+                    element.innerHTML = message;
+                    element.className = isError ? 'error' : 'errInfo';
 
-                let userId = `<%= user.id %>`
-                let video = $("#customFile")[0].files[0];
-                if (!video) {
-                    alert('Please select a video first')
-                    return
                 }
-                $('.progress-loading').css('display', 'block');
-                $('#loading-btn').css('display', 'block');
-                $('#upload-btn').hide();
-                let formData = new FormData();
-                formData.append('video', video);
-                formData.append('userId', userId)
-                $.ajax({
-                    type: 'post',
-                    processData: false,
-                    contentType: false,
-                    url: `/api/video/upload`,
-                    data: formData,
-                    enctype: 'multipart/form-data',
-                    xhr: function () {
-                        var xhr = new window.XMLHttpRequest();
-                        xhr.upload.addEventListener("progress", function (evt) {
-                            if (evt.lengthComputable) {
-                                var percentComplete = evt.loaded / evt.total;
-                                percentComplete = parseInt(percentComplete * 100);
-                                $('.progress-bar').css('width', percentComplete + '%').attr('aria-valuenow', percentComplete);
-                            }
-                        }, false);
-                        return xhr;
-                    },
-                    success: data => {
-                        $("#customFile").val(null);
-                        $('#fileName').text('');
-                        $('#loading-btn').hide();
-                        $('.progress-loading').hide();
-                        $('#upload-btn').show();
-                        $('#successModal').modal('show');
-                        // alert('Video Uploaded Successfully');
-                        // window.location.replace('https://timeslot.citystvnetwork.com/dashboard');
-                    },
-                    error: (e) => {
-                        console.log(e);
-                        $('#loading-btn').hide();
-                        $('.progress-loading').hide();
-                        $('#upload-btn').show();
-                        // alert('Something went wrong while upload video');
-                        $('#errorModal').modal('show');
-                    },
-                });
-            }
-            else {
-                var message = `Video length is ${parseInt(vid.duration / 60)} minutes, video length should be atleast 15 minutes`;
-                var isError = true;
-                displayMessage(message, isError)
+
+                if (vid.duration >= Number(duration)) {
+                    // var message = `Video length is ${parseInt(vid.duration/60)} minutes, Good`;
+                    var message = ``;
+                    var isError = false;
+                    displayMessage(message, isError);
+
+                    let video = $("#customFile")[0].files[0];
+                    if (!video) {
+                        alert('Please select a video first')
+                        return
+                    }
+                    $('.progress-loading').css('display', 'block');
+                    $('#loading-btn').css('display', 'block');
+                    $('#upload-btn').hide();
+                    let formData = new FormData();
+                    formData.append('video', video);
+                    formData.append('duration', duration);
+                    // $.ajax({
+                    //     type: 'post',
+                    //     processData: false,
+                    //     contentType: false,
+                    //     url: `/api/video/ad-upload`,
+                    //     data: formData,
+                    //     enctype: 'multipart/form-data',
+                    //     xhr: function () {
+                    //         var xhr = new window.XMLHttpRequest();
+                    //         xhr.upload.addEventListener("progress", function (evt) {
+                    //             if (evt.lengthComputable) {
+                    //                 var percentComplete = evt.loaded / evt.total;
+                    //                 percentComplete = parseInt(percentComplete * 100);
+                    //                 $('.progress-bar').css('width', percentComplete + '%').attr('aria-valuenow', percentComplete);
+                    //             }
+                    //         }, false);
+                    //         return xhr;
+                    //     },
+                    //     success: data => {
+                    //         $("#customFile").val(null);
+                    //         $('#fileName').text('');
+                    //         $('#loading-btn').hide();
+                    //         $('.progress-loading').hide();
+                    //         $('#upload-btn').show();
+                    //         $('#successModal').modal('show');
+                    //         // alert('Video Uploaded Successfully');
+                    //         // window.location.replace('https://timeslot.citystvnetwork.com/dashboard');
+                    //     },
+                    //     error: (e) => {
+                    //         console.log(e);
+                    //         $('#loading-btn').hide();
+                    //         $('.progress-loading').hide();
+                    //         $('#upload-btn').show();
+                    //         // alert('Something went wrong while upload video');
+                    //         $('#errorModal').modal('show');
+                    //     },
+                    // });
+                }
+                else {
+                    var message = `Video duration must be greater or equal to ${duration} sec.`;
+                    var isError = true;
+                    displayMessage(message, isError)
+                }
+            } else {
+                alert('Please select the duration');
             }
         });
+
     </script>
 
 </body>

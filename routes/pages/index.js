@@ -32,11 +32,6 @@ router.get('/sports', (req, res) => {
     res.render('pages/SlotBookingForm', { channel: 'Sports' });
 });
 
-//Timeslot Booking Form
-router.get('/form', (req, res) => {
-    res.render('pages/SlotBookingForm', { channel: 'Sports' });
-});
-
 
 // Authentication Page for Video Upload
 router.get('/video-auth', (req, res) => {
@@ -44,9 +39,15 @@ router.get('/video-auth', (req, res) => {
     res.render('pages/VideoAuthPage', { error: '' });
 });
 
+
+// Route for ad upload
+router.get('/ads-upload', (req, res) => {
+    // console.log(req.params)
+    res.render('pages/AdsVideoUploadPage');
+});
+
 router.get('/auth-billing-portal', (req, res) => {
     res.render('pages/BillingAuthPage', { error: '' });
 });
-
 
 module.exports = router;

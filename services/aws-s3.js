@@ -99,11 +99,6 @@ exports.mediaConvertUpload = multer({
 
 
 exports.getBucketObjects = async (bucketPath) => {
-    // let params = {
-    //     Bucket: 'stv-curated-data',
-    //     Delimiter: '/',
-    //     Prefix: bucketPath
-    // }
     let params = {
         Bucket: 'temporary-ads-run',
         Delimiter: '/',
@@ -120,3 +115,20 @@ exports.getBucketObjects = async (bucketPath) => {
         });
     });
 }
+
+
+//ADS VIDEO UPLOAD
+exports.videoAdUpload = multer({
+    storage: multerS3({
+        s3: s3,
+        bucket: 'temporary-ads-run/temp',
+        acl: 'public-read',
+        key: function (req, file, cb) {
+            cb(null, path.basename(file.originalname, path.extname(file.originalname)) + '-' + Date.now() + path.extname(file.originalname))
+        }
+    }),
+    // limits: { fileSize: 2000000 }, // In bytes: 2000000 bytes = 2 MB
+    fileFilter: function (req, file, cb) {
+        checkFileType(file, cb);
+    }
+}).single('video');
