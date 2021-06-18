@@ -155,6 +155,14 @@
         outline: none;
     }
 
+    .error {
+        color: red;
+    }
+
+    .errInfo {
+        color: green;
+    }
+
     /* modal css end */
 </style>
 
@@ -182,12 +190,19 @@
                     </h6>
 
                     <div class="custom-file overflow-hidden rounded-pill mb-5">
-                        <input id="customFile" type="file" class="custom-file-input rounded-pill">
+                        <input id="customFile" type="file" accept="video/*" class="custom-file-input rounded-pill">
                         <label for="customFile" class="custom-file-label rounded-pill">Choose file</label>
                     </div>
+
+                    <!--test start  -->
+                    <div id="message"></div>
+                    <video id="myVideo" hidden></video>
+                    <!-- test end -->
+
+
                     <!-- End -->
 
-                    <h6 class="text-center mb-4 text-muted" id="fileName"></h6>
+                    <h6 style="overflow: hidden;" class="text-center mb-4 text-muted" id="fileName"></h6>
 
                     <!-- progress bar  -->
                     <div class="progress-loading">
@@ -257,64 +272,105 @@
             $('#fileName').text(fileName);
         });
 
-        $('#upload-btn').on('click', () => {
+        var vid = document.getElementById("myVideo");
+        (function localFileVideoPlayer() {
+            'use strict'
+            var URL = window.URL || window.webkitURL
+            //   var displayMessage = function (message, isError) {
+            //     var element = document.querySelector('#message')
+            //     element.innerHTML = message
+            //     element.className = isError ? 'error' : 'info'
+            //   }
+            var playSelectedFile = function (event) {
+                var file = this.files[0];
+                var type = file.type;
+                var videoNode = document.querySelector('video');
+                // var canPlay = videoNode.canPlayType(type)
+                // if (canPlay === '') canPlay = 'no'
+                // var message = 'Can play type "' + type + '": ' + canPlay
+                // var isError = canPlay === 'no'
+                // displayMessage(message, isError)
+                // if (isError) {
+                //   return
+                // }
 
-            let userId = `<%= user.id %>`
-            let video = $("#customFile")[0].files[0];
-            if (!video) {
-                alert('Please select a video first')
-                return
+                var fileURL = URL.createObjectURL(file)
+                videoNode.src = fileURL
+            }
+            var inputNode = document.querySelector('input')
+            inputNode.addEventListener('change', playSelectedFile, false)
+        })();
+
+        $('#upload-btn').on('click', () => {
+            var displayMessage = function (message, isError) {
+                var element = document.querySelector('#message');
+                element.innerHTML = message;
+                element.className = isError ? 'error' : 'errInfo';
+
             }
 
-            $('.progress-loading').css('display', 'block');
-            $('#loading-btn').css('display', 'block');
-            $('#upload-btn').hide();
+            if (vid.duration > 840) {
+                // var message = `Video length is ${parseInt(vid.duration/60)} minutes, Good`;
+                var message = ``;
+                var isError = false;
+                displayMessage(message, isError);
 
-            let formData = new FormData();
-            formData.append('video', video);
-            formData.append('userId', userId)
-            $.ajax({
-                type: 'post',
-                processData: false,
-                contentType: false,
-                url: `/api/video/upload`,
-                data: formData,
-                enctype: 'multipart/form-data',
-                xhr: function () {
-                    var xhr = new window.XMLHttpRequest();
-                    xhr.upload.addEventListener("progress", function (evt) {
-                        if (evt.lengthComputable) {
-                            var percentComplete = evt.loaded / evt.total;
-                            percentComplete = parseInt(percentComplete * 100);
-                            $('.progress-bar').css('width', percentComplete + '%').attr('aria-valuenow', percentComplete);
-                        }
-                    }, false);
-                    return xhr;
-                },
-                success: data => {
-
-                    $("#customFile").val(null);
-                    $('#fileName').text('');
-
-                    $('#loading-btn').hide();
-                    $('.progress-loading').hide();
-                    $('#upload-btn').show();
-                    $('#successModal').modal('show');
-                    // alert('Video Uploaded Successfully');
-                    // window.location.replace('https://timeslot.citystvnetwork.com/dashboard');
-                },
-                error: (e) => {
-                    console.log(e);
-
-                    $('#loading-btn').hide();
-                    $('.progress-loading').hide();
-                    $('#upload-btn').show();
-                    // alert('Something went wrong while upload video');
-                    $('#errorModal').modal('show');
-                },
-            });
+                let userId = `<%= user.id %>`
+                let video = $("#customFile")[0].files[0];
+                if (!video) {
+                    alert('Please select a video first')
+                    return
+                }
+                $('.progress-loading').css('display', 'block');
+                $('#loading-btn').css('display', 'block');
+                $('#upload-btn').hide();
+                let formData = new FormData();
+                formData.append('video', video);
+                formData.append('userId', userId)
+                $.ajax({
+                    type: 'post',
+                    processData: false,
+                    contentType: false,
+                    url: `/api/video/upload`,
+                    data: formData,
+                    enctype: 'multipart/form-data',
+                    xhr: function () {
+                        var xhr = new window.XMLHttpRequest();
+                        xhr.upload.addEventListener("progress", function (evt) {
+                            if (evt.lengthComputable) {
+                                var percentComplete = evt.loaded / evt.total;
+                                percentComplete = parseInt(percentComplete * 100);
+                                $('.progress-bar').css('width', percentComplete + '%').attr('aria-valuenow', percentComplete);
+                            }
+                        }, false);
+                        return xhr;
+                    },
+                    success: data => {
+                        $("#customFile").val(null);
+                        $('#fileName').text('');
+                        $('#loading-btn').hide();
+                        $('.progress-loading').hide();
+                        $('#upload-btn').show();
+                        $('#successModal').modal('show');
+                        // alert('Video Uploaded Successfully');
+                        // window.location.replace('https://timeslot.citystvnetwork.com/dashboard');
+                    },
+                    error: (e) => {
+                        console.log(e);
+                        $('#loading-btn').hide();
+                        $('.progress-loading').hide();
+                        $('#upload-btn').show();
+                        // alert('Something went wrong while upload video');
+                        $('#errorModal').modal('show');
+                    },
+                });
+            }
+            else {
+                var message = `Video length is ${parseInt(vid.duration / 60)} minutes, video length must be greater than 14 minutes`;
+                var isError = true;
+                displayMessage(message, isError)
+            }
         });
-
     </script>
 
 </body>
