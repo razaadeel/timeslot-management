@@ -19,12 +19,19 @@ module.exports = (sequelize, DataTypes) => {
         tableName: 'CityChannelStatus'
     });
 
-    CityChannelStatus.getChannelStatus = (cityId, channelName) => {
-        let channel = CityChannelStatus.findOne({
+    CityChannelStatus.getChannelStatus = async (cityId, channelName) => {
+        let channel = await CityChannelStatus.findOne({
             where: { cityId: cityId, channelName: channelName }
         });
 
         return channel;
+    }
+
+    CityChannelStatus.getCityChannels = async (cityId) => {
+        let channels = await CityChannelStatus.findAll({
+            where: { cityId: cityId, status: 'offline' }
+        });
+        return channels;
     }
 
     return CityChannelStatus;

@@ -15,8 +15,13 @@ module.exports = {
     "accessKeyId": process.env.WASABI_ACCESS_KEY_ID,
     "secretAccessKey": process.env.WASABI_SECRET_ACCESS_KEY
   },
+  "slack": {
+    "error": process.env.SLACK_ERROR,
+    "videoUpload": process.env.SLACK_VIDEO_UPLOAD,
+    "newUser": process.env.SLACK_NEW_USER,
+    "cityActivation": process.env.SLACK_CITY_ACTIVATION
+  },
   "qencodeApiKey": process.env.QENCODE_API_KEY,
   "chargifyAPIKey": process.env.CHARGIFY_API_KEY,
   "leadDynoPrivateKey": process.env.LEADDYNO_PRIVATE_KEY,
-  "slack_webhook": process.env.SLACK_WEBHOOK
 }

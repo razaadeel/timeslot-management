@@ -3,6 +3,8 @@ const db = require('../models');
 const s3 = require('../services/aws-s3');
 const chargify = require('../services/chargify');
 const transcode = require('../services/qencode');
+const mailgun = require('../services/mailgun');
+const slack = require('../utils/slack_logs');
 
 exports.uploadVideo = async (req, res) => {
     try {
@@ -69,7 +71,22 @@ exports.uploadVideo = async (req, res) => {
 
                     //saving video data to ContentVideoUpload
                     db.ContentVideoUpload.saveVideoDetails({
-                        userId,
+                        inputName: req.file.key,
+                        outputName: outputVideoName,
+                        destination: destination
+                    });
+
+                    //sending email alert for video upload
+                    mailgun.sendEmail('contentVideoUpload', {
+                        email: user.email,
+                        inputName: req.file.key,
+                        outputName: outputVideoName,
+                        destination: destination
+                    });
+
+                    //sending slack alert for video upload
+                    slack.videoUploadMsg({
+                        email: user.email,
                         inputName: req.file.key,
                         outputName: outputVideoName,
                         destination: destination

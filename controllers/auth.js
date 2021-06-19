@@ -1,5 +1,7 @@
 const db = require('../models');
 const chargify = require('../services/chargify');
+const mailgun = require('../services/mailgun');
+const slack = require('../utils/slack_logs');
 // const leaddyno = require('../services/leaddyno');
 
 exports.createUser = async (req, res) => {
@@ -67,21 +69,55 @@ exports.createUser = async (req, res) => {
             candidateLastName
         });
 
-        // //checking if user has referral code
-        // if (chargify_customerId) {
-        //     let metadata = await chargify.getCustomerMetadata(chargify_customerId);
-        //     let referralObj = metadata.find(obj => obj.name === 'Referral Code');
-        //     if (referralObj) {
+        //sending slack alert for new slot booking
+        slack.newUserMsg({
+            userId: user.id,
+            email: email,
+            city: bookingDetails.cityName,
+            state: bookingDetails.stateName,
+            timeslot: `${startTime} - ${endTime}`,
+            channel: bookingDetails.channelName
+        });
 
-        //         //geting user subscription type
-        //         let subscription = await chargify.getCustomerSubscription(chargify_customerId);
+        //sending email alert for new slot booking
+        mailgun.sendEmail('newUser', {
+            userId: user.id,
+            email: email,
+            city: bookingDetails.cityName,
+            state: bookingDetails.stateName,
+            timeslot: `${startTime} - ${endTime}`,
+            channel: bookingDetails.channelName
+        });
 
-        //         //create a customer in leaddyno if subscription is "ads removed"
-        //         if (subscription.handle.includes('ads_removed')) {
-        //             leaddyno.createLead(email, referralObj.value);
-        //         }
-        //     }
-        // }
+        //Checking if city channels are created in mediacp
+        let channels = await db.CityChannelStatus.getCityChannels(cityId);
+        console.log(bookingDetails);
+        if (channels) {
+            let body = {
+                city: bookingDetails.cityName,
+                state: bookingDetails.stateName,
+                channels
+            }
+            mailgun.sendEmail('activation', body);
+
+            slack.newChannelCreationMsg(body);
+        }
+
+        //checking if user has referral code
+        if (chargify_customerId) {
+            let metadata = await chargify.getCustomerMetadata(chargify_customerId);
+            let referralObj = metadata.find(obj => obj.name === 'Referral Code');
+            if (referralObj) {
+
+                //geting user subscription type
+                let subscription = await chargify.getCustomerSubscription(chargify_customerId);
+
+                //create a customer in leaddyno if subscription is "ads removed"
+                if (subscription.handle.includes('ads_removed')) {
+                    leaddyno.createLead(email, referralObj.value);
+                }
+            }
+        }
 
         return res.json('successful');
 
