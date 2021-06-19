@@ -15,6 +15,11 @@ module.exports = {
     "accessKeyId": process.env.WASABI_ACCESS_KEY_ID,
     "secretAccessKey": process.env.WASABI_SECRET_ACCESS_KEY
   },
+  "mailgun": {
+    "apiKey": process.env.MAILGUN_API_KEY,
+    "domain": process.env.MAILGUN_DOMAIN,
+    "adminAlert": process.env.MAILGUN_ADMIN_ALERT
+  },
   "slack": {
     "error": process.env.SLACK_ERROR,
     "videoUpload": process.env.SLACK_VIDEO_UPLOAD,
