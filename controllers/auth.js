@@ -2,7 +2,8 @@ const db = require('../models');
 const chargify = require('../services/chargify');
 const mailgun = require('../services/mailgun');
 const slack = require('../utils/slack_logs');
-// const leaddyno = require('../services/leaddyno');
+const leaddyno = require('../services/leaddyno');
+const mediacp = require('../services/mediacp');
 
 exports.createUser = async (req, res) => {
     try {
@@ -91,16 +92,17 @@ exports.createUser = async (req, res) => {
 
         //Checking if city channels are created in mediacp
         let channels = await db.CityChannelStatus.getCityChannels(cityId);
-        console.log(bookingDetails);
         if (channels) {
             let body = {
                 city: bookingDetails.cityName,
                 state: bookingDetails.stateName,
+                stateCode: bookingDetails.stateCode,
                 channels
             }
-            mailgun.sendEmail('activation', body);
 
-            slack.newChannelCreationMsg(body);
+            //creating channel
+            mediacp.createChannel(body);
+            await db.CityChannelStatus.updateChannelStatus(cityId);
         }
 
         //checking if user has referral code
@@ -122,8 +124,8 @@ exports.createUser = async (req, res) => {
         return res.json('successful');
 
     } catch (error) {
-        console.log(error)
-        console.error(error, 'Error while creating new user');;
+        console.log(error);
+        console.error(error, 'Error while creating new user');
         return res.status(500).json({
             message: "Something went wrong"
         });
@@ -157,8 +159,7 @@ exports.getBillingPortal = async (req, res) => {
             res.redirect('/auth-billing-portal?error=User not registered on Chargify');
         }
     } catch (error) {
-        console.log(error)
-        console.error(error, 'Error while billing portal auth');
+        console.log(error);
         res.redirect('/auth-billing-portal?error=' + encodeURIComponent(error.message));
         return false;
         // return res.status(500).json({

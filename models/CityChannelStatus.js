@@ -34,5 +34,12 @@ module.exports = (sequelize, DataTypes) => {
         return channels;
     }
 
+    CityChannelStatus.updateChannelStatus = async (cityId) => {
+        await CityChannelStatus.update(
+            { status: 'active' },
+            { where: { cityId: cityId } }
+        );
+    }
+
     return CityChannelStatus;
 };

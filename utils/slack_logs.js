@@ -30,6 +30,29 @@ console.error = (err, title,) => {
     }
 }
 
+exports.error = (err, title,) => {
+    try {
+        slack.setWebhook(config.error);
+        slack.webhook({
+            channel: "#errors-log",
+            username: "webhookbot",
+            text: err.message,
+            attachments: [{
+                author: 'adeel',
+                color: 'danger',
+                title: title,
+                text: err.stack,
+            }]
+        }, function (err, response) {
+            // console.log(response);
+        });
+        return true
+    } catch (error) {
+        console.log(error)
+        return true
+    }
+}
+
 exports.videoUploadMsg = (body) => {
     try {
         slack.setWebhook(config.videoUpload);
@@ -41,21 +64,19 @@ exports.videoUploadMsg = (body) => {
                 author: 'adeel',
                 color: '#38d67a',
                 title: 'Following are the details',
-                text: `Email: ${body.email} \n
-                       Input Name: ${body.inputName} \n
-                       Output Name: ${body.outputName} \n
-                       Destination: ${body.destination}
-                `,
+                text: `Email: ${body.email} \n Input Name: ${body.inputName} \n Output Name: ${body.outputName} \n Destination: ${body.destination}`,
             }]
         }, function (err, response) {
-            if (err) {
-                console.log(err);
-            } else {
-                console.log(response);
-            }
+            // if (err) {
+            //     console.log(err);
+            // } else {
+            //     console.log(response);
+            // }
         });
+        return true
     } catch (error) {
         console.log(error)
+        return true
     }
 }
 
@@ -73,43 +94,95 @@ exports.newUserMsg = (body) => {
                 text: `Email: ${body.email} \n City: ${body.city} \n State: ${body.state} \n timeslot: ${body.timeslot} \n Channel: ${body.channel} \n`,
             }]
         }, function (err, response) {
-            if (err) {
-                console.log(err);
-            } else {
-                console.log(response);
-            }
+            // if (err) {
+            //     console.log(err);
+            // } else {
+            //     console.log(response);
+            // }
+            
         });
+        return true
     } catch (error) {
         console.log(error)
+        return true
     }
 }
 
 
-exports.newChannelCreationMsg = (body) => {
+exports.channelCreationRequest = (body, allChannels) => {
     try {
         let channelNames = '';
-        body.channels.forEach(channel => {
-            channelNames = channelNames + channel.channelName + '\n'
+
+        // let cityName = body.city;
+        // cityName = cityName.split(' ').join('').toLowerCase();//removing spaces from city name
+
+        allChannels.forEach(channel => {
+            let channelName = channel;
+            channelName = channelName.split(' ');//removing spaces from channel name
+            channelName = channelName[0];
+            channelNames = channelNames + channelName + '\n'; //appending "channelName" to "channelNames"
         });
+
         slack.setWebhook(config.cityActivation);
         slack.webhook({
             channel: "#city-activation-alerts",
             username: "webhookbot",
-            text: 'New City Activation Request',
+            text: 'Error while creating following channel',
             attachments: [{
                 author: 'adeel',
-                color: '#f5aa42',
-                title: 'Following are the details',
-                text: `Create the following channels for this City: ${body.city}, State: ${body.state} \n` + channelNames,
+                color: '#e3a539',
+                title: 'New City Activation Request',
+                text: `Create the following channels manually: \n` + channelNames,
             }]
         }, function (err, response) {
-            if (err) {
-                console.log(err);
-            } else {
-                console.log(response);
-            }
+            // if (err) {
+            //     console.log(err);
+            // } else {
+            //     console.log(response);
+            // }
         });
+        return true
     } catch (error) {
         console.log(error)
+        return true
+    }
+}
+
+exports.channelCreationSuccess = (body, allChannels) => {
+    try {
+        let channelNames = '';
+
+        let cityName = body.city;
+        cityName = cityName.split(' ').join('').toLowerCase();//removing spaces from city name
+
+        allChannels.forEach(channel => {
+            let channelName = channel;
+            channelName = channelName.split(' ');//removing spaces from channel name
+            channelName = channelName[0];
+            channelNames = channelNames + channelName + '\n'; //appending "channelName" to "channelNames"
+        });
+
+        slack.setWebhook(config.cityActivation);
+        slack.webhook({
+            channel: "#city-activation-alerts",
+            username: "webhookbot",
+            text: 'New Channels Created',
+            attachments: [{
+                author: 'adeel',
+                color: '#38d67a',
+                title: 'Success',
+                text: `Following channels are created successfully: \n` + channelNames,
+            }]
+        }, function (err, response) {
+            // if (err) {
+            //     console.log(err);
+            // } else {
+            //     console.log(response);
+            // }
+        });
+        return true
+    } catch (error) {
+        console.log(error)
+        return true
     }
 }

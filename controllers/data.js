@@ -52,8 +52,7 @@ exports.getChargifyUser = async (req, res) => {
         let user = await chargify.getCustomer(customerId);
         res.json(user);
     } catch (error) {
-        console.log(error)
-        console.error(error, 'testing error');;
+        console.log(error);
         return res.status(500).json({
             message: "Something went wrong"
         });

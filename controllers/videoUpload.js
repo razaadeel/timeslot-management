@@ -211,7 +211,7 @@ exports.qencodeRequest = async (req, res) => {
             let state = splitDestination[1].toLowerCase();
             let city = splitDestination[2].split(' ').join('').toLowerCase();
             let channel = splitDestination[3].toLowerCase() === 'public' ? 'entertainment' : splitDestination[3].toLowerCase();
-
+            channel.split(' ').join('')
             let ftp = {
                 ftpURL: 'mediastreamingcp.com:2121',
                 ftpUsername: `w1s_${state}-${city}-${channel}@162.244.81.156`,

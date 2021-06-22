@@ -26,6 +26,12 @@ module.exports = {
     "newUser": process.env.SLACK_NEW_USER,
     "cityActivation": process.env.SLACK_CITY_ACTIVATION
   },
+  "mediacp": {
+    "apiKey": process.env.MEDIACP_API_KEY,
+    "username": process.env.MEDIACP_USERNAME,
+    "password": process.env.MEDIACP_PASSWORDS,
+    "url": process.env.MEDIACP_URL
+  },
   "qencodeApiKey": process.env.QENCODE_API_KEY,
   "chargifyAPIKey": process.env.CHARGIFY_API_KEY,
   "leadDynoPrivateKey": process.env.LEADDYNO_PRIVATE_KEY,

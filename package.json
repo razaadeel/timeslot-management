@@ -30,6 +30,7 @@
     "pg-hstore": "^2.3.3",
     "qencode-api": "^2.1.5",
     "sequelize": "^6.6.1",
-    "slack-node": "^0.1.8"
+    "slack-node": "^0.1.8",
+    "xml2js": "^0.4.23"
   }
 }

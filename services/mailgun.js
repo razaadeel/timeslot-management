@@ -20,12 +20,17 @@ exports.sendEmail = (type, body) => {
     try {
         let subject = '';
         let html = '';
-        if (type === 'activation') {
+        if (type === 'channelCreationRequest') {
             subject = 'New City Activation Request';
-
-            html = `<div>Create the following channels for this city: <b>${body.city}</b>, state: <b>${body.state}</b></div>`;
-            body.channels.forEach(channel => {
-                html = html + `<div>${channel.channelName}</div>`
+            html = `<div>Create the following channels manually: </div>`;
+            body.forEach(channel => {
+                html = html + `<div>${channel}</div>`
+            });
+        } else if (type === 'channelCreationSuccess') {
+            subject = 'Channels Created Successfully';
+            html = `<div>Following channels are created successfully: </div>`;
+            body.forEach(channel => {
+                html = html + `<div>${channel}</div>`
             });
         } else if (type === 'newUser') {
             subject = 'Time Slot Creation Alert';
@@ -46,6 +51,7 @@ exports.sendEmail = (type, body) => {
             `;
         }
 
+        console.log('html', html);
         const data = {
             //Specify email data
             from: from_who,
@@ -58,8 +64,7 @@ exports.sendEmail = (type, body) => {
         //Invokes the method to send emails given the above data with the helper library
         mailgun.messages().send(data, function (err, body) {
             if (err) {
-                res.send('error');
-                console.log("got an error: ", err);
+                throw Error(err);
             }
             else {
                 console.log(body);
