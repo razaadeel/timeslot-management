@@ -133,21 +133,7 @@ exports.qencodeRequest = async (req, res) => {
 
         let status = JSON.parse(req.body.status);
         if (status.error == 0 && req.body.event === 'saved') {
-            // //spliting destination string to get state,city,channel
-            // let adsBucket = req.query.destination.split('/');
 
-            // //Creating Ads bucket 'location' for particular state,city,channel
-            // adsBucket = `${adsBucket[0]}/${adsBucket[1]}/${adsBucket[2]}/Ads/`;
-
-            // //getting all ads from bucket
-            // let adsObjects = await s3.getBucketObjects(adsBucket);
-
-            //getting ads from temporary bucket
-            // let adBucket = 'temporary-ads-run/ads/';
-            // let randomNum = Math.floor(Math.random() * 2);
-            // let adsObjects = await s3.getBucketObjects('temporary-ads-run/ads/');
-
-            //selecting random bucket i.c '30' or '60'
             let firstAdSlot = [];
             let secondAdSlot = [];
             for (let i = 0; i < 2; i++) {
@@ -211,6 +197,11 @@ exports.qencodeRequest = async (req, res) => {
             let state = splitDestination[1].toLowerCase();
             let city = splitDestination[2].split(' ').join('').toLowerCase();
             let channel = splitDestination[3].toLowerCase() === 'public' ? 'entertainment' : splitDestination[3].toLowerCase();
+            let day = splitDestination[4];
+            let timeslot = splitDestination[5];
+
+            let outputvideoname = day + '-' + timeslot + '-' + req.query.outputvideoname;
+
             channel.split(' ').join('')
             let ftp = {
                 ftpURL: 'mediastreamingcp.com:2121',
@@ -219,7 +210,7 @@ exports.qencodeRequest = async (req, res) => {
             }
 
             //sending video for stitching
-            transcode.stitchVideos(req.query.destination, ftp, req.query.outputvideoname, firstAdSlot, secondAdSlot);
+            transcode.stitchVideos(req.query.destination, ftp, outputvideoname, firstAdSlot, secondAdSlot);
             res.json({ message: 'success' });
         }
         if (status.error != 0) {

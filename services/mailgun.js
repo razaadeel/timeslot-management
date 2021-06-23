@@ -51,7 +51,6 @@ exports.sendEmail = (type, body) => {
             `;
         }
 
-        console.log('html', html);
         const data = {
             //Specify email data
             from: from_who,
