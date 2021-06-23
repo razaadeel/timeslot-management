@@ -99,7 +99,7 @@ exports.newUserMsg = (body) => {
             // } else {
             //     console.log(response);
             // }
-            
+
         });
         return true
     } catch (error) {
@@ -117,10 +117,10 @@ exports.channelCreationRequest = (body, allChannels) => {
         // cityName = cityName.split(' ').join('').toLowerCase();//removing spaces from city name
 
         allChannels.forEach(channel => {
-            let channelName = channel;
+            let channelName = channel.channelName;;
             channelName = channelName.split(' ');//removing spaces from channel name
             channelName = channelName[0];
-            channelNames = channelNames + channelName + '\n'; //appending "channelName" to "channelNames"
+            channelNames = channelNames + '*Name:* ' + channelName + '\n' + '*HSL_URL:* ' + channel.HSL_URL + '\n \n'; //appending "channelName" to "channelNames"
         });
 
         slack.setWebhook(config.cityActivation);
@@ -156,10 +156,10 @@ exports.channelCreationSuccess = (body, allChannels) => {
         cityName = cityName.split(' ').join('').toLowerCase();//removing spaces from city name
 
         allChannels.forEach(channel => {
-            let channelName = channel;
+            let channelName = channel.channelName;
             channelName = channelName.split(' ');//removing spaces from channel name
             channelName = channelName[0];
-            channelNames = channelNames + channelName + '\n'; //appending "channelName" to "channelNames"
+            channelNames = channelNames + '*Name:* ' + channelName + '\n' + '*HSL_URL:* ' + channel.HSL_URL + '\n \n'; //appending "channelName" to "channelNames"
         });
 
         slack.setWebhook(config.cityActivation);
@@ -171,7 +171,7 @@ exports.channelCreationSuccess = (body, allChannels) => {
                 author: 'adeel',
                 color: '#38d67a',
                 title: 'Success',
-                text: `Following channels are created successfully: \n` + channelNames,
+                text: `Following channels are created successfully: \n \n` + channelNames,
             }]
         }, function (err, response) {
             // if (err) {

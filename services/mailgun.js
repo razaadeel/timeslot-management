@@ -24,13 +24,13 @@ exports.sendEmail = (type, body) => {
             subject = 'New City Activation Request';
             html = `<div>Create the following channels manually: </div>`;
             body.forEach(channel => {
-                html = html + `<div>${channel}</div>`
+                html = html + `<div>Name: ${channel.channelName}</div><div>HSL_URL: ${channel.HSL_URL}</div>`
             });
         } else if (type === 'channelCreationSuccess') {
             subject = 'Channels Created Successfully';
             html = `<div>Following channels are created successfully: </div>`;
             body.forEach(channel => {
-                html = html + `<div>${channel}</div>`
+                html = html + `<div>Name: ${channel.channelName}</div><div>HSL_URL: ${channel.HSL_URL}</div>`
             });
         } else if (type === 'newUser') {
             subject = 'Time Slot Creation Alert';

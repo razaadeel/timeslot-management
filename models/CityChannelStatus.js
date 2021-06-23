@@ -14,6 +14,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             defaultValue: 'manual'
         },
+        HslUrl: {
+            type: DataTypes.STRING,
+            defaultValue: ''
+        }
     }, {
         timestamps: true,
         tableName: 'CityChannelStatus'
@@ -38,6 +42,13 @@ module.exports = (sequelize, DataTypes) => {
         await CityChannelStatus.update(
             { status: 'active' },
             { where: { cityId: cityId } }
+        );
+    }
+
+    CityChannelStatus.updateChannelHslUrl = async (cityId, channel, url) => {
+        await CityChannelStatus.update(
+            { HslUrl: url },
+            { where: { cityId: cityId, channelName: channel } }
         );
     }
 
