@@ -136,58 +136,90 @@ exports.qencodeRequest = async (req, res) => {
 
             let firstAdSlot = [];
             let secondAdSlot = [];
+            let check30 = true;
+            let check60 = true;
+
+            let adsObjects1 = await getBucketObjects("ads/30/");
+            let adsObjects2 = await getBucketObjects("ads/60/");
+
             for (let i = 0; i < 2; i++) {
-                let adBucket = 'ads/';
-
-                // let adSlotNum = 1;
+                let adsObjects;
                 let adSlotNum = Math.floor(Math.random() * 2);
-
                 if (adSlotNum === 1) {
-                    adBucket = adBucket + '60/'
+                    adsObjects = adsObjects2;
                 } else {
-                    adBucket = adBucket + '30/'
+                    adsObjects = adsObjects1;
                 }
-                let adsObjects = await s3.getBucketObjects(adBucket);
 
                 //removing first element (1st element is folder root)
                 adsObjects.splice(0, 1);
 
                 //picking video randomly from adsObject
-                if (adSlotNum === 1) {
+                if (adSlotNum === 1 & adsObjects.length > 0) {
+                    console.log("0")
                     if (i === 0) {
                         let adNum1 = Math.floor(Math.random() * adsObjects.length);
                         firstAdSlot.push(adsObjects[adNum1]);
-                    } else {
+                        check60 = false;
+                    } else if (i === 1 & (adsObjects.length > 1 || check60)) {
+
                         let adNum1 = Math.floor(Math.random() * adsObjects.length);
                         while (firstAdSlot.some(item => item.Key === adsObjects[adNum1].Key)) {
                             adNum1 = Math.floor(Math.random() * adsObjects.length);
                         }
                         secondAdSlot.push(adsObjects[adNum1]);
                     }
-
-                } else {
-                    if (i === 0) {
-                        let adNum1 = Math.floor(Math.random() * adsObjects.length);
-                        firstAdSlot.push(adsObjects[adNum1]);
-                        let adNum2 = Math.floor(Math.random() * adsObjects.length);
+                    else { console.log("3 not") }
+                }
+                else {
+                    adsObjects1.splice(0, 1);
+                    if (i === 0 & adsObjects1.length >= 2) {
+                        let adNum1 = Math.floor(Math.random() * adsObjects1.length);
+                        firstAdSlot.push(adsObjects1[adNum1]);
+                        let adNum2 = Math.floor(Math.random() * adsObjects1.length);
                         while (adNum2 === adNum1) {
-                            adNum2 = Math.floor(Math.random() * adsObjects.length);
+                            adNum2 = Math.floor(Math.random() * adsObjects1.length);
                         }
-                        firstAdSlot.push(adsObjects[adNum2]);
-                    } else {
-                        let adNum1 = Math.floor(Math.random() * adsObjects.length);
-                        while (firstAdSlot.some(item => item.Key === adsObjects[adNum1].Key)) {
-                            adNum1 = Math.floor(Math.random() * adsObjects.length);
+                        firstAdSlot.push(adsObjects1[adNum2]);
+                        check30 = false;
+                    } else if (i === 1 & (adsObjects1.length > 3 || check30) & adsObjects1.length >= 2) {
+                        let adNum1 = Math.floor(Math.random() * adsObjects1.length);
+                        while (firstAdSlot.some(item => item.Key === adsObjects1[adNum1].Key)) {
+                            adNum1 = Math.floor(Math.random() * adsObjects1.length);
                         }
-                        secondAdSlot.push(adsObjects[adNum1]);
-                        let adNum2 = Math.floor(Math.random() * adsObjects.length);
+                        secondAdSlot.push(adsObjects1[adNum1]);
+                        let adNum2 = Math.floor(Math.random() * adsObjects1.length);
                         while (
-                            firstAdSlot.some(item => item.Key === adsObjects[adNum2].Key)
-                            || secondAdSlot.some(item => item.Key === adsObjects[adNum2].Key)
+                            firstAdSlot.some(item => item.Key === adsObjects1[adNum2].Key)
+                            || secondAdSlot.some(item => item.Key === adsObjects1[adNum2].Key)
                         ) {
-                            adNum2 = Math.floor(Math.random() * adsObjects.length);
+                            adNum2 = Math.floor(Math.random() * adsObjects1.length);
                         }
-                        secondAdSlot.push(adsObjects[adNum2]);
+                        secondAdSlot.push(adsObjects1[adNum2]);
+                    }
+                    else if (i === 0) {
+                        adsObjects2.splice(0, 1);
+                        if (adsObjects2.length > 0) {
+                            let adNum1 = Math.floor(Math.random() * adsObjects2.length);
+                            firstAdSlot.push(adsObjects2[adNum1]);
+                            check60 = false;
+                        }
+                        else { console.log("9 not") }
+                    }
+                    else if (i === 1) {
+                        adsObjects2.splice(0, 1);
+                        if ((adsObjects2.length > 1 || check60) & adsObjects2.length > 0) {
+                            let adNum1 = Math.floor(Math.random() * adsObjects2.length);
+                            while (firstAdSlot.some(item => item.Key === adsObjects2[adNum1].Key)) {
+                                adNum1 = Math.floor(Math.random() * adsObjects2.length);
+                            }
+                            secondAdSlot.push(adsObjects2[adNum1]);
+                            console.log("11")
+                        }
+                        else { console.log("12 not") }
+                    }
+                    else {
+                        console.log("not have to")
                     }
                 }
             }
@@ -217,8 +249,8 @@ exports.qencodeRequest = async (req, res) => {
             throw new Error('Error while transcoding video');
         }
     } catch (error) {
-        console.log(error)
-        console.error(error, 'Qencode');;
+        console.log(error);
+        console.error(error, 'Qencode');
         return res.status(401).json({ message: 'something went wrong' });
     }
 }
