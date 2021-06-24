@@ -21,7 +21,7 @@ exports.createChannel = async (body) => {
             channelName = channelName.split(' ');
             channelName = channelName[0];
 
-            let HSL_URL = `https://5e1d043cba697.streamlock.net:443/${channelName}/${channelName}/playlist.m3u8`;
+            let HLS_URL = `https://5e1d043cba697.streamlock.net:443/${channelName}/${channelName}/playlist.m3u8`;
 
             let xml = `<?xml version='1.0'?>
             <methodCall>
@@ -94,11 +94,11 @@ exports.createChannel = async (body) => {
                     let status = result.methodResponse.params[0].param[0].value[0].struct[0].member[0].value[0].string[0];
                     if (status === 'failed') {
                         let errMsg = result.methodResponse.params[0].param[0].value[0].struct[0].member[1].value[0].string[0];
-                        errorChannels.push({ channelName, HSL_URL });
+                        errorChannels.push({ channelName, HLS_URL });
                         await slack.error({ message: errMsg, stack: 'services/mediacp.js line 98' }, `Error while creating a chanenl ${channelName}`);
 
                     } else {
-                        successfulChannels.push({ channelName, HSL_URL });
+                        successfulChannels.push({ channelName, HLS_URL });
                     }
 
                     if ([...body.channels].length - 1 == index) {

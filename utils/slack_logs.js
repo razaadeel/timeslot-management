@@ -120,7 +120,7 @@ exports.channelCreationRequest = (body, allChannels) => {
             let channelName = channel.channelName;;
             channelName = channelName.split(' ');//removing spaces from channel name
             channelName = channelName[0];
-            channelNames = channelNames + '*Name:* ' + channelName + '\n' + '*HSL_URL:* ' + channel.HSL_URL + '\n \n'; //appending "channelName" to "channelNames"
+            channelNames = channelNames + '*Name:* ' + channelName + '\n' + '*HLS_URL:* ' + channel.HLS_URL + '\n \n'; //appending "channelName" to "channelNames"
         });
 
         slack.setWebhook(config.cityActivation);
@@ -159,7 +159,7 @@ exports.channelCreationSuccess = (body, allChannels) => {
             let channelName = channel.channelName;
             channelName = channelName.split(' ');//removing spaces from channel name
             channelName = channelName[0];
-            channelNames = channelNames + '*Name:* ' + channelName + '\n' + '*HSL_URL:* ' + channel.HSL_URL + '\n \n'; //appending "channelName" to "channelNames"
+            channelNames = channelNames + '*Name:* ' + channelName + '\n' + '*HLS_URL:* ' + channel.HLS_URL + '\n \n'; //appending "channelName" to "channelNames"
         });
 
         slack.setWebhook(config.cityActivation);

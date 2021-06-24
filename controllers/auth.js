@@ -115,8 +115,8 @@ exports.createUser = async (req, res) => {
                 channelName = channelName.split(' ');
                 channelName = channelName[0];
 
-                let HSL_URL = `https://5e1d043cba697.streamlock.net:443/${channelName}/${channelName}/playlist.m3u8`;
-                await db.CityChannelStatus.updateChannelHslUrl(cityId, channel.channelName, HSL_URL);
+                let HLS_URL = `https://5e1d043cba697.streamlock.net:443/${channelName}/${channelName}/playlist.m3u8`;
+                await db.CityChannelStatus.updateChannelHslUrl(cityId, channel.channelName, HLS_URL);
             });
         }
 
