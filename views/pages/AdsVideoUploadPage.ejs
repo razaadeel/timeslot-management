@@ -205,9 +205,9 @@
                     </div>
 
                     <div>
-                        <input type="radio" id="30sec" name="duration" value="28">
+                        <input type="radio" id="30sec" name="duration" value="30">
                         <label for="30sec">30 sec</label><br>
-                        <input type="radio" id="60sec" name="duration" value="58">
+                        <input type="radio" id="60sec" name="duration" value="60">
                         <label for="60sec">60 sec</label><br>
                     </div>
 
@@ -302,7 +302,6 @@
         $('#upload-btn').on('click', () => {
 
             let duration = $('input[name="duration"]:checked').val();
-            console.log(duration)
             if (duration) {
 
                 var displayMessage = function (message, isError) {
@@ -312,7 +311,7 @@
 
                 }
 
-                if (vid.duration >= Number(duration)) {
+                if (vid.duration >= Number(duration) - 2) {
                     // var message = `Video length is ${parseInt(vid.duration/60)} minutes, Good`;
                     var message = ``;
                     var isError = false;
@@ -368,7 +367,7 @@
                     });
                 }
                 else {
-                    var message = `Video duration must be greater or equal to ${duration} sec.`;
+                    var message = `Video duration must be greater or equal to ${duration - 2} sec.`;
                     var isError = true;
                     displayMessage(message, isError)
                 }
