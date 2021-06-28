@@ -184,6 +184,13 @@
         outline: 0 none;
     }
 
+    .name-checbox-container {
+        margin-bottom: 10px;
+        width: 95%;
+        display: grid;
+        grid-template-columns: 1fr 11fr;
+    }
+
     .checbox-container {
         margin-top: 20px;
         width: 95%;
@@ -209,9 +216,15 @@
         display: none;
         margin-top: 20px;
     }
+
+    #msform .form-loading {
+        margin-top: 100px;
+    }
 </style>
 
 <body>
+
+
     <!-- multistep form -->
     <form id="msform">
         <!-- logo -->
@@ -224,42 +237,59 @@
             <li>Select Timeslot</li>
             <li>Program Details</li>
         </ul>
+
+
+        <!-- form loading -->
+        <div class='form-loading'>
+            <img src="http://cdnjs.cloudflare.com/ajax/libs/semantic-ui/0.16.1/images/loader-large.gif"
+                alt="processing..." />
+        </div>
+
+
         <!-- fieldsets -->
-        <fieldset>
+        <fieldset class='form-step-one'>
             <h2 class="fs-title">Verify Contact Details</h2>
             <!-- <h3 class="fs-subtitle">All fields are required</h3> -->
 
-            <% if(channel==='ElectedOfficials' ) {%>
-                <input type="text" id="officialFirstName" name="officialFirstName"
-                    placeholder="Officials First Name (required)" required />
-                <input type="text" id="officialLastName" name="officialLastName"
-                    placeholder="Officials Last Name (required)" required />
-                <input type="text" id="offcialTitle" name="offcialTitle"
-                    placeholder="Elected Officials Title (required)" required />
-                <% } else if(channel==="Candidate" ){%>
-                    <input type="text" id="candidateFirstName" name="candidateFirstName"
-                        placeholder="Candidates First Name (required)" required />
-                    <input type="text" id="candidateLastName" name="candidateLastName"
-                        placeholder="Candidates Last Name (required)" required />
-                    <% } else{%>
-                        <input type="text" id="organizationName" name="organizationName"
-                            placeholder="<%- channel !== 'Entertainment'?'Organization Name (required)':'Org / Business / Individual Name (required)' %>"
-                            required />
-                        <% }%>
+            <% if(channel!=='ElectedOfficials' && channel!=='Candidate' ){%>
+                <input type="text" id="organizationName" name="organizationName"
+                    placeholder="<%- channel !== 'Entertainment'?'Organization Name (required)':'Org / Business / Individual Name (required)' %>"
+                    required />
+                <%}%>
 
+                    <input type="text" id="firstName" name="firstName" placeholder="Contact First Name (required)"
+                        id="First Name" required />
+                    <input type="text" id="lastName" name="lastName" placeholder="Contact Last Name (required)"
+                        required />
+                    <input type="text" id="contactTitle" name="contactTitle" placeholder="Contact Title (optional)" />
+                    <% if(channel==='ElectedOfficials' ) {%>
+                        <div class="name-checbox-container">
+                            <input type="checkbox" id="nameOption" name="nameOption" value="true" class="checkboxes" />
+                            <label for="nameOption" class="checkboxes">
+                                If below fields are same as First and Last Name
+                            </label>
+                        </div>
+                        <input type="text" id="officialFirstName" name="officialFirstName"
+                            placeholder="Officials First Name (required)" required />
+                        <input type="text" id="officialLastName" name="officialLastName"
+                            placeholder="Officials Last Name (required)" required />
+                        <input type="text" id="offcialTitle" name="offcialTitle"
+                            placeholder="Elected Officials Title (required)" required />
+                        <%}%>
 
-                            <input type="text" id="firstName" name="firstName"
-                                placeholder="Contact First Name (required)" id="First Name" required />
-                            <input type="text" id="lastName" name="lastName" placeholder="Contact Last Name (required)"
-                                required />
-                            <input type="text" id="contactTitle" name="contactTitle"
-                                placeholder="Contact Title (optional)" />
-                            <input type="text" id="email" name="email" placeholder="Contact Email (required)"
-                                required />
-                            <input type="text" id="phoneNumber" name="phoneNumber" placeholder="Phone Number (required)"
-                                required />
-                            <input type="text" id="website" name="website" placeholder="Website (optional)" />
-                            <input type="button" id="step1" name="next" class="next action-button" value="Next" />
+                            <%if(channel==="Candidate" ){%>
+                                <input type="text" id="candidateFirstName" name="candidateFirstName"
+                                    placeholder="Candidates First Name (required)" required />
+                                <input type="text" id="candidateLastName" name="candidateLastName"
+                                    placeholder="Candidates Last Name (required)" required />
+                                <%}%>
+                                    <input type="text" id="email" name="email" placeholder="Contact Email (required)"
+                                        required />
+                                    <input type="text" id="phoneNumber" name="phoneNumber"
+                                        placeholder="Phone Number (required)" required />
+                                    <input type="text" id="website" name="website" placeholder="Website (optional)" />
+                                    <input type="button" id="step1" name="next" class="next action-button"
+                                        value="Next" />
         </fieldset>
 
         <fieldset>
@@ -315,12 +345,13 @@
     </form>
 
     <script>
-
         // success function for chargify user api
         const setChargifyUserValues = (data) => {
-            $('#firstName').val(data.first_name);
-            $('#lastName').val(data.last_name);
-            $('#email').val(data.email);
+            $('.form-step-one').show();
+            $('.form-loading').hide();
+            $('#firstName').val(data.first_name).prop('readonly', true);
+            $('#lastName').val(data.last_name).prop('readonly', true);
+            $('#email').val(data.email).prop('readonly', true);
             $('#phoneNumber').val(data.phone);
             $('#organizationName').val(data.organization);
         }
@@ -330,18 +361,40 @@
         let url = new URL(url_string);
         let customerId = url.searchParams.get("customer_id");
         let subscriptionId = url.searchParams.get("subscription_id");
-        console.log(customerId, subscriptionId)
         if (customerId) {
+            $('.form-step-one').hide();
             $.ajax({
                 type: 'GET',
                 url: `/api/data/chargify-user?customerId=${customerId}`,
                 success: setChargifyUserValues,
                 error: () => {
                     alert('Something went wrong!');
+                    $('.form-loading').hide();
+                    $('.form-step-one').show();
                 },
                 contentType: "application/json"
             });
+        } else {
+            $('.form-loading').hide();
         }
+
+        //if nameOption is selected
+        $('#nameOption').change(function () {
+            if (this.checked) {
+                if ('<%=channel ==="ElectedOfficials"%>') {
+                    $('#officialFirstName').val($('#firstName').val()).prop('readonly', true);
+                    $('#officialLastName').val($('#lastName').val()).prop('readonly', true);
+                } else {
+                    $('#candidateFirstName').val($('#firstName').val()).prop('readonly', true);
+                    $('#candidateLastName').val($('#lastName').val()).prop('readonly', true);
+                }
+            } else {
+                $('#officialFirstName').prop('readonly', false);
+                $('#officialLastName').prop('readonly', false);
+                $('#candidateFirstName').prop('readonly', false);
+                $('#candidateLastName').prop('readonly', false);
+            }
+        });
 
         // enable/disable step1 button
         // $('#step1').attr('disabled', 'disabled');
@@ -514,7 +567,6 @@
                 $('#states').append(new Option(item.state, item.code));
             });
         }
-
         // function will be called on document load 
         getStates();
 
@@ -620,19 +672,21 @@
             values.chargify_customerId = customerId;
             values.chargify_subscriptionId = subscriptionId;
 
-            $('#pageloader').css('display', 'block');
-            $('#step3').hide();
-            $('#submit').hide();
+            console.log(values)
 
-            // this endipont will create user and save booking details
-            $.ajax({
-                type: 'POST',
-                url: `/api/auth/create-user/${channelId}`,
-                data: JSON.stringify(values),
-                success: () => authSuccess(values),
-                error: authError,
-                contentType: "application/json"
-            });
+            // $('#pageloader').css('display', 'block');
+            // $('#step3').hide();
+            // $('#submit').hide();
+
+            // // this endipont will create user and save booking details
+            // $.ajax({
+            //     type: 'POST',
+            //     url: `/api/auth/create-user/${channelId}`,
+            //     data: JSON.stringify(values),
+            //     success: () => authSuccess(values),
+            //     error: authError,
+            //     contentType: "application/json"
+            // });
 
         });
 
