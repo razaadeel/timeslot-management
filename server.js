@@ -34,6 +34,11 @@ app.use('/api/data', require('./routes/api/data'));
 app.use('/api/auth', require('./routes/api/auth'));
 app.use('/api/video', require('./routes/api/video'));
 app.use('/api/webhook', require('./routes/api/webhooks'));
+
+//router for testing purpose
+app.use('/test', require('./routes/api/test'));
+
+// sending 404 for unknown routes
 app.use('*', function (req, res) {
     res.status(404)
     if (req.headers.accept.indexOf('html'))
@@ -42,8 +47,6 @@ app.use('*', function (req, res) {
         res.send("URL cannot found");
 })
 
-//router for testing purpose
-app.use('/test', require('./routes/api/test'));
 
 let port = process.env.PORT || 5000;
 app.listen(port, () => {
