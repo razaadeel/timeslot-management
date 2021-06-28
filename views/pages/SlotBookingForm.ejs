@@ -674,19 +674,19 @@
 
             console.log(values)
 
-            // $('#pageloader').css('display', 'block');
-            // $('#step3').hide();
-            // $('#submit').hide();
+            $('#pageloader').css('display', 'block');
+            $('#step3').hide();
+            $('#submit').hide();
 
-            // // this endipont will create user and save booking details
-            // $.ajax({
-            //     type: 'POST',
-            //     url: `/api/auth/create-user/${channelId}`,
-            //     data: JSON.stringify(values),
-            //     success: () => authSuccess(values),
-            //     error: authError,
-            //     contentType: "application/json"
-            // });
+            // this endipont will create user and save booking details
+            $.ajax({
+                type: 'POST',
+                url: `/api/auth/create-user/${channelId}`,
+                data: JSON.stringify(values),
+                success: () => authSuccess(values),
+                error: authError,
+                contentType: "application/json"
+            });
 
         });
 
