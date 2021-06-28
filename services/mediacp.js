@@ -17,7 +17,7 @@ exports.createChannel = async (body) => {
         body.channels.forEach(async (channel, index) => {
             let cityName = body.city;
             cityName = cityName.split(' ').join('').toLowerCase();
-            let channelName = `test-${(body.stateCode).toLowerCase() + '-' + cityName + '-' + (channel.channelName).toLowerCase()}`
+            let channelName = `${(body.stateCode).toLowerCase() + '-' + cityName + '-' + (channel.channelName).toLowerCase()}`
             channelName = channelName.split(' ');
             channelName = channelName[0];
 

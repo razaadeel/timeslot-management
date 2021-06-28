@@ -139,8 +139,8 @@ exports.qencodeRequest = async (req, res) => {
             let check30 = true;
             let check60 = true;
 
-            let adsObjects1 = await getBucketObjects("ads/30/");
-            let adsObjects2 = await getBucketObjects("ads/60/");
+            let adsObjects1 = await s3.getBucketObjects("ads/30/");
+            let adsObjects2 = await s3.getBucketObjects("ads/60/");
 
             for (let i = 0; i < 2; i++) {
                 let adsObjects;
