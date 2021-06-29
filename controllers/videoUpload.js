@@ -95,9 +95,12 @@ exports.uploadVideo = async (req, res) => {
                     //sending response to front end for video upload
                     res.json({ message: 'successful' });
 
-                    let channel = await db.CityChannelStatus.getChannelStatus(userBooking.cityId, userBooking.channelName);
+                    let chn = userBooking.channelName === 'Entertainment' ? 'Ent' : userBooking.channelName;
+                    let channel = await db.CityChannelStatus.getChannelStatus(userBooking.cityId, chn);
+                    
                     if (channel) {
                         if (channel.scheduling === 'automated') {
+                            console.log(channel.scheduling);
                             //sending file for transcoding for automated system
                             transcode.automatedSystem(videoLocation, destination, outputVideoName);
 
