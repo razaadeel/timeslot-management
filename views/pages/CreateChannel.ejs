@@ -190,8 +190,6 @@
         $('#create-channel').submit(function (e) {
             e.preventDefault();
 
-            $('#submit-btn').hide();
-            $('#loading-btn').show();
 
             let values = { channels: [] };
             $.each($(this).serializeArray(), function (i, field) {
@@ -202,21 +200,27 @@
                 }
             });
 
-            $.ajax({
-                method: 'post',
-                url: `/api/internal-channel/create`,
-                data: values,
-                success: (res) => {
-                    $('#submit-btn').show();
-                    $('#loading-btn').hide();
-                    alert('Request sent for creating channels');
-                },
-                error: err => {
-                    $('#submit-btn').show();
-                    $('#loading-btn').hide();
-                    alert('Something went wrong while creating channels');
-                }
-            });
+            if (values.channels.length > 0) {
+                $('#submit-btn').hide();
+                $('#loading-btn').show();
+                $.ajax({
+                    method: 'post',
+                    url: `/api/internal-channel/create`,
+                    data: values,
+                    success: (res) => {
+                        $('#submit-btn').show();
+                        $('#loading-btn').hide();
+                        alert('Request sent for creating channels');
+                    },
+                    error: err => {
+                        $('#submit-btn').show();
+                        $('#loading-btn').hide();
+                        alert('Something went wrong while creating channels');
+                    }
+                });
+            } else {
+                alert('Please check atleast 1 channel');
+            }
 
         });
 
