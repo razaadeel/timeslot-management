@@ -7,10 +7,9 @@ exports.createChannel = async (req, res) => {
         let city = await db.City.cityDetails(cityId);
 
         // creating channnel in mediacp
-        // mediacp.createChannelByForm({ channels, stateCode, city });
+        mediacp.createChannelByForm({ channels, stateCode, city });
 
         //updating status and url of channel
-        console.log(cityId)
         channels.forEach(async item => {
             let cityName = city.cityName.split(' ').join('').toLowerCase();
             let channelName = `${stateCode.toLowerCase() + '-' + cityName + '-' + item.toLowerCase()}`

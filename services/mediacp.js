@@ -132,15 +132,14 @@ exports.createChannel = async (body) => {
 
 exports.createChannelByForm = async (data) => {
     try {
-        console.log(data)
         let successfulChannels = [];
         let errorChannels = [];
-        data.channels.forEach(async item => {
+        data.channels.forEach(async (item, index) => {
             let cityName = data.city.cityName.split(' ').join('').toLowerCase();
             let channelName = `${data.stateCode.toLowerCase() + '-' + cityName + '-' + item.toLowerCase()}`
             channelName = channelName.split(' ');
             channelName = channelName[0];
-
+            console.log(channelName)
             let HLS_URL = `https://5e1d043cba697.streamlock.net:443/${channelName}/${channelName}/playlist.m3u8`;
 
             let xml = `<?xml version='1.0'?>
@@ -166,10 +165,6 @@ exports.createChannelByForm = async (data) => {
                     <member>
                         <name>slug</name>
                         <value><string>${channelName}</string></value>
-                    </member>
-                    <member>
-                        <name>password</name>
-                        <value><string>${config.mediacp.password}</string></value>
                     </member>
                     <member>
                         <name>adminpassword</name>
@@ -221,15 +216,18 @@ exports.createChannelByForm = async (data) => {
                         successfulChannels.push({ channelName, HLS_URL });
                     }
 
-                    if ([...body.channels].length - 1 == index) {
+                    console.log(data.channels)
+                    console.log([...data.channels].length)
+                    if ([...data.channels].length - 1 == index) {
+                        console.log([...data.channels].length)
                         //send notifications after 3 sec
                         setTimeout(() => {
                             if (successfulChannels.length > 0) {
-                                slack.channelCreationSuccess(body, successfulChannels);
+                                slack.channelCreationSuccess({}, successfulChannels);
                                 mailgun.sendEmail('channelCreationSuccess', successfulChannels);
                             }
                             if (errorChannels.length > 0) {
-                                slack.channelCreationRequest(body, errorChannels);
+                                slack.channelCreationRequest({}, errorChannels);
                                 mailgun.sendEmail('channelCreationRequest', errorChannels);
                             }
                         }, 3000);

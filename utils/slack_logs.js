@@ -152,8 +152,8 @@ exports.channelCreationSuccess = (body, allChannels) => {
     try {
         let channelNames = '';
 
-        let cityName = body.city;
-        cityName = cityName.split(' ').join('').toLowerCase();//removing spaces from city name
+        // let cityName = body.city;
+        // cityName = cityName.split(' ').join('').toLowerCase();//removing spaces from city name
 
         allChannels.forEach(channel => {
             let channelName = channel.channelName;
