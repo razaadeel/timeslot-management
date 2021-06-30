@@ -52,5 +52,42 @@ module.exports = (sequelize, DataTypes) => {
         );
     }
 
+    CityChannelStatus.activeStates = async () => {
+        let query = `select DISTINCT on (ct."stateName") * from "CityChannelStatus" ccs
+        join "Cities" ct on ct.id = ccs."cityId"
+        where ccs."status" = 'active';`
+        let states = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+        return states;
+    }
+
+    CityChannelStatus.activeCitiesOfState = async (stateCode) => {
+        let query = `select DISTINCT on ("cityId") * from "CityChannelStatus" ccs
+                    join "Cities" ct on ct.id = ccs."cityId"
+                    where ct."stateCode" = '${stateCode}' and ccs.status = 'active';`
+        let cities = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+        return cities;
+    }
+
+    CityChannelStatus.activeChannelsOfCity = async (cityId) => {
+        let query = `select * from "CityChannelStatus" ccs
+                    where ccs."cityId" = ${cityId} and ccs.status = 'active';`
+        let channels = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+        return channels;
+    }
+
+    CityChannelStatus.offlineChannelsOfCity = async (cityId) => {
+        let query = `select * from "CityChannelStatus" ccs
+                    where ccs."cityId" = ${cityId} and ccs.status = 'offline';`
+        let channels = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+        return channels;
+    }
+
+    CityChannelStatus.updateChannel = async (cityId, channelName, HslUrl) => {
+        CityChannelStatus.update(
+            { status: 'active', HslUrl: HslUrl },
+            { where: { cityId: cityId, channelName: channelName } }
+        );
+    }
+
     return CityChannelStatus;
 };

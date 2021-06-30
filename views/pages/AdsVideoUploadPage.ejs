@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Upload</title>
+    <title>Document</title>
 
     <!-- Font Awesome kit script -->
     <script src="https://kit.fontawesome.com/a81368914c.js"></script>
@@ -22,249 +22,330 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet"
+        id="bootstrap-css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #1259A7;
+        }
+
+        .form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        }
+
+        .logo-image {
+            height: 100px;
+            width: 100px;
+            object-fit: contain;
+        }
+
+        .custom-file {
+            margin: 20px 0
+        }
+
+        .submit-btn {
+            background-color: #1259A7;
+            color: white;
+            border: 0 none;
+            outline: none;
+        }
+
+        .submit-btn:hover {
+            color: lightgray;
+        }
+
+        #loading-btn {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .progress-loading {
+            display: none;
+        }
+
+        .error {
+            color: red;
+            margin-bottom: 10px;
+        }
+
+        /* modal css start */
+        .modal-confirm {
+            color: #434e65;
+            width: 525px;
+            z-index: 10000;
+        }
+
+        .modal-confirm .modal-content {
+            padding: 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        .modal-confirm .error-modal-header {
+            background: #e85e6c;
+            border-bottom: none;
+            position: relative;
+            text-align: center;
+            margin: -20px -20px 0;
+            border-radius: 5px 5px 0 0;
+            padding: 35px;
+        }
+
+        .modal-confirm .success-modal-header {
+            background: #47c9a2;
+            border-bottom: none;
+            position: relative;
+            text-align: center;
+            margin: -20px -20px 0;
+            border-radius: 5px 5px 0 0;
+            padding: 35px;
+        }
+
+        .modal-confirm h4 {
+            text-align: center;
+            font-size: 36px;
+            margin: 10px 0;
+        }
+
+        .modal-confirm .form-control,
+        .modal-confirm .btn {
+            min-height: 40px;
+            border-radius: 3px;
+        }
+
+        .modal-confirm .close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: #fff;
+            text-shadow: none;
+            opacity: 0.5;
+        }
+
+        .modal-confirm .close:hover {
+            opacity: 0.8;
+        }
+
+        .modal-confirm .icon-box {
+            color: #fff;
+            width: 95px;
+            height: 95px;
+            display: inline-block;
+            border-radius: 50%;
+            z-index: 9;
+            border: 5px solid #fff;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .modal-confirm .icon-box i {
+            font-size: 58px;
+            margin: -2px 0 0 -2px;
+        }
+
+        .modal-confirm.modal-dialog {
+            margin-top: 80px;
+        }
+
+        .modal-confirm .btn,
+        .modal-confirm .btn:active {
+            color: #fff;
+            border-radius: 4px;
+            background: #eeb711 !important;
+            text-decoration: none;
+            transition: all 0.4s;
+            line-height: normal;
+            border-radius: 30px;
+            margin-top: 10px;
+            padding: 6px 20px;
+            min-width: 150px;
+            border: none;
+        }
+
+        .modal-confirm .btn:hover,
+        .modal-confirm .btn:focus {
+            background: #eda645 !important;
+            outline: none;
+        }
+    </style>
 </head>
 
-<style>
-    .file-upload input[type='file'] {
-        display: none;
-    }
-
-    body {
-        background: linear-gradient(to right, #135BA8, #4d89c9, #135BA8);
-        height: 100vh;
-    }
-
-    .rounded-lg {
-        border-radius: 1rem;
-    }
-
-    .custom-file-label.rounded-pill {
-        border-radius: 50rem;
-    }
-
-    .custom-file-label.rounded-pill::after {
-        border-radius: 0 50rem 50rem 0;
-    }
-
-    #loading-btn {
-        display: none;
-        margin-top: 10px;
-    }
-
-    .progress-loading {
-        display: none;
-    }
-
-    /* modal css start */
-    .modal-confirm {
-        color: #434e65;
-        width: 525px;
-    }
-
-    .modal-confirm .modal-content {
-        padding: 20px;
-        font-size: 16px;
-        border-radius: 5px;
-        border: none;
-    }
-
-    .modal-confirm .error-modal-header {
-        background: #e85e6c;
-        border-bottom: none;
-        position: relative;
-        text-align: center;
-        margin: -20px -20px 0;
-        border-radius: 5px 5px 0 0;
-        padding: 35px;
-    }
-
-    .modal-confirm .success-modal-header {
-        background: #47c9a2;
-        border-bottom: none;
-        position: relative;
-        text-align: center;
-        margin: -20px -20px 0;
-        border-radius: 5px 5px 0 0;
-        padding: 35px;
-    }
-
-    .modal-confirm h4 {
-        text-align: center;
-        font-size: 36px;
-        margin: 10px 0;
-    }
-
-    .modal-confirm .form-control,
-    .modal-confirm .btn {
-        min-height: 40px;
-        border-radius: 3px;
-    }
-
-    .modal-confirm .close {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        color: #fff;
-        text-shadow: none;
-        opacity: 0.5;
-    }
-
-    .modal-confirm .close:hover {
-        opacity: 0.8;
-    }
-
-    .modal-confirm .icon-box {
-        color: #fff;
-        width: 95px;
-        height: 95px;
-        display: inline-block;
-        border-radius: 50%;
-        z-index: 9;
-        border: 5px solid #fff;
-        padding: 15px;
-        text-align: center;
-    }
-
-    .modal-confirm .icon-box i {
-        font-size: 58px;
-        margin: -2px 0 0 -2px;
-    }
-
-    .modal-confirm.modal-dialog {
-        margin-top: 80px;
-    }
-
-    .modal-confirm .btn,
-    .modal-confirm .btn:active {
-        color: #fff;
-        border-radius: 4px;
-        background: #eeb711 !important;
-        text-decoration: none;
-        transition: all 0.4s;
-        line-height: normal;
-        border-radius: 30px;
-        margin-top: 10px;
-        padding: 6px 20px;
-        min-width: 150px;
-        border: none;
-    }
-
-    .modal-confirm .btn:hover,
-    .modal-confirm .btn:focus {
-        background: #eda645 !important;
-        outline: none;
-    }
-
-    .error {
-        color: red;
-    }
-
-    .errInfo {
-        color: green;
-    }
-
-    /* modal css end */
-</style>
-
 <body>
-    <div class="container p-5">
-        <div class="row">
-            <div class="col-lg-5 mx-auto">
-                <div class="p-5 bg-white shadow rounded-lg">
-                    <img src="https://pp.netclipart.com/pp/s/251-2515071_upload-button-clipart-circle-upload-button.png"
-                        alt="" width="100" class="d-block mx-auto mb-4 rounded-pill">
+    <div class="form-container">
+        <form class="form" id="uploadForm">
+            <div class="text-center">
+                <img src="https://citystreamingtelevision.com/img/logo.png" class="rounded logo-image" alt="brand">
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="organizationName">Oraganization:</label>
+                    <input type="text" class="form-control" name="organizationName" id="organizationName"
+                        placeholder="Oraganization Name" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="campaignName">Campaign:</label>
+                    <input type="text" class="form-control" name="campaignName" id="campaignName"
+                        placeholder="Campaign Name" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="state">State</label>
+                    <select id="state" class="form-control" name="state">
+                        <option selected disabled value="">Choose...</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="city">City</label>
+                    <select id="city" class="form-control" name="city">
+                        <option selected disabled value="">Choose...</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="channel">Channel</label>
+                    <select id="channel" class="form-control" name="channel">
+                        <option selected disabled value="">Choose...</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="campaignName">Total Budget:</label>
+                    <input type="number" class="form-control" name="budget" id="budget" placeholder="Total Budget"
+                        required>
+                </div>
+            </div>
 
-                    <!-- Default bootstrap file upload-->
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label>Start Date</label>
+                    <input type="text" name="startDate" id="start-date" class="form-control" placeholder="Choose"
+                        required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label>End Date</label>
+                    <input type="text" name="endDate" id="end-date" class="form-control" placeholder="Choose" required>
+                </div>
+            </div>
+            <div class="custom-file form-group">
+                <input type="file" class="custom-file-input" id="customFile" name="customFile">
+                <label class="custom-file-label" for="customFile">Choose file</label>
+            </div>
 
-                    <h6 class="text-center mb-4 text-muted">
-                        Choose the file to upload.
-                    </h6>
+            <h6 style="overflow: hidden;" class="text-center text-muted" style="margin-top: 10px;" id="fileName"></h6>
 
-                    <div class="custom-file overflow-hidden rounded-pill">
-                        <input id="customFile" type="file" accept="video/*" class="custom-file-input rounded-pill">
-                        <label for="customFile" class="custom-file-label rounded-pill">Choose file</label>
+            <div class="form-group">
+                <span>Select Duration of Ad: </span>
+                <input type="radio" id="30sec" name="duration" value="30">
+                <label for="30sec">30 sec</label>
+                <input type="radio" id="60sec" name="duration" value="60">
+                <label for="60sec">60 sec</label>
+            </div>
+
+            <!-- progress bar  -->
+            <div class="progress-loading">
+                <div class="progress progress-striped active">
+                    <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0"
+                        aria-valuemax="100">
                     </div>
+                </div>
+            </div>
 
-                    <!--test start  -->
-                    <div id="message"></div>
-                    <video id="myVideo" hidden></video>
-                    <!-- test end -->
+            <div>
+                <div id="message"></div>
+                <video id="myVideo" hidden></video>
+            </div>
+
+            <button type="submit" id="upload-btn" class="btn btn-lg btn-block submit submit-btn">Submit</button>
+            <button class="btn btn-lg btn-block submit-btn" type="submit action-btn" id="loading-btn" disabled>
+                <span class="spinner-border spinner-border-md" role="status" aria-hidden="true"></span>
+                Uploading...
+            </button>
+        </form>
 
 
-                    <!-- End -->
-
-                    <h6 style="overflow: hidden;" class="text-center mb-4 text-muted" id="fileName"></h6>
-
-                    <!-- progress bar  -->
-                    <div class="progress-loading">
-                        <div class="progress progress-striped active">
-                            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0"
-                                aria-valuemax="100">
-                            </div>
+        <!--Error Modal HTML -->
+        <div id="errorModal" class="modal fade">
+            <div class="modal-dialog modal-confirm">
+                <div class="modal-content">
+                    <div class="error-modal-header justify-content-center">
+                        <div class="icon-box">
+                            <i class="material-icons">&#xE5CD;</i>
                         </div>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     </div>
-
-                    <div>
-                        <input type="radio" id="30sec" name="duration" value="30">
-                        <label for="30sec">30 sec</label><br>
-                        <input type="radio" id="60sec" name="duration" value="60">
-                        <label for="60sec">60 sec</label><br>
+                    <div class="modal-body text-center">
+                        <h4>Ooops!</h4>
+                        <p>Something went wrong.</p>
+                        <button class="btn btn-success" data-dismiss="modal">Close</button>
                     </div>
-
-                    <div class="d-flex justify-content-center mt-3">
-                        <button class="btn btn-success" id="upload-btn">Upload</button>
-
-                        <button class="btn btn-primary" type="button" id="loading-btn" disabled>
-                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                            Uploading...
-                        </button>
-                    </div>
-                    <!-- End -->
                 </div>
             </div>
         </div>
-    </div>
 
-
-    <!--Error Modal HTML -->
-    <div id="errorModal" class="modal fade">
-        <div class="modal-dialog modal-confirm">
-            <div class="modal-content">
-                <div class="error-modal-header justify-content-center">
-                    <div class="icon-box">
-                        <i class="material-icons">&#xE5CD;</i>
+        <!-- Success Modal HTML -->
+        <div id="successModal" class="modal fade">
+            <div class="modal-dialog modal-confirm">
+                <div class="modal-content">
+                    <div class="success-modal-header justify-content-center">
+                        <div class="icon-box">
+                            <i class="material-icons">&#xE876;</i>
+                        </div>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     </div>
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                </div>
-                <div class="modal-body text-center">
-                    <h4>Ooops!</h4>
-                    <p>Something went wrong.</p>
-                    <button class="btn btn-success" data-dismiss="modal">Close</button>
+                    <div class="modal-body text-center">
+                        <h4>Great!</h4>
+                        <p>Video uploaded successfully.</p>
+                        <button class="btn btn-success" data-dismiss="modal">Close</button>
+                    </div>
                 </div>
             </div>
         </div>
+
     </div>
 
-    <!-- Success Modal HTML -->
-    <div id="successModal" class="modal fade">
-        <div class="modal-dialog modal-confirm">
-            <div class="modal-content">
-                <div class="success-modal-header justify-content-center">
-                    <div class="icon-box">
-                        <i class="material-icons">&#xE876;</i>
-                    </div>
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                </div>
-                <div class="modal-body text-center">
-                    <h4>Great!</h4>
-                    <p>Video uploaded successfully.</p>
-                    <button class="btn btn-success" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
+        $("#start-date").datepicker({
+            dateFormat: 'mm/dd/yy',
+            changeMonth: true,
+            changeYear: false,
+            minDate: 0,
+            onSelect: function () {
+                let endDate = $('#end-date');
+                let startDate = $(this).datepicker('getDate');
+                startDate.setDate(startDate.getDate() + 1);
+                //dt2 not set or dt1 date is greater than dt2 date
+                endDate.datepicker('setDate', startDate);
+                //first day which can be selected in dt2 is selected date in dt1
+                endDate.datepicker('option', 'minDate', startDate);
+            }
+        });
+        $("#end-date").datepicker({
+            dateFormat: 'mm/dd/yy',
+            changeMonth: true,
+            changeYear: false,
+            minDate: Date.now()
+        });
+
         $('#customFile').change(function (e) {
             var fileName = e.target.files[0].name;
             $('#fileName').text(fileName);
@@ -295,14 +376,61 @@
                 var fileURL = URL.createObjectURL(file)
                 videoNode.src = fileURL
             }
-            var inputNode = document.querySelector('input')
+            var inputNode = document.querySelector('#customFile')
             inputNode.addEventListener('change', playSelectedFile, false)
         })();
 
-        $('#upload-btn').on('click', () => {
+
+        //getting active states
+        const getActiveStates = () => {
+            $.ajax({
+                type: 'get',
+                url: `/api/data/active-states`,
+                success: data => {
+                    data.forEach(item => {
+                        $('#state').append(new Option(item.stateName, item.stateCode));
+                    });
+                },
+                error: (e) => { }
+            });
+        }
+        getActiveStates();
+
+        //getting active cities of state 
+        $('#state').change(function () {
+            let option = new Option('Choonse', null, true)
+            option.disabled
+
+            $('#city').empty();
+            $('#city').append(new Option('Choose..', '', true,));
+
+            $('#channel').empty();
+            $('#channel').append(new Option('Choose..', '', true,));
+            $.ajax({
+                type: 'get',
+                url: `/api/data/active-cities/${this.value}`,
+                success: data => {
+                    data.forEach(item => {
+                        $('#city').append(new Option(item.cityName, item.cityName));
+                    });
+                },
+                error: (e) => { }
+            });
+        });
+
+        $('#uploadForm').submit(function (e) {
+            e.preventDefault();
 
             let duration = $('input[name="duration"]:checked').val();
             if (duration) {
+                console.log(duration)
+
+                let values = {};
+                $.each($(this).serializeArray(), function (i, field) {
+                    values[field.name] = field.value;
+                });
+
+                console.log(values)
 
                 var displayMessage = function (message, isError) {
                     var element = document.querySelector('#message');
@@ -310,6 +438,8 @@
                     element.className = isError ? 'error' : 'errInfo';
 
                 }
+
+                console.log(vid.duration)
 
                 if (vid.duration >= Number(duration) - 2) {
                     // var message = `Video length is ${parseInt(vid.duration/60)} minutes, Good`;

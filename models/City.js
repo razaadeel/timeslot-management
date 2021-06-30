@@ -37,5 +37,10 @@ module.exports = (sequelize, DataTypes) => {
         return cities;
     }
 
+    City.cityDetails = async (id) => {
+        let city = await City.findOne({ where: { id } });
+        return city;
+    }
+
     return City;
 }

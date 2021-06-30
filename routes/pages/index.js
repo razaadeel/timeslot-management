@@ -46,8 +46,14 @@ router.get('/ads-upload', (req, res) => {
     res.render('pages/AdsVideoUploadPage');
 });
 
+// billing portal auth
 router.get('/auth-billing-portal', (req, res) => {
     res.render('pages/BillingAuthPage', { error: '' });
+});
+
+//create channel form ----> for SIMON
+router.get('/create-channels', (req, res) => {
+    res.render('pages/CreateChannel', { error: '' });
 });
 
 module.exports = router;

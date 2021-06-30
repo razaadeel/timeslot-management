@@ -58,3 +58,54 @@ exports.getChargifyUser = async (req, res) => {
         });
     }
 }
+
+exports.activeStates = async (req, res) => {
+    try {
+        let states = await db.CityChannelStatus.activeStates();
+        res.json(states);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Something went wrong"
+        });
+    }
+}
+
+exports.activeCitiesOfState = async (req, res) => {
+    try {
+        let { stateCode } = req.params;
+        let cities = await db.CityChannelStatus.activeCitiesOfState(stateCode);
+        res.json(cities);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Something went wrong"
+        });
+    }
+}
+
+exports.activeChannelsOfCity = async (req, res) => {
+    try {
+        let { cityId } = req.params;
+        let channels = await db.CityChannelStatus.activeChannelsOfCity(cityId);
+        res.json(channels);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Something went wrong"
+        });
+    }
+}
+
+exports.offlineChannelsOfCity = async (req, res) => {
+    try {
+        let { cityId } = req.params;
+        let channels = await db.CityChannelStatus.offlineChannelsOfCity(cityId);
+        res.json(channels);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Something went wrong"
+        });
+    }
+}
