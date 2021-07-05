@@ -2,7 +2,6 @@ const aws = require('aws-sdk');
 const multerS3 = require('multer-s3');
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 
 const env = process.env.NODE_ENV || 'development';
 
@@ -128,7 +127,7 @@ exports.videoAdUpload = multer({
         }
     }),
     // limits: { fileSize: 2000000 }, // In bytes: 2000000 bytes = 2 MB
-    fileFilter: function (req, file, cb) {
+    fileFilter: async function (req, file, cb) {
         checkFileType(file, cb);
     }
-}).single('video');
+}).single('video')

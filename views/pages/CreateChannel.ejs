@@ -172,7 +172,7 @@
 
             $.ajax({
                 type: 'get',
-                url: `/api/data/oflline-channels/${this.value}`,
+                url: `/api/data/channels/${this.value}?status=offline`,
                 success: data => {
                     $('#channels-select').empty();
                     data.forEach(item => {

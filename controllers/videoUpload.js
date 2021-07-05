@@ -5,6 +5,7 @@ const chargify = require('../services/chargify');
 const transcode = require('../services/qencode');
 const mailgun = require('../services/mailgun');
 const slack = require('../utils/slack_logs');
+const multiparty = require('multiparty');
 
 exports.uploadVideo = async (req, res) => {
     try {
@@ -97,7 +98,7 @@ exports.uploadVideo = async (req, res) => {
 
                     let chn = userBooking.channelName === 'Entertainment' ? 'Ent' : userBooking.channelName;
                     let channel = await db.CityChannelStatus.getChannelStatus(userBooking.cityId, chn);
-                    
+
                     if (channel) {
                         if (channel.scheduling === 'automated') {
                             console.log(channel.scheduling);
@@ -259,42 +260,87 @@ exports.qencodeRequest = async (req, res) => {
 }
 
 
-//ADS upload controller
-exports.uploadAdVideo = async (req, res) => {
+exports.checkCampaignName = async (req, res, next) => {
     try {
-        // service created to upload videos to wasabi s3
-        s3.videoAdUpload(req, res, async (error) => {
-            if (error) {
-                console.log('errors', error);
-                return res.status(400).json({ error: error });
-            } else {
-                // If File not found
-                if (req.file === undefined) {
-                    console.log('Error: No File Selected!');
-                    return res.status(400).json('Error: No File Selected');
-                } else {
-                    // If Success
-                    const videoName = req.file.key;
-                    const videoLocation = req.file.location;
-                    const videoDuration = req.body.duration;
-
-                    let outputVideoName = `${videoName}-${videoDuration}.mp4`
-                    res.json({ message: 'successful' });
-
-                    //sending file for transcoding
-                    transcode.uploadAds(videoLocation, outputVideoName, videoDuration);
-
-                    return true;
-                }
+        let form = new multiparty.Form();
+        form.parse(req, async function (err, fields, files) {
+            //form data is in "fields", each field is in the form of array 
+            let isCampaignExists = await db.CampaignInfo.checkName(fields.adsUserId[0], fields.campaignName[0]);
+            if (isCampaignExists) {
+                return res.status(400).json({ message: 'Campaign already exists' });
             }
+            next();
         });
     } catch (error) {
         console.log(error);
+        console.error(error, 'Error while checking campaign name in ad upload form');
         return res.status(401).json({ message: 'something went wrong' });
     }
 }
 
+//ADS upload controller
+exports.uploadAdVideo = async (req, res) => {
 
+    let { campaignName, adsUserId } = req.query;
+
+    let isCampaignExists = await db.CampaignInfo.checkName(adsUserId, campaignName);
+    if (isCampaignExists) {
+        return res.status(400).json({ message: 'Campaign already exists' });
+    }
+
+    // service created to upload videos to wasabi s3
+    s3.videoAdUpload(req, res, async (error) => {
+        if (error) {
+            console.log('errors', error);
+            return res.status(400).json({ error: error });
+        } else {
+            // If File not found
+            if (req.file === undefined) {
+                console.log('Error: No File Selected!');
+                return res.status(400).json('Error: No File Selected');
+            } else {
+                // If Success
+                try {
+                    const videoName = req.file.key;
+                    const videoURL = req.file.location;
+                    const data = req.body
+                    let outputVideoName = `${data.campaignName}-${data.duration}.mp4`;
+                    // if (data.channel) {
+                    //     let channelName = data.channel.split(' ');
+                    //     channelName = channelName[0];
+                    //     channelName = channelName === 'Ent' ? 'Public' : channelName;
+                    //     let destination = `stv-curated-data/${data.state}/${data.cityName}/${channelName}/Ads/${outputVideoName}`;
+
+                    //     if (data.scheduling === 'automated') {
+                    //         transcode.automatedSystemAd(videoURL, destination, data.duration);
+                    //     } else {
+                    //         transcode.manualSystemAd(videoURL, destination, data.duration);
+                    //     }
+
+                    // } else {
+                    //     let destination = `stv-curated-data/${data.state}/${data.cityName}/Ads/${outputVideoName}`;
+                    //     transcode.manualSystemAd(videoURL, destination, data.duration);
+                    // }
+                    //Saving campaign info
+                    res.json({ message: 'Successful' });
+                    console.log(JSON.parse(data.channels));
+                    data.videoUrl = videoURL;
+                    let campaign = await db.CampaignInfo.createCampaign(data);
+                    // await db.CampaignChannels.saveCampaignChannels(campaign.id, data.channels);
+
+                    return true;
+
+                } catch (error) {
+                    console.log(error);
+                    return res.status(401).json({ message: 'something went wrong' });
+                }
+            }
+        }
+    });
+
+}
+
+//UPLOADING VIDEO TO MEDIA CONVERT
 exports.uploadVideoMediaConvert = async (req, res) => {
     try {
         req.destination = 'AL/Albertville/Community/Mon/0700'

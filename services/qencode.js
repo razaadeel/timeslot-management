@@ -229,8 +229,8 @@ exports.stitchVideos = async (destination, ftp, outputVideoName, firstAdSlot, se
 }
 
 
-//ADS VIDEO UPLOAD
-exports.uploadAds = async (videoUrl, outputVideoName, duration) => {
+//ADS VIDEO UPLOAD FOR MANUAL SYSTEM
+exports.manualSystemAd = async (videoUrl, destination, duration) => {
     try {
         const qencode = new QencodeApiClient(config.qencodeApiKey);
         let transcodingParams = {
@@ -240,7 +240,7 @@ exports.uploadAds = async (videoUrl, outputVideoName, duration) => {
                     "start_time": 0,
                     "duration": duration,
                     "destination": {
-                        url: `s3://s3.wasabisys.com/temporary-ads-run/ads/${duration}/${outputVideoName}`,
+                        url: `s3://s3.wasabisys.com/${destination}`,
                         key: config.wasabi.accessKeyId,
                         secret: config.wasabi.secretAccessKey,
                         permissions: "public-read"
@@ -275,6 +275,58 @@ exports.uploadAds = async (videoUrl, outputVideoName, duration) => {
     } catch (error) {
         console.log(error)
         console.error(error, 'testing error');;
+        res.status(400).json({ message: error.message });
+    }
+}
+
+//ADS VIDEO UPLOAD FOR AUTOMATED SYSTEM
+exports.automatedSystemAd = async (videoUrl, destination, duration) => {
+    try {
+        const qencode = new QencodeApiClient(config.qencodeApiKey);
+        let transcodingParams = {
+            "format": [
+                {
+                    "output": "mp4",
+                    "start_time": 0,
+                    "duration": duration,
+                    "destination": {
+                        url: `s3://s3.us-east-1.amazonaws.com/${destination}`,
+                        key: config.aws.accessKeyId,
+                        secret: config.aws.secretAccessKey,
+                        permissions: "public-read"
+                    },
+                    "audio_bitrate": "128",
+                    "optimize_bitrate": "0",
+                    "max_bitrate": "1000",
+                    "bitrate": "1000",
+                    "framerate": "24",
+                    "keyframe": "2s"
+                }
+            ],
+            encoder_version: "2",
+            source: videoUrl,
+        }
+
+        let task = qencode.CreateTask();
+        let i = 0;
+        while (true) {
+            if (i < 2) {
+                let transcode = await task.StartCustom(transcodingParams);
+                i++;
+                if (transcode.error == 0) {
+                    console.log('video upload successfull')
+                    break;
+                } else {
+                    console.log(transcode)
+                }
+            }
+            else {
+                break;
+            }
+        }
+    } catch (error) {
+        console.log(error);
+        console.error(error, 'testing error');
         res.status(400).json({ message: error.message });
     }
 }

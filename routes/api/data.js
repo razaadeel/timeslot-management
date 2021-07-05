@@ -22,10 +22,9 @@ router.get('/active-states', dataController.activeStates);
 //Get active city of 
 router.get('/active-cities/:stateCode', dataController.activeCitiesOfState);
 
-//Get states where channels are active
-router.get('/active-channels/:cityId', dataController.activeChannelsOfCity);
+//Get channels based on their status which will send in query i.e ?status=active/offline
+router.get('/channels', dataController.channelsStatusOfCity);
 
-//Get states where channels are active
-router.get('/oflline-channels/:cityId', dataController.offlineChannelsOfCity);
+//router.get('/channels/:cityId', dataController.channelsStatusOfCity);
 
 module.exports = router;
