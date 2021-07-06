@@ -5,7 +5,7 @@ const chargify = require('../services/chargify');
 const transcode = require('../services/qencode');
 const mailgun = require('../services/mailgun');
 const slack = require('../utils/slack_logs');
-const multiparty = require('multiparty');
+const moment = require('moment');
 
 exports.uploadVideo = async (req, res) => {
     try {
@@ -71,7 +71,7 @@ exports.uploadVideo = async (req, res) => {
                     }
 
                     //saving video data to ContentVideoUpload
-                    db.ContentVideoUpload.saveVideoDetails({
+                    let videoData = await db.ContentVideoUpload.saveVideoDetails({
                         inputName: req.file.key,
                         outputName: outputVideoName,
                         destination: destination
@@ -110,13 +110,13 @@ exports.uploadVideo = async (req, res) => {
 
                         } else {
                             //sending file for transcoding for manual system
-                            transcode.manualSystem(videoLocation, destination, outputVideoName, userId);
+                            transcode.manualSystem(videoLocation, destination, outputVideoName, userId, videoData.id);
                         }
                     } else {
 
                         //if channel is not found in "CityChannelStatus" (table)
                         // temporary we are sending them to manual system
-                        transcode.manualSystem(videoLocation, destination, outputVideoName, userId);
+                        transcode.manualSystem(videoLocation, destination, outputVideoName, userId, videoData.id);
                     }
 
                     return true;
@@ -134,127 +134,361 @@ exports.uploadVideo = async (req, res) => {
 // callback route controller for quencode
 exports.qencodeRequest = async (req, res) => {
     try {
+        res.json({ message: 'success' });
 
-        let status = JSON.parse(req.body.status);
-        if (status.error == 0 && req.body.event === 'saved') {
+        // let status = JSON.parse(req.body.status);
+        // if (status.error == 0 && req.body.event === 'saved') {
 
-            let firstAdSlot = [];
-            let secondAdSlot = [];
-            let check30 = true;
-            let check60 = true;
+        let destination = req.query.destination;
+        let splitDestination = destination.split('/');
+        let state = splitDestination[1].toLowerCase();
+        let city = splitDestination[2].split(' ').join('').toLowerCase();
+        let channel = splitDestination[3].toLowerCase() === 'public' ? 'entertainment' : splitDestination[3].toLowerCase();
+        let day = splitDestination[4];
+        let timeslot = splitDestination[5];
 
-            let adsObjects1 = await s3.getBucketObjects("ads/30/");
-            let adsObjects2 = await s3.getBucketObjects("ads/60/");
+        let outputvideoname = day + '-' + timeslot + '-' + req.query.outputvideoname;
 
-            for (let i = 0; i < 2; i++) {
-                let adsObjects;
-                let adSlotNum = Math.floor(Math.random() * 2);
-                if (adSlotNum === 1) {
-                    adsObjects = adsObjects2;
-                } else {
-                    adsObjects = adsObjects1;
-                }
+        let userId = req.query.userId;
+        let videoId = req.query.videoId;
 
-                //removing first element (1st element is folder root)
-                adsObjects.splice(0, 1);
 
-                //picking video randomly from adsObject
-                if (adSlotNum === 1 & adsObjects.length > 0) {
-                    console.log("0")
-                    if (i === 0) {
-                        let adNum1 = Math.floor(Math.random() * adsObjects.length);
-                        firstAdSlot.push(adsObjects[adNum1]);
-                        check60 = false;
-                    } else if (i === 1 & (adsObjects.length > 1 || check60)) {
+        let firstAdSlot = [];
+        let secondAdSlot = [];
+        let check30 = true;
+        let check60 = true;
 
-                        let adNum1 = Math.floor(Math.random() * adsObjects.length);
-                        while (firstAdSlot.some(item => item.Key === adsObjects[adNum1].Key)) {
-                            adNum1 = Math.floor(Math.random() * adsObjects.length);
-                        }
-                        secondAdSlot.push(adsObjects[adNum1]);
+        let firstInternalCheck30 = true;
+        let firstInternalCheck60 = true;
+
+        let secondInternalCheck30 = true;
+        let secondInternalCheck60 = true;
+
+
+        let adsObjects1 = await db.CampaignInfo.getCampaignName(state, city, channel, 30, "high"); //35
+        let adsObjects2 = await db.CampaignInfo.getCampaignName(state, city, channel, 60, "high"); //35
+
+        let adsObjects3 = await db.CampaignInfo.getInternalCampaignName(state, city, channel, 30, "low"); //10
+        let adsObjects4 = await db.CampaignInfo.getInternalCampaignName(state, city, channel, 60, "low"); //10
+
+        let adsObjects5 = await db.CampaignInfo.getInternalCampaignName("0", "0", channel, 30, "low"); //5
+        let adsObjects6 = await db.CampaignInfo.getInternalCampaignName("0", "0", channel, 60, "low"); //5
+
+        // let adsObjects1 = await db.CampaignInfo.getCampaignName("GA", "columbus", "Faith", 30, "high"); //35
+        // let adsObjects2 = await db.CampaignInfo.getCampaignName("GA", "columbus", "Faith", 60, "high"); //35
+
+        // let adsObjects3 = await db.CampaignInfo.getInternalCampaignName("GA", "columbus", "Faith", 30, "low"); //10
+        // let adsObjects4 = await db.CampaignInfo.getInternalCampaignName("GA", "columbus", "Faith", 60, "low"); //10
+
+        // let adsObjects5 = await db.CampaignInfo.getInternalCampaignName("0", "0", "Faith", 30, "low"); //5
+        // let adsObjects6 = await db.CampaignInfo.getInternalCampaignName("0", "0", "Faith", 60, "low"); //5
+
+
+        for (let i = 0; i < 2; i++) {
+            // let adBucket = 'ads/';
+            let adsObjects;
+            // let adSlotNum = 1;
+            let adSlotNum = Math.floor(Math.random() * 2);
+            if (adSlotNum === 1) {
+                // adBucket = adBucket + '60/'
+                adsObjects = adsObjects2;
+            } else {
+                // adBucket = adBucket + '30/'
+                adsObjects = adsObjects1;
+            }
+            //removing first element (1st element is folder root)
+            //picking video randomly from adsObject
+
+            if (adSlotNum === 1 & adsObjects.length > 0) {
+                console.log("0")
+                if (i === 0) {
+                    let adNum1 = Math.floor(Math.random() * adsObjects.length);
+                    firstAdSlot.push(adsObjects[adNum1]);
+                    check60 = false;
+                    console.log("1")
+                } else if (i === 1 & (adsObjects.length > 1 || check60)) {
+
+                    let adNum1 = Math.floor(Math.random() * adsObjects.length);
+                    while (firstAdSlot.some(item => item.id === adsObjects[adNum1].id)) {
+                        adNum1 = Math.floor(Math.random() * adsObjects.length);
                     }
-                    else { console.log("3 not") }
+                    secondAdSlot.push(adsObjects[adNum1]);
+                    console.log("2")
+                }
+                else if (i === 1 & (adsObjects3.length > 1)) {
+                    console.log("3 not")
+                    let adNum1 = Math.floor(Math.random() * adsObjects3.length);
+                    while (firstAdSlot.some(item => item.id === adsObjects3[adNum1].id)) {
+                        adNum1 = Math.floor(Math.random() * adsObjects3.length);
+                    }
+                    secondAdSlot.push(adsObjects3[adNum1]);
+
+                    let adNum2 = Math.floor(Math.random() * adsObjects3.length);
+                    while (
+                        firstAdSlot.some(item => item.id === adsObjects3[adNum2].id)
+                        || secondAdSlot.some(item => item.id === adsObjects3[adNum2].id)
+                    ) {
+                        adNum2 = Math.floor(Math.random() * adsObjects3.length);
+                    }
+                    secondAdSlot.push(adsObjects3[adNum2]);
+                }
+                else if (i === 1 & (adsObjects4.length > 1 || firstInternalCheck60)) {
+                    console.log("if no ads find in first internal 30 or external 60 in second slot")
+
+                    let adNum1 = Math.floor(Math.random() * adsObjects4.length);
+                    while (firstAdSlot.some(item => item.id === adsObjects4[adNum1].id)) {
+                        adNum1 = Math.floor(Math.random() * adsObjects4.length);
+                    }
+                    secondAdSlot.push(adsObjects4[adNum1]);
+
+                }
+                else if (i === 1 & (adsObjects6.length > 1 || secondInternalCheck60)) {
+                    console.log("second internal ads")
+
+                    let adNum1 = Math.floor(Math.random() * adsObjects6.length);
+                    while (firstAdSlot.some(item => item.id === adsObjects6[adNum1].id)) {
+                        adNum1 = Math.floor(Math.random() * adsObjects6.length);
+                    }
+                    secondAdSlot.push(adsObjects6[adNum1]);
+                }
+                else if (i === 1 & (adsObjects5.length > 1)) {
+                    let adNum1 = Math.floor(Math.random() * adsObjects5.length);
+                    while (firstAdSlot.some(item => item.id === adsObjects5[adNum1].id)) {
+                        adNum1 = Math.floor(Math.random() * adsObjects5.length);
+                    }
+                    secondAdSlot.push(adsObjects5[adNum1]);
+
+                    let adNum2 = Math.floor(Math.random() * adsObjects5.length);
+                    while (
+                        firstAdSlot.some(item => item.id === adsObjects5[adNum2].id)
+                        || secondAdSlot.some(item => item.id === adsObjects5[adNum2].id)
+                    ) {
+                        adNum2 = Math.floor(Math.random() * adsObjects5.length);
+                    }
+                    secondAdSlot.push(adsObjects5[adNum2]);
+                }
+                else { console.log("if nothing fount, static") }
+
+            }
+            else {
+                console.log("4")
+                if (i === 0 & adsObjects1.length >= 2) {
+                    let adNum1 = Math.floor(Math.random() * adsObjects1.length);
+                    firstAdSlot.push(adsObjects1[adNum1]);
+                    let adNum2 = Math.floor(Math.random() * adsObjects1.length);
+                    while (adNum2 === adNum1) {
+                        adNum2 = Math.floor(Math.random() * adsObjects1.length);
+                    }
+                    firstAdSlot.push(adsObjects1[adNum2]);
+                    check30 = false;
+                    console.log("5 => 30")
+
+                } else if (i === 1 & (adsObjects1.length > 3 || check30) & adsObjects1.length >= 2) {
+
+                    let adNum1 = Math.floor(Math.random() * adsObjects1.length);
+
+                    while (firstAdSlot.some(item => item.id === adsObjects1[adNum1].id)) {
+                        adNum1 = Math.floor(Math.random() * adsObjects1.length);
+                    }
+                    secondAdSlot.push(adsObjects1[adNum1]);
+                    let adNum2 = Math.floor(Math.random() * adsObjects1.length);
+                    while (
+                        firstAdSlot.some(item => item.id === adsObjects1[adNum2].id)
+                        || secondAdSlot.some(item => item.id === adsObjects1[adNum2].id)
+                    ) {
+                        adNum2 = Math.floor(Math.random() * adsObjects1.length);
+                    }
+                    console.log("temp3")
+                    secondAdSlot.push(adsObjects1[adNum2]);
+                    console.log("6 => 30")
+                }
+                else if (i === 0) {
+                    console.log("7")
+
+                    if (adsObjects2.length > 0) {
+                        let adNum1 = Math.floor(Math.random() * adsObjects2.length);
+                        firstAdSlot.push(adsObjects2[adNum1]);
+                        check60 = false;
+                        console.log("8")
+                    }
+                    else if (adsObjects4.length > 0) {
+                        console.log("9 not")
+                        let adNum1 = Math.floor(Math.random() * adsObjects4.length);
+                        firstAdSlot.push(adsObjects4[adNum1]);
+                        firstInternalCheck60 = false;
+
+                    }
+                    else if (adsObjects3.length > 1) {
+                        console.log("if can't find any first internal or external 1 min ads")
+                        let adNum1 = Math.floor(Math.random() * adsObjects3.length);
+                        firstAdSlot.push(adsObjects3[adNum1]);
+                        let adNum2 = Math.floor(Math.random() * adsObjects3.length);
+                        while (adNum2 === adNum1) {
+                            adNum2 = Math.floor(Math.random() * adsObjects3.length);
+                        }
+                        firstAdSlot.push(adsObjects3[adNum2]);
+                        firstInternalCheck30 = false;
+
+                    }
+                    else if (adsObjects5.length > 1) {
+                        console.log("if first internal 30 sec not found ")
+                        let adNum1 = Math.floor(Math.random() * adsObjects5.length);
+                        firstAdSlot.push(adsObjects5[adNum1]);
+                        let adNum2 = Math.floor(Math.random() * adsObjects5.length);
+                        while (adNum2 === adNum1) {
+                            adNum2 = Math.floor(Math.random() * adsObjects5.length);
+                        }
+                        firstAdSlot.push(adsObjects5[adNum2]);
+                        secondInternalCheck30 = false;
+                    }
+                    else if (adsObjects6.length > 0) {
+                        let adNum1 = Math.floor(Math.random() * adsObjects6.length);
+                        firstAdSlot.push(adsObjects6[adNum1]);
+                        secondInternalCheck60 = false;
+                    }
+                    else { console.log("if nothing find, here static ads") }
+                }
+                else if (i === 1) {
+                    console.log("10")
+                    if ((adsObjects2.length > 1 || check60) & adsObjects2.length > 0) {
+
+                        let adNum1 = Math.floor(Math.random() * adsObjects2.length);
+                        while (firstAdSlot.some(item => item.id === adsObjects2[adNum1].id)) {
+                            adNum1 = Math.floor(Math.random() * adsObjects2.length);
+                        }
+                        secondAdSlot.push(adsObjects2[adNum1]);
+                        console.log("11")
+                    }
+                    else if ((adsObjects3.length > 3 || firstInternalCheck30) & adsObjects3.length >= 2) {
+                        console.log("if no ads find in external 30 or external 60")
+
+                        let adNum1 = Math.floor(Math.random() * adsObjects3.length);
+                        while (firstAdSlot.some(item => item.id === adsObjects3[adNum1].id)) {
+                            adNum1 = Math.floor(Math.random() * adsObjects3.length);
+                        }
+                        secondAdSlot.push(adsObjects3[adNum1]);
+                        let adNum2 = Math.floor(Math.random() * adsObjects3.length);
+                        while (
+                            firstAdSlot.some(item => item.id === adsObjects3[adNum2].id)
+                            || secondAdSlot.some(item => item.id === adsObjects3[adNum2].id)
+                        ) {
+                            adNum2 = Math.floor(Math.random() * adsObjects3.length);
+                        }
+                        secondAdSlot.push(adsObjects3[adNum2]);
+                    }
+                    else if ((adsObjects4.length > 1 || firstInternalCheck60) & adsObjects4.length > 0) {
+                        console.log("if no ads find in external 30 or 60 and first internal 30")
+
+                        let adNum1 = Math.floor(Math.random() * adsObjects4.length);
+                        while (firstAdSlot.some(item => item.id === adsObjects4[adNum1].id)) {
+                            adNum1 = Math.floor(Math.random() * adsObjects4.length);
+                        }
+                        secondAdSlot.push(adsObjects4[adNum1]);
+                    }
+                    else if ((adsObjects5.length > 3 || secondInternalCheck30) & adsObjects5.length >= 2) {
+                        console.log("no ads in first internal 60 sec")
+                        let adNum1 = Math.floor(Math.random() * adsObjects5.length);
+                        while (firstAdSlot.some(item => item.id === adsObjects5[adNum1].id)) {
+                            adNum1 = Math.floor(Math.random() * adsObjects5.length);
+                        }
+
+                        secondAdSlot.push(adsObjects5[adNum1]);
+                        let adNum2 = Math.floor(Math.random() * adsObjects5.length);
+                        while (
+                            firstAdSlot.some(item => item.id === adsObjects5[adNum2].id)
+                            || secondAdSlot.some(item => item.id === adsObjects5[adNum2].id)
+                        ) {
+                            adNum2 = Math.floor(Math.random() * adsObjects5.length);
+                        }
+                        secondAdSlot.push(adsObjects5[adNum2]);
+                    }
+                    else if ((adsObjects6.length > 1 || secondInternalCheck60) & adsObjects6.length > 0) {
+                        console.log("no ads in second internal 30 sec slot 2")
+
+                        let adNum1 = Math.floor(Math.random() * adsObjects6.length);
+                        while (firstAdSlot.some(item => item.id === adsObjects6[adNum1].id)) {
+                            adNum1 = Math.floor(Math.random() * adsObjects6.length);
+                        }
+                        secondAdSlot.push(adsObjects6[adNum1]);
+                    }
+                    else { console.log("static ads slot 2") }
                 }
                 else {
-                    adsObjects1.splice(0, 1);
-                    if (i === 0 & adsObjects1.length >= 2) {
-                        let adNum1 = Math.floor(Math.random() * adsObjects1.length);
-                        firstAdSlot.push(adsObjects1[adNum1]);
-                        let adNum2 = Math.floor(Math.random() * adsObjects1.length);
-                        while (adNum2 === adNum1) {
-                            adNum2 = Math.floor(Math.random() * adsObjects1.length);
-                        }
-                        firstAdSlot.push(adsObjects1[adNum2]);
-                        check30 = false;
-                    } else if (i === 1 & (adsObjects1.length > 3 || check30) & adsObjects1.length >= 2) {
-                        let adNum1 = Math.floor(Math.random() * adsObjects1.length);
-                        while (firstAdSlot.some(item => item.Key === adsObjects1[adNum1].Key)) {
-                            adNum1 = Math.floor(Math.random() * adsObjects1.length);
-                        }
-                        secondAdSlot.push(adsObjects1[adNum1]);
-                        let adNum2 = Math.floor(Math.random() * adsObjects1.length);
-                        while (
-                            firstAdSlot.some(item => item.Key === adsObjects1[adNum2].Key)
-                            || secondAdSlot.some(item => item.Key === adsObjects1[adNum2].Key)
-                        ) {
-                            adNum2 = Math.floor(Math.random() * adsObjects1.length);
-                        }
-                        secondAdSlot.push(adsObjects1[adNum2]);
-                    }
-                    else if (i === 0) {
-                        adsObjects2.splice(0, 1);
-                        if (adsObjects2.length > 0) {
-                            let adNum1 = Math.floor(Math.random() * adsObjects2.length);
-                            firstAdSlot.push(adsObjects2[adNum1]);
-                            check60 = false;
-                        }
-                        else { console.log("9 not") }
-                    }
-                    else if (i === 1) {
-                        adsObjects2.splice(0, 1);
-                        if ((adsObjects2.length > 1 || check60) & adsObjects2.length > 0) {
-                            let adNum1 = Math.floor(Math.random() * adsObjects2.length);
-                            while (firstAdSlot.some(item => item.Key === adsObjects2[adNum1].Key)) {
-                                adNum1 = Math.floor(Math.random() * adsObjects2.length);
-                            }
-                            secondAdSlot.push(adsObjects2[adNum1]);
-                            console.log("11")
-                        }
-                        else { console.log("12 not") }
-                    }
-                    else {
-                        console.log("not have to")
-                    }
+                    console.log("not have to")
                 }
             }
-
-            let destination = req.query.destination;
-            let splitDestination = destination.split('/');
-            let state = splitDestination[1].toLowerCase();
-            let city = splitDestination[2].split(' ').join('').toLowerCase();
-            let channel = splitDestination[3].toLowerCase() === 'public' ? 'entertainment' : splitDestination[3].toLowerCase();
-            let day = splitDestination[4];
-            let timeslot = splitDestination[5];
-
-            let outputvideoname = day + '-' + timeslot + '-' + req.query.outputvideoname;
-
-            channel.split(' ').join('')
-            let ftp = {
-                ftpURL: 'mediastreamingcp.com:2121',
-                ftpUsername: `w1s_${state}-${city}-${channel}@162.244.81.156`,
-                secret: '654321'
-            }
-
-            //sending video for stitching
-            transcode.stitchVideos(req.query.destination, ftp, outputvideoname, firstAdSlot, secondAdSlot);
-            res.json({ message: 'success' });
         }
-        if (status.error != 0) {
-            throw new Error('Error while transcoding video');
+
+
+        let dayValue = { Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6, Sun: 7 }
+
+        const dayINeed = dayValue[day];
+        const today = moment().isoWeekday();
+
+        let date;
+        if (today < dayINeed) date = moment().isoWeekday(dayINeed).format("YYYY-MM-DD"); //If day is in current week
+        else date = moment().add(1, 'weeks').isoWeekday(dayINeed).format("YYYY-MM-DD");
+
+        let airDate = moment(date + ' ' + `${timeslot[0]}${timeslot[1]}:${timeslot[2]}${timeslot[3]}`).format();
+
+        //removing ad reporst if exists (if user uploads another video before its airDate)
+        await db.AdsReporting.removeAdReport(userId, airDate);
+
+        for (let i = 0; i < firstAdSlot.length; i++) {
+            let adSlot = "First Slot";
+            let viewers = 0;
+            let campaignID = firstAdSlot[i].id;
+
+            const stitchInfo = await db.StitchAdsInfo.saveStitchInfo({
+                userId, videoId,
+                campaignID, airDate,
+                state, city,
+                channel
+            });
+            const reportingInfo = await db.AdsReporting.saveAdsReport({
+                adSlot, viewers,
+                videoId, showName: 'Not available',
+                userId, airDate,
+                campaignID, state,
+                city, channel
+            });
         }
+        for (let i = 0; i < secondAdSlot.length; i++) {
+            let adSlot = "Second Slot";
+            let viewers = 0;
+            let campaignID = secondAdSlot[i].id;
+            const stitchInfo = await db.StitchAdsInfo.saveStitchInfo({
+                userId, videoId,
+                campaignID, airDate,
+                state, city,
+                channel
+            });
+            const reportingInfo = await db.AdsReporting.saveAdsReport({
+                adSlot, viewers,
+                videoId, showName: 'Not available',
+                userId, airDate,
+                campaignID, state,
+                city, channel
+            });
+        }
+
+        // channel.split(' ').join('')
+        // let ftp = {
+        //     ftpURL: 'mediastreamingcp.com:2121',
+        //     ftpUsername: `w1s_${state}-${city}-${channel}@162.244.81.156`,
+        //     secret: '654321'
+        // }
+
+        // // //sending video for stitching
+        // transcode.stitchVideos(req.query.destination, ftp, outputvideoname, firstAdSlot, secondAdSlot);
+        // res.json({ message: 'success' });
+        // }
+        // if (status.error != 0) {
+        //     throw new Error('Error while transcoding video');
+        // }
     } catch (error) {
         console.log(error);
-        console.error(error, 'Qencode');
+        // console.error(error, 'Qencode');
         return res.status(401).json({ message: 'something went wrong' });
     }
 }
@@ -305,28 +539,27 @@ exports.uploadAdVideo = async (req, res) => {
                     const videoURL = req.file.location;
                     const data = req.body
                     let outputVideoName = `${data.campaignName}-${data.duration}.mp4`;
-                    // if (data.channel) {
-                    //     let channelName = data.channel.split(' ');
-                    //     channelName = channelName[0];
-                    //     channelName = channelName === 'Ent' ? 'Public' : channelName;
-                    //     let destination = `stv-curated-data/${data.state}/${data.cityName}/${channelName}/Ads/${outputVideoName}`;
+                    if (data.channel) {
+                        let channelName = data.channel.split(' ');
+                        channelName = channelName[0];
+                        channelName = channelName === 'Ent' ? 'Public' : channelName;
+                        // let destination = `stv-curated-data/${data.state}/${data.cityName}/${channelName}/Ads/${outputVideoName}`;
 
-                    //     if (data.scheduling === 'automated') {
-                    //         transcode.automatedSystemAd(videoURL, destination, data.duration);
-                    //     } else {
-                    //         transcode.manualSystemAd(videoURL, destination, data.duration);
-                    //     }
+                        if (data.scheduling === 'automated') {
+                            // transcode.automatedSystemAd(videoURL, destination, data.duration);
+                        } else {
+                            transcode.manualSystemAd(videoURL, destination, data.duration);
+                        }
 
-                    // } else {
-                    //     let destination = `stv-curated-data/${data.state}/${data.cityName}/Ads/${outputVideoName}`;
-                    //     transcode.manualSystemAd(videoURL, destination, data.duration);
-                    // }
+                    } else {
+                        // let destination = `stv-curated-data/${data.state}/${data.cityName}/Ads/${outputVideoName}`;
+                        let destination = `temporary-ads-run/temp/${outputVideoName}`;
+                        transcode.manualSystemAd(videoURL, destination, data.duration);
+                    }
                     //Saving campaign info
                     res.json({ message: 'Successful' });
-                    console.log(JSON.parse(data.channels));
                     data.videoUrl = videoURL;
                     let campaign = await db.CampaignInfo.createCampaign(data);
-                    // await db.CampaignChannels.saveCampaignChannels(campaign.id, data.channels);
 
                     return true;
 

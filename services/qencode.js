@@ -62,7 +62,7 @@ exports.automatedSystem = async (videoUrl, destination, outputVideoName) => {
 }
 
 //manual system (video will sent for stitching with ads)
-exports.manualSystem = async (videoUrl, destination, outputVideoName, userId) => {
+exports.manualSystem = async (videoUrl, destination, outputVideoName, userId, videoId) => {
     try {
         const qencode = new QencodeApiClient(config.qencodeApiKey);
         let transcodingParams = {
@@ -121,8 +121,8 @@ exports.manualSystem = async (videoUrl, destination, outputVideoName, userId) =>
                 }
             ],
             encoder_version: "2",
-            // callback_url: `https://f2904128c664.ngrok.io/api/video/qencode-request?destination=${destination}&outputvideoname=${outputVideoName}&userId=${userId}`,
-            callback_url: `https://citystreamingtelevision.com/api/video/qencode-request?destination=${destination}&outputvideoname=${outputVideoName}&userId=${userId}`,
+            // callback_url: `https://f2904128c664.ngrok.io/api/video/qencode-request?destination=${destination}&outputvideoname=${outputVideoName}&userId=${userId}&videoId=${videoId}`,
+            callback_url: `https://citystreamingtelevision.com/api/video/qencode-request?destination=${destination}&outputvideoname=${outputVideoName}&userId=${userId}&videoId=${videoId}`,
             source: videoUrl
         }
         // remove space in url

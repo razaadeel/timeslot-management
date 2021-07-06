@@ -1,11 +1,8 @@
 'use strict';
 const {
-    Model
+    Model,
+    Op
 } = require('sequelize');
-const db = require('./index.js');
-// const CampaignChannels = require('./CampaignChannels.js');
-
-const CampaignChannels = db.CampaignChannels;
 
 module.exports = (sequelize, DataTypes) => {
     class CampaignInfo extends Model {
@@ -155,7 +152,10 @@ module.exports = (sequelize, DataTypes) => {
 
     CampaignInfo.createCampaign = async (data) => {
         try {
-            console.log(data.channels)
+
+            const db = require('./index.js');
+            const CampaignChannels = db.CampaignChannels;
+
             let campaign = await CampaignInfo.create({
                 campaignName: data.campaignName,
                 organizationName: data.organizationName,
@@ -170,8 +170,7 @@ module.exports = (sequelize, DataTypes) => {
                 adsUserId: data.adsUserId,
                 videoDuration: data.duration,
                 priority: data.priority,
-                // CampaignChannels: [{JSON.parse(data.channels)}]
-                CampaignChannels: [{ channelName }]
+                CampaignChannels: JSON.parse(data.channels)
             }, {
                 include: [CampaignChannels]
             });
@@ -181,6 +180,62 @@ module.exports = (sequelize, DataTypes) => {
             console.log(error)
             throw Error(error)
         }
+    }
+
+    //returns campaigns with low priority
+    CampaignInfo.getCampaignName = async (stateCode, city, channelName, duration) => {
+        const db = require('./index.js');
+        const CampaignChannels = db.CampaignChannels;
+        let adsInfo = await CampaignInfo.findAll({
+            where: {
+                stateCode: stateCode, city: city, videoDuration: duration, status: 1, priority: "high",
+                startDate: {
+                    [Op.lte]: new Date(),
+                    // [Op.gte]: new Date()
+                },
+                endDate: {
+                    // [Model.lte]: new Date(),
+                    [Op.gte]: new Date()
+                },
+                leftAmount: {
+                    [Op.gte]: 0
+                },
+            },
+            include: {
+                model: CampaignChannels,
+                where: {
+                    channelName: channelName,
+                }
+            }
+        });
+        return adsInfo;
+    }
+
+    //returns campaigns with low priority
+    CampaignInfo.getInternalCampaignName = async (stateCode, city, channelName, duration) => {
+        const db = require('./index.js');
+        const CampaignChannels = db.CampaignChannels;
+        let adsInfo = await CampaignInfo.findAll({
+            where: {
+                stateCode: stateCode, city: city, videoDuration: duration, status: 1, priority: "low",
+                startDate: {
+                    [Op.lte]: new Date(),
+                    // [Op.gte]: new Date()
+                },
+                endDate: {
+                    // [Model.lte]: new Date(),
+                    [Op.gte]: new Date()
+                },
+                leftAmount: 0,
+            },
+            include: {
+                model: CampaignChannels,
+                where: {
+                    channelName: channelName,
+                }
+            }
+        });
+        return adsInfo;
     }
 
     return CampaignInfo;

@@ -39,13 +39,5 @@ module.exports = (sequelize, DataTypes) => {
         modelName: 'CampaignChannels',
     });
 
-    // CampaignChannels.saveCampaignChannels = async (campaignId, channels) => {
-    //     try {
-    //         await CampaignChannels.create();
-    //     } catch (error) {
-    //         throw new Error(error)
-    //     }
-    // }
-
     return CampaignChannels;
 };

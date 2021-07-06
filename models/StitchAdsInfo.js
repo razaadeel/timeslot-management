@@ -75,5 +75,22 @@ module.exports = (sequelize, DataTypes) => {
         sequelize,
         modelName: 'StitchAdsInfo',
     });
+
+    StitchAdsInfo.saveStitchInfo = async (data) => {
+        try {
+            await StitchAdsInfo.create({
+                userId: data.userId,
+                videoId: data.videoId,
+                campaignId: data.campaignID,
+                airDate: data.airDate,
+                stateCode: data.state,
+                city: data.city,
+                channelName: data.channel
+            });
+        } catch (error) {
+            throw Error(error)
+        }
+    }
+
     return StitchAdsInfo;
 };

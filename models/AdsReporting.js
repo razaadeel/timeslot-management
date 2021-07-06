@@ -102,5 +102,33 @@ module.exports = (sequelize, DataTypes) => {
         modelName: 'AdsReporting',
         tableName: 'AdsReporting',
     });
+
+    AdsReporting.saveAdsReport = async (data) => {
+        try {
+            await AdsReporting.create({
+                adSlot: data.adSlot,
+                adsViewers: data.viewers,
+                videoId: data.videoId,
+                showName: 'Not available',
+                userId: data.userId,
+                airDate: data.airDate,
+                campaignId: data.campaignID,
+                stateCode: data.state,
+                city: data.city,
+                channelName: data.channel
+            });
+        } catch (error) {
+            throw Error(error)
+        }
+    }
+
+    AdsReporting.removeAdReport = async (userId, airDate) => {
+        try {
+            await AdsReporting.destroy({ where: { userId, airDate } });
+        } catch (error) {
+            throw Error(error)
+        }
+    }
+
     return AdsReporting;
 };
