@@ -183,19 +183,22 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     //returns campaigns with low priority
-    CampaignInfo.getCampaignName = async (stateCode, city, channelName, duration) => {
+    CampaignInfo.getCampaignName = async (stateCode, city, channelName, duration, priority, airDate) => {
         const db = require('./index.js');
         const CampaignChannels = db.CampaignChannels;
         let adsInfo = await CampaignInfo.findAll({
             where: {
-                stateCode: stateCode, city: city, videoDuration: duration, status: 1, priority: "high",
+                stateCode: { [Op.iLike]: stateCode },
+                city: { [Op.iLike]: city },
+                videoDuration: duration,
+                status: 1,
+                priority: priority,
                 startDate: {
                     [Op.lte]: new Date(),
-                    // [Op.gte]: new Date()
                 },
                 endDate: {
-                    // [Model.lte]: new Date(),
-                    [Op.gte]: new Date()
+                    [Op.gte]: new Date(),
+                    [Op.gte]: airDate
                 },
                 leftAmount: {
                     [Op.gte]: 0
@@ -204,7 +207,7 @@ module.exports = (sequelize, DataTypes) => {
             include: {
                 model: CampaignChannels,
                 where: {
-                    channelName: channelName,
+                    channelName: { [Op.iLike]: channelName }
                 }
             }
         });
@@ -212,30 +215,41 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     //returns campaigns with low priority
-    CampaignInfo.getInternalCampaignName = async (stateCode, city, channelName, duration) => {
+    CampaignInfo.getInternalCampaignName = async (stateCode, city, channelName, duration, priority, airDate) => {
         const db = require('./index.js');
         const CampaignChannels = db.CampaignChannels;
         let adsInfo = await CampaignInfo.findAll({
             where: {
-                stateCode: stateCode, city: city, videoDuration: duration, status: 1, priority: "low",
+                stateCode: { [Op.iLike]: stateCode },
+                city: { [Op.iLike]: city },
+                videoDuration: duration,
+                status: 1,
+                priority: priority,
                 startDate: {
                     [Op.lte]: new Date(),
-                    // [Op.gte]: new Date()
                 },
                 endDate: {
-                    // [Model.lte]: new Date(),
-                    [Op.gte]: new Date()
+                    [Op.gte]: new Date(),
+                    [Op.gte]: airDate
                 },
                 leftAmount: 0,
             },
             include: {
                 model: CampaignChannels,
                 where: {
-                    channelName: channelName,
+                    channelName: { [Op.iLike]: channelName }
                 }
             }
         });
         return adsInfo;
+    }
+
+    CampaignInfo.pauseCampaign = async (campaignId) => {
+        await CampaignInfo.update(
+            { status: 0 },
+            { where: { id: campaignId } }
+        )
+        return true;
     }
 
     return CampaignInfo;

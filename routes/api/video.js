@@ -10,6 +10,8 @@ router.post('/ad-upload', videoUploadController.uploadAdVideo);
 
 router.post('/upload-mediaconvert', multer().any(), videoUploadController.uploadVideoMediaConvert);
 
+//Qencode callback urls
 router.post('/qencode-request', videoUploadController.qencodeRequest);
+router.post('/callback/advideo-qencode-status', videoUploadController.adVideoStatus);
 
 module.exports = router;
