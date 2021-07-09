@@ -33,7 +33,7 @@ const AwsS3 = new aws.S3({
 // file type handler
 function checkFileType(file, cb) {
     // Allowed ext
-    const filetypes = /mp4|webm|mov|webm|ogv|flv|m4v/;
+    const filetypes = /mp4|webm|mov|ogg|ogv|flv|m4v/;
     // Check ext
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
     // Check mime

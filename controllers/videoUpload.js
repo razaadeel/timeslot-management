@@ -77,26 +77,27 @@ exports.uploadVideo = async (req, res) => {
 
                     //saving video data to ContentVideoUpload
                     let videoData = await db.ContentVideoUpload.saveVideoDetails({
+                        userId,
                         inputName: req.file.key,
                         outputName: outputVideoName,
                         destination: destination
                     });
 
-                    // //sending email alert for video upload
-                    // mailgun.sendEmail('contentVideoUpload', {
-                    //     email: user.email,
-                    //     inputName: req.file.key,
-                    //     outputName: outputVideoName,
-                    //     destination: destination
-                    // });
+                    //sending email alert for video upload
+                    mailgun.sendEmail('contentVideoUpload', {
+                        email: user.email,
+                        inputName: req.file.key,
+                        outputName: outputVideoName,
+                        destination: destination
+                    });
 
-                    // //sending slack alert for video upload
-                    // slack.videoUploadMsg({
-                    //     email: user.email,
-                    //     inputName: req.file.key,
-                    //     outputName: outputVideoName,
-                    //     destination: destination
-                    // });
+                    //sending slack alert for video upload
+                    slack.videoUploadMsg({
+                        email: user.email,
+                        inputName: req.file.key,
+                        outputName: outputVideoName,
+                        destination: destination
+                    });
 
                     //sending response to front end for video upload
                     res.json({ message: 'successful' });

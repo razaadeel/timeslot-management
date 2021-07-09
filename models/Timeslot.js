@@ -27,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
             and b."dayId" = ${dayId}
             and b."channelId" = ${channelId}
             and b."cityId" = ${cityId}
+            and b."isActive" = 'true' 
         )
         order by tm.id asc`
 
