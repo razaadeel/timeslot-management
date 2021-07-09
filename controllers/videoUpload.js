@@ -71,6 +71,7 @@ exports.uploadVideo = async (req, res) => {
 
                     //saving video data to ContentVideoUpload
                     db.ContentVideoUpload.saveVideoDetails({
+                        userId,
                         inputName: req.file.key,
                         outputName: outputVideoName,
                         destination: destination
@@ -97,7 +98,7 @@ exports.uploadVideo = async (req, res) => {
 
                     let chn = userBooking.channelName === 'Entertainment' ? 'Ent' : userBooking.channelName;
                     let channel = await db.CityChannelStatus.getChannelStatus(userBooking.cityId, chn);
-                    
+
                     if (channel) {
                         if (channel.scheduling === 'automated') {
                             console.log(channel.scheduling);
