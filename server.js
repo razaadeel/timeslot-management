@@ -1,9 +1,12 @@
 const express = require('express');
+const app = express();
 const path = require('path');
 
 require('./utils/slack_logs');
 
-const app = express();
+//CRON JOBS
+require('./cron_jobs/cancelBooking');
+
 
 //Database 
 const db = require('./models');

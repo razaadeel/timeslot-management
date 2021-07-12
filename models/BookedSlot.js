@@ -126,5 +126,21 @@ module.exports = (sequelize, DataTypes) => {
         return bookingDetails[0];
     }
 
+    BookedSlot.canncelBookingNoVideo = async () => {
+        let query = `update "BookedSlots"
+        set "isActive" = 'false',
+        "updatedAt" = now()
+        where not exists (
+            select from "ContentVideoUploads" cv
+            where "BookedSlots"."userId" = cv."userId"
+        )
+        and DATE_PART('day', Current_date - "BookedSlots"."createdAt")  >= 15
+        and "BookedSlots"."isActive" = 'true'
+        RETURNING *`
+
+        let updatedRecord = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+        return updatedRecord;
+    }
+
     return BookedSlot;
 }
