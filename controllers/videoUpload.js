@@ -279,7 +279,7 @@ exports.qencodeRequest = async (req, res) => {
                         secondAdSlot.push(adsObjects5[adNum2]);
                     }
                     else {
-                        firstAdSlot.push({ id: 0, videoUrl: 'https://stv-ads-data.s3.us-east-1.wasabisys.com/Testing 3-60-0.mp4' });
+                        firstAdSlot.push({ id: 0, videoUrl: 'https://s3.wasabisys.com/temporary-ads-run/ads/60/5310648197H.mpg' });
                     }
 
                 }
@@ -426,7 +426,7 @@ exports.qencodeRequest = async (req, res) => {
                         }
                         else {
                             //temporary ad 
-                            secondAdSlot.push({ id: 0, videoUrl: 'https://stv-ads-data.s3.us-east-1.wasabisys.com/Testing 3-60-0.mp4' });
+                            secondAdSlot.push({ id: 0, videoUrl: 'https://s3.wasabisys.com/temporary-ads-run/ads/60/5210042650H.mpg' });
                             console.log("static ads slot 2")
                         }
                     }
