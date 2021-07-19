@@ -43,7 +43,7 @@ exports.sendEmail = (type, body) => {
             `;
         } else if (type === 'contentVideoUpload') {
             subject = 'Content Video Upload Alert';
-            html = `A new video is uploaded by following user
+            html = `<b>${body.scheduling}</b>A new video is uploaded by following user
                     <div>Email: <b>${body.email}</b></div>
                     <div>Input Video Name: <b>${body.inputName}</b></div>
                     <div>Output Video Name: <b>${body.outputName}</b></div>

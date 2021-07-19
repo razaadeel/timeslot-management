@@ -83,12 +83,19 @@ exports.uploadVideo = async (req, res) => {
                         destination: destination
                     });
 
+                    //sending response to front end for video upload
+                    res.json({ message: 'successful' });
+
+                    let chn = userBooking.channelName === 'Entertainment' ? 'Ent' : userBooking.channelName;
+                    let channel = await db.CityChannelStatus.getChannelStatus(userBooking.cityId, chn);
+
                     //sending email alert for video upload
                     mailgun.sendEmail('contentVideoUpload', {
                         email: user.email,
                         inputName: req.file.key,
                         outputName: outputVideoName,
-                        destination: destination
+                        destination: destination,
+                        scheduling: channel.scheduling
                     });
 
                     //sending slack alert for video upload
@@ -96,14 +103,9 @@ exports.uploadVideo = async (req, res) => {
                         email: user.email,
                         inputName: req.file.key,
                         outputName: outputVideoName,
-                        destination: destination
+                        destination: destination,
+                        scheduling: channel.scheduling
                     });
-
-                    //sending response to front end for video upload
-                    res.json({ message: 'successful' });
-
-                    let chn = userBooking.channelName === 'Entertainment' ? 'Ent' : userBooking.channelName;
-                    let channel = await db.CityChannelStatus.getChannelStatus(userBooking.cityId, chn);
 
                     if (channel) {
                         if (channel.scheduling === 'automated') {
