@@ -8,7 +8,7 @@ const videoUploadController = require('../../controllers/videoUpload');
 router.get('/', async (req, res) => {
     try {
 
-        res.json({ message: 'success', airDate });
+        res.json({ message: 'success' });
     } catch (error) {
         console.log(error)
         res.status(400).json({ message: error.message });
