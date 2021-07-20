@@ -279,7 +279,8 @@ exports.qencodeRequest = async (req, res) => {
                         secondAdSlot.push(adsObjects5[adNum2]);
                     }
                     else {
-                        firstAdSlot.push({ id: 0, videoUrl: 'https://s3.wasabisys.com/temporary-ads-run/ads/60/5310648197H.mpg' });
+                        secondAdSlot.push({ id: 0, videoUrl: 'https://s3.wasabisys.com/temporary-ads-run/ads/60/5210042650H.mpg' });
+
                     }
 
                 }
@@ -359,7 +360,10 @@ exports.qencodeRequest = async (req, res) => {
                             firstAdSlot.push(adsObjects6[adNum1]);
                             secondInternalCheck60 = false;
                         }
-                        else { console.log("if nothing find, here static ads") }
+                        else {
+                            console.log("if nothing find, here static ads")
+                            firstAdSlot.push({ id: 0, videoUrl: 'https://s3.wasabisys.com/temporary-ads-run/ads/60/5310648197H.mpg' });
+                        }
                     }
                     else if (i === 1) {
                         console.log("10")
