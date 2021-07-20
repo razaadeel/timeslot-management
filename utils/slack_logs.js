@@ -59,7 +59,7 @@ exports.videoUploadMsg = (body) => {
         slack.webhook({
             channel: "#time-slot-video-submitted-alert",
             username: "webhookbot",
-            text: 'Time Slot Video Submitted Alert',
+            text: `*${body.scheduling}*`,
             attachments: [{
                 author: 'adeel',
                 color: '#38d67a',

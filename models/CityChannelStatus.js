@@ -68,6 +68,16 @@ module.exports = (sequelize, DataTypes) => {
         return cities;
     }
 
+    CityChannelStatus.allActiveChannels = async () => {
+        let channels = await CityChannelStatus.findAll({
+            where: { status: 'active' },
+            attributes: [
+                [sequelize.fn('DISTINCT', sequelize.col('channelName')), 'channelName'],
+            ]
+        })
+        return channels;
+    }
+
     CityChannelStatus.activeChannelsOfCity = async (cityId) => {
         let query = `select * from "CityChannelStatus" ccs
                     where ccs."cityId" = ${cityId} and ccs.status = 'active';`

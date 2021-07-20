@@ -84,24 +84,22 @@ exports.activeCitiesOfState = async (req, res) => {
     }
 }
 
-exports.activeChannelsOfCity = async (req, res) => {
+exports.channelsStatusOfCity = async (req, res) => {
     try {
-        let { cityId } = req.params;
-        let channels = await db.CityChannelStatus.activeChannelsOfCity(cityId);
-        res.json(channels);
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            message: "Something went wrong"
-        });
-    }
-}
+        let { status, cityId, type } = req.query;
 
-exports.offlineChannelsOfCity = async (req, res) => {
-    try {
-        let { cityId } = req.params;
-        let channels = await db.CityChannelStatus.offlineChannelsOfCity(cityId);
-        res.json(channels);
+        if (status === 'active') {
+            if (type === 'byCity') {
+                let channels = await db.CityChannelStatus.activeChannelsOfCity(cityId); //returns all active channels of city
+                res.json(channels);
+            } else {
+                let channels = await db.CityChannelStatus.allActiveChannels(); // returns distinct active channels
+                res.json(channels);
+            }
+        } else {
+            let channels = await db.CityChannelStatus.offlineChannelsOfCity(cityId);
+            res.json(channels);
+        }
     } catch (error) {
         console.log(error);
         return res.status(500).json({

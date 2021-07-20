@@ -734,7 +734,7 @@
             $('#pageloader').hide();
             $('#step3').show();
             $('#submit').show();
-            alert(error.responseJSON?.message);
+            alert(error.responseJSON ? error.responseJSON.message : error.message);
         }
 
     </script>

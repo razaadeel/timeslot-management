@@ -7,7 +7,7 @@ const config = env === 'development' ?
     : require(__dirname + '/../config/config.js'); // import in prod
 
 
-//manual system (video will upload directly to aws s3 after transcoding)
+//automated system ( content video will upload directly to aws s3 after transcoding)
 exports.automatedSystem = async (videoUrl, destination, outputVideoName) => {
     try {
         const qencode = new QencodeApiClient(config.qencodeApiKey);
@@ -61,8 +61,8 @@ exports.automatedSystem = async (videoUrl, destination, outputVideoName) => {
     }
 }
 
-//manual system (video will sent for stitching with ads)
-exports.manualSystem = async (videoUrl, destination, outputVideoName, userId) => {
+//manual system STEP:1 (video will sent for stitching with ads)
+exports.manualSystem = async (videoUrl, destination, outputVideoName, userId, videoId) => {
     try {
         const qencode = new QencodeApiClient(config.qencodeApiKey);
         let transcodingParams = {
@@ -121,8 +121,8 @@ exports.manualSystem = async (videoUrl, destination, outputVideoName, userId) =>
                 }
             ],
             encoder_version: "2",
-            // callback_url: `https://f2904128c664.ngrok.io/api/video/qencode-request?destination=${destination}&outputvideoname=${outputVideoName}&userId=${userId}`,
-            callback_url: `https://citystreamingtelevision.com/api/video/qencode-request?destination=${destination}&outputvideoname=${outputVideoName}&userId=${userId}`,
+            callback_url: `http://tms-dev01.services.citystvnetwork.com/api/video/qencode-request?destination=${destination}&outputvideoname=${outputVideoName}&userId=${userId}&videoId=${videoId}`,
+            // callback_url: `https://citystreamingtelevision.com/api/video/qencode-request?destination=${destination}&outputvideoname=${outputVideoName}&userId=${userId}&videoId=${videoId}`,
             source: videoUrl
         }
         // remove space in url
@@ -149,7 +149,8 @@ exports.manualSystem = async (videoUrl, destination, outputVideoName, userId) =>
     }
 }
 
-exports.stitchVideos = async (destination, ftp, outputVideoName, firstAdSlot, secondAdSlot) => {
+//manual system STEP:1 (stich content video with ad video for manual channels)
+exports.stitchVideos = async (destination, ftp, outputVideoName, firstAdSlot, secondAdSlot, videoNameForFtp) => {
     try {
         const qencode = new QencodeApiClient(config.qencodeApiKey);
 
@@ -157,19 +158,20 @@ exports.stitchVideos = async (destination, ftp, outputVideoName, firstAdSlot, se
         stitchArr.push({ "url": `https://s3.wasabisys.com/${destination}/1${outputVideoName}` });
 
         if (firstAdSlot.length === 1) {
-            stitchArr.push({ "url": `https://s3.wasabisys.com/temporary-ads-run/${firstAdSlot[0].Key}` });
-        } else {
-            stitchArr.push({ "url": `https://s3.wasabisys.com/temporary-ads-run/${firstAdSlot[0].Key}` });
-            stitchArr.push({ "url": `https://s3.wasabisys.com/temporary-ads-run/${firstAdSlot[1].Key}` });
+            stitchArr.push({ "url": firstAdSlot[0].videoUrl });
+        } else if (firstAdSlot.length > 1) {
+            stitchArr.push({ "url": firstAdSlot[0].videoUrl });
+            stitchArr.push({ "url": firstAdSlot[1].videoUrl });
         }
 
         stitchArr.push({ "url": `https://s3.wasabisys.com/${destination}/2${outputVideoName}` });
 
         if (secondAdSlot.length === 1) {
-            stitchArr.push({ "url": `https://s3.wasabisys.com/temporary-ads-run/${secondAdSlot[0].Key}` });
-        } else {
-            stitchArr.push({ "url": `https://s3.wasabisys.com/temporary-ads-run/${secondAdSlot[0].Key}` });
-            stitchArr.push({ "url": `https://s3.wasabisys.com/temporary-ads-run/${secondAdSlot[1].Key}` });
+            stitchArr.push({ "url": secondAdSlot[0].videoUrl });
+        } else if (secondAdSlot.length > 1) {
+
+            stitchArr.push({ "url": secondAdSlot[0].videoUrl });
+            stitchArr.push({ "url": secondAdSlot[1].videoUrl });
         }
 
         stitchArr.push({ "url": `https://s3.wasabisys.com/${destination}/3${outputVideoName}` });
@@ -195,11 +197,11 @@ exports.stitchVideos = async (destination, ftp, outputVideoName, firstAdSlot, se
                         //     "key": "w1s_adeel-test-channel@162.244.81.156",
                         //     "secret": "12345678"
                         // }
-                        {
-                            "url": 'ftp://' + ftp.ftpURL + '/' + outputVideoName,
-                            "key": ftp.ftpUsername,
-                            "secret": ftp.secret
-                        }
+                        // {
+                        //     "url": 'ftp://' + ftp.ftpURL + '/' + videoNameForFtp,
+                        //     "key": ftp.ftpUsername,
+                        //     "secret": ftp.secret
+                        // }
                     ]
                 }
             ],
@@ -228,9 +230,8 @@ exports.stitchVideos = async (destination, ftp, outputVideoName, firstAdSlot, se
     }
 }
 
-
-//ADS VIDEO UPLOAD
-exports.uploadAds = async (videoUrl, outputVideoName, duration) => {
+// transcoding ad video 
+exports.transcodeAdVideo = async (videoUrl, destinations, duration, campaignId) => {
     try {
         const qencode = new QencodeApiClient(config.qencodeApiKey);
         let transcodingParams = {
@@ -239,12 +240,7 @@ exports.uploadAds = async (videoUrl, outputVideoName, duration) => {
                     "output": "mp4",
                     "start_time": 0,
                     "duration": duration,
-                    "destination": {
-                        url: `s3://s3.wasabisys.com/temporary-ads-run/ads/${duration}/${outputVideoName}`,
-                        key: config.wasabi.accessKeyId,
-                        secret: config.wasabi.secretAccessKey,
-                        permissions: "public-read"
-                    },
+                    "destination": destinations,
                     "audio_bitrate": "128",
                     "optimize_bitrate": "0",
                     "max_bitrate": "1000",
@@ -254,6 +250,8 @@ exports.uploadAds = async (videoUrl, outputVideoName, duration) => {
                 }
             ],
             encoder_version: "2",
+            callback_url: `http://tms-dev01.services.citystvnetwork.com/api/video/callback/advideo-qencode-status?campaignId=${campaignId}`,
+            // callback_url: `https://citystreamingtelevision.com/api/video/callback/advideo-qencode-status?campaignId=${campaignId}`,
             source: videoUrl,
         }
 
@@ -266,6 +264,8 @@ exports.uploadAds = async (videoUrl, outputVideoName, duration) => {
                 if (transcode.error == 0) {
                     console.log('video upload successfull')
                     break;
+                } else {
+                    console.log(transcode)
                 }
             }
             else {
@@ -273,8 +273,7 @@ exports.uploadAds = async (videoUrl, outputVideoName, duration) => {
             }
         }
     } catch (error) {
-        console.log(error)
-        console.error(error, 'testing error');;
-        res.status(400).json({ message: error.message });
+        console.log(error);
+        console.error(error, 'Error in services/qencode');
     }
 }

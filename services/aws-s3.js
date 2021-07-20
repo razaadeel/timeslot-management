@@ -2,7 +2,6 @@ const aws = require('aws-sdk');
 const multerS3 = require('multer-s3');
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 
 const env = process.env.NODE_ENV || 'development';
 
@@ -34,7 +33,7 @@ const AwsS3 = new aws.S3({
 // file type handler
 function checkFileType(file, cb) {
     // Allowed ext
-    const filetypes = /mp4|webm|mov|webm|ogv|flv|m4v/;
+    const filetypes = /mp4|webm|mov|ogg|ogv|flv|m4v/;
     // Check ext
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
     // Check mime
@@ -128,7 +127,7 @@ exports.videoAdUpload = multer({
         }
     }),
     // limits: { fileSize: 2000000 }, // In bytes: 2000000 bytes = 2 MB
-    fileFilter: function (req, file, cb) {
+    fileFilter: async function (req, file, cb) {
         checkFileType(file, cb);
     }
-}).single('video');
+}).single('video')

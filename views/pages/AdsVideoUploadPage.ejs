@@ -28,18 +28,24 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
     <style>
+        html {
+            height: 100%;
+        }
+
         body {
             padding: 0;
             margin: 0;
             box-sizing: border-box;
+            height: 100%;
         }
 
         .form-container {
             display: flex;
+            flex: 1;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            height: 100%;
             background-color: #1259A7;
         }
 
@@ -78,6 +84,19 @@
 
         .progress-loading {
             display: none;
+        }
+
+        #allStates {
+            margin: 10px 0;
+        }
+
+        #allStates+label {
+            font-weight: 100;
+        }
+
+        #channels-select {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
         }
 
         .error {
@@ -207,42 +226,39 @@
                 </div>
             </div>
             <div class="form-row">
+                <div class="col-md-12"><input type="checkbox" id="allStates" name="allStates" value="true">
+                    <label for="allStates">Run Ad in all States</label>
+                </div>
+            </div>
+            <div class="form-row">
                 <div class="form-group col-md-6">
                     <label for="state">State</label>
-                    <select id="state" class="form-control" name="state">
+                    <select id="state" class="form-control" name="state" required>
                         <option selected disabled value="">Choose...</option>
                     </select>
                 </div>
                 <div class="form-group col-md-6">
                     <label for="city">City</label>
-                    <select id="city" class="form-control" name="city">
+                    <select id="city" class="form-control" name="city" required>
                         <option selected disabled value="">Choose...</option>
                     </select>
                 </div>
             </div>
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    <label for="channel">Channel</label>
-                    <select id="channel" class="form-control" name="channel">
-                        <option selected disabled value="">Choose...</option>
-                    </select>
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="campaignName">Total Budget:</label>
-                    <input type="number" class="form-control" name="budget" id="budget" placeholder="Total Budget"
-                        required>
-                </div>
+            <div class="form-row mb-4">
+                <label for="channel">Channel</label>
+                <div class="col-md-12" id="channels-select"></div>
             </div>
 
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label>Start Date</label>
                     <input type="text" name="startDate" id="start-date" class="form-control" placeholder="Choose"
-                        required>
+                        autocomplete="off" required>
                 </div>
                 <div class="form-group col-md-6">
                     <label>End Date</label>
-                    <input type="text" name="endDate" id="end-date" class="form-control" placeholder="Choose" required>
+                    <input type="text" name="endDate" id="end-date" class="form-control" placeholder="Choose"
+                        autocomplete="off" required>
                 </div>
             </div>
             <div class="custom-file form-group">
@@ -294,7 +310,7 @@
                     </div>
                     <div class="modal-body text-center">
                         <h4>Ooops!</h4>
-                        <p>Something went wrong.</p>
+                        <p id="error-response">Something went wrong.</p>
                         <button class="btn btn-success" data-dismiss="modal">Close</button>
                     </div>
                 </div>
@@ -354,24 +370,11 @@
         var vid = document.getElementById("myVideo");
         (function localFileVideoPlayer() {
             'use strict'
-            var URL = window.URL || window.webkitURL
-            //   var displayMessage = function (message, isError) {
-            //     var element = document.querySelector('#message')
-            //     element.innerHTML = message
-            //     element.className = isError ? 'error' : 'info'
-            //   }
+            var URL = window.URL || window.webkitURL;
             var playSelectedFile = function (event) {
                 var file = this.files[0];
                 var type = file.type;
                 var videoNode = document.querySelector('video');
-                // var canPlay = videoNode.canPlayType(type)
-                // if (canPlay === '') canPlay = 'no'
-                // var message = 'Can play type "' + type + '": ' + canPlay
-                // var isError = canPlay === 'no'
-                // displayMessage(message, isError)
-                // if (isError) {
-                //   return
-                // }
 
                 var fileURL = URL.createObjectURL(file)
                 videoNode.src = fileURL
@@ -396,53 +399,108 @@
         }
         getActiveStates();
 
+        $('#allStates').change(function () {
+            $('#channels-select').empty();
+            if (this.checked) {
+                $('#state').prop('disabled', true);
+                $('#city').prop('disabled', true);
+                getActiveChannels(null, 'all');
+            } else {
+                $('#state').prop('disabled', false);
+                $('#city').prop('disabled', false);
+
+            }
+        });
+
+        let cities = [];
         //getting active cities of state 
         $('#state').change(function () {
-            let option = new Option('Choonse', null, true)
-            option.disabled
+            let option1 = new Option('Choose', null, true, true);
+            option1.disabled = true;
+            let option2 = new Option('Choose', '', true, true);
+            option2.disabled = true;
 
             $('#city').empty();
-            $('#city').append(new Option('Choose..', '', true,));
-
+            $('#city').append(option1);
             $('#channel').empty();
-            $('#channel').append(new Option('Choose..', '', true,));
+            $('#channel').append(option2);
+
+            $('#channels-select').empty();
+
             $.ajax({
                 type: 'get',
                 url: `/api/data/active-cities/${this.value}`,
                 success: data => {
+                    cities = data;
                     data.forEach(item => {
-                        $('#city').append(new Option(item.cityName, item.cityName));
+                        $('#city').append(new Option(item.cityName, item.cityId));
                     });
                 },
                 error: (e) => { }
             });
         });
 
+        $('#city').change(function () {
+            let option = new Option('Choose', '', true, true)
+            option.disabled = true;
+
+            $('#channel').empty();
+            $('#channel').append(option);
+
+            getActiveChannels(this.value);
+
+        });
+
+        const getActiveChannels = (cityId, type = 'byCity') => {
+            $.ajax({
+                type: 'get',
+                url: `/api/data/channels?cityId=${cityId}&status=active&type=${type}`,
+                success: data => {
+                    $('#channels-select').empty();
+                    data.forEach(item => {
+                        $checkbox = `<div><input type="checkbox" id="${item.channelName}" name="channel" value="${item.channelName}">
+                                    <label for="${item.channelName}">${item.channelName}</label></div>`;
+
+                        $('#channels-select').append($checkbox);
+                    });
+                },
+                error: (e) => {
+                    console.log(e)
+                }
+            });
+        }
+
         $('#uploadForm').submit(function (e) {
             e.preventDefault();
 
             let duration = $('input[name="duration"]:checked').val();
             if (duration) {
-                console.log(duration)
 
-                let values = {};
+                let values = { channels: [] };
                 $.each($(this).serializeArray(), function (i, field) {
-                    values[field.name] = field.value;
+                    if (field.name === 'channel') {
+                        values.channels = [...values.channels, { channelName: field.value }]
+                    } else {
+                        values[field.name] = field.value;
+                    }
                 });
 
-                console.log(values)
+                if (!values.allStates) {
+                    let city = cities.filter(item => item.cityId == values.city);
+                    values.cityName = city[0].cityName;
+                    values.scheduling = city[0].scheduling;
+                }
+                values.adsUserId = 0;
+                values.budget = 0;
+                values.priority = 'low';
 
                 var displayMessage = function (message, isError) {
                     var element = document.querySelector('#message');
                     element.innerHTML = message;
                     element.className = isError ? 'error' : 'errInfo';
-
                 }
 
-                console.log(vid.duration)
-
                 if (vid.duration >= Number(duration) - 2) {
-                    // var message = `Video length is ${parseInt(vid.duration/60)} minutes, Good`;
                     var message = ``;
                     var isError = false;
                     displayMessage(message, isError);
@@ -457,12 +515,22 @@
                     $('#upload-btn').hide();
                     let formData = new FormData();
                     formData.append('video', video);
-                    formData.append('duration', duration);
+                    for (var key in values) {
+                        if (key === 'channels') {
+                            formData.append('channels', JSON.stringify(values.channels));
+                            // values.channels.forEach((item, index) => {
+                            //     formData.append('channels[]', values.channels[index]);
+                            //     console.log(values.channels[index]);
+                            // });
+                        } else {
+                            formData.append(key, values[key]);
+                        }
+                    }
                     $.ajax({
                         type: 'post',
                         processData: false,
                         contentType: false,
-                        url: `/api/video/ad-upload`,
+                        url: `/api/video/ad-upload?campaignName=${values.campaignName}&adsUserId=${values.adsUserId}`,
                         data: formData,
                         enctype: 'multipart/form-data',
                         xhr: function () {
@@ -483,16 +551,19 @@
                             $('.progress-loading').hide();
                             $('#upload-btn').show();
                             $('#successModal').modal('show');
-                            // alert('Video Uploaded Successfully');
-                            // window.location.replace('https://timeslot.citystvnetwork.com/dashboard');
+                            $("input[type=text], input[type=number]").val("");
+                            $("#state").prop('selectedIndex', 0);
+                            $("#city").prop('selectedIndex', 0);
+                            $("#channel").prop('selectedIndex', 0);
+                            $('.progress-bar').css('width', 0 + '%').attr('aria-valuenow', 0);
                         },
                         error: (e) => {
-                            console.log(e);
                             $('#loading-btn').hide();
                             $('.progress-loading').hide();
                             $('#upload-btn').show();
-                            // alert('Something went wrong while upload video');
+                            $('#error-response').text(e.responseJSON?.message || 'Something went wrong');
                             $('#errorModal').modal('show');
+                            $('.progress-bar').css('width', 0 + '%').attr('aria-valuenow', 0);
                         },
                     });
                 }
@@ -505,9 +576,7 @@
                 alert('Please select the duration');
             }
         });
-
     </script>
-
 </body>
 
 </html>
