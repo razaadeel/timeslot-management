@@ -106,12 +106,6 @@ exports.uploadVideo = async (req, res) => {
                         destination: destination,
                         scheduling: channel.scheduling
                     });
-                    
-                    //sending response to front end for video upload
-                    res.json({ message: 'successful' });
-
-                    let chn = userBooking.channelName === 'Entertainment' ? 'Ent' : userBooking.channelName;
-                    let channel = await db.CityChannelStatus.getChannelStatus(userBooking.cityId, chn);
 
                     if (channel) {
                         if (channel.scheduling === 'automated') {
