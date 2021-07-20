@@ -16,6 +16,7 @@ cron.schedule('0 8 * * *', async () => {
 cron.schedule('0 9 * * *', async () => {
     try {
         await db.BookedSlot.canncelBookingWithVideo();
+        console.log('updated')
     } catch (error) {
         console.log('Error in cron job ===> cancelBooking');
         console.log(error);
