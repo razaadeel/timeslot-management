@@ -1,5 +1,6 @@
 // const { QueryTypes } = require('sequelize')
-// QueryTypes.
+// const db = require('./index');
+
 module.exports = (sequelize, DataTypes) => {
     const BookedSlot = sequelize.define('BookedSlot', {
         isActive: {
@@ -28,6 +29,17 @@ module.exports = (sequelize, DataTypes) => {
             isActive: true
         });
         return booking;
+    }
+
+    //Checking User Booking (exist or not)
+    BookedSlot.checkBooking = async (email) => {
+        let query = `select * from "BookedSlots" bs
+        join "Users" u on bs."userId"= u.id
+        where u.email = '${email}'`;
+
+        let booking = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+
+        return booking[0];
     }
 
     // get booking detials by booking id

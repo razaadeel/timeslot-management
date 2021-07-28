@@ -7,6 +7,9 @@ const authController = require('../../controllers/auth');
 // Create User
 router.post('/create-user/:channelId', authController.createUser);
 
+// SignUp user
+router.post('/signup', authController.signup);
+
 // video upload auth
 router.post('/user-by-email', authController.getUserByEmail);
 

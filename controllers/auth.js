@@ -1,3 +1,6 @@
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+
 const db = require('../models');
 const chargify = require('../services/chargify');
 const mailgun = require('../services/mailgun');
@@ -144,6 +147,34 @@ exports.createUser = async (req, res) => {
         return res.status(500).json({
             message: "Something went wrong"
         });
+    }
+}
+
+// register user from email and password (comming from bubble.io)
+exports.signup = async (req, res) => {
+    try {
+        console.log('working')
+        console.log(req.body)
+        // let {
+        //     email, password,
+        //     chargify_customerId, chargify_subscriptionId,
+        // } = req.body;
+
+        // //checking if email is already exists
+        // let emailExists = await db.User.checkEmail(email);
+        // if (emailExists) {
+        //     return res.status(409).json({ message: 'Email already exists' });
+        // }
+        // const salt = await bcrypt.genSalt(10);
+        // password = await bcrypt.hash(password, salt);
+
+        // let user = await db.User.createUser({ email, password, chargify_customerId, chargify_subscriptionId });
+
+        return res.json({ msg: 'success' });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(400).json({ msg: 'internal server error' });
     }
 }
 

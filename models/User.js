@@ -14,6 +14,9 @@ module.exports = (sequelize, DataTypes) => {
         chargifySubscriptionId: {
             type: DataTypes.STRING,
         },
+        password: {
+            type: DataTypes.STRING
+        },
         createdAt: {
             allowNull: false,
             defaultValue: sequelize.fn('now'),
@@ -23,6 +26,10 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             defaultValue: sequelize.fn('now'),
             type: DataTypes.DATE
+        }
+    }, {
+        defaultScope: {
+            attributes: { exclude: ['password'] },
         }
     });
 
@@ -50,7 +57,8 @@ module.exports = (sequelize, DataTypes) => {
             name: data.firstName + ' ' + data.lastName,
             email: data.email,
             chargifyCustomerId: data.chargify_customerId,
-            chargifySubscriptionId: data.chargify_subscriptionId
+            chargifySubscriptionId: data.chargify_subscriptionId,
+            password: data.password
         });
         return user
     }
