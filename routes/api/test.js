@@ -17,12 +17,7 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        // console.log(req.body.error)
-        if (req.body.error) {
-            throw new Error('Testing slack error log');
-        } else {
-            res.json({ message: 'success' });
-        }
+        res.json({ message: 'success', userId: 1 });
     } catch (error) {
         console.error(error, 'testing error');
         res.status(400).json({ message: error.message });

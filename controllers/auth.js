@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
+
 const db = require('../models');
 const chargify = require('../services/chargify');
 const mailgun = require('../services/mailgun');
@@ -12,7 +13,7 @@ exports.createUser = async (req, res) => {
     try {
         let {
             firstName, lastName,
-            email, cityId,
+            email, password, cityId,
             dayId, timeslotId, showName,
             showDescription, addon,
             slotExpansion, organizationName,
@@ -30,7 +31,10 @@ exports.createUser = async (req, res) => {
             return res.status(409).json({ message: 'Email already exists' });
         }
 
-        let user = await db.User.createUser({ firstName, lastName, email, chargify_customerId, chargify_subscriptionId });
+        const salt = await bcrypt.genSalt(10);
+        password = await bcrypt.hash(password, salt)
+
+        let user = await db.User.createUser({ firstName, lastName, email, password, chargify_customerId, chargify_subscriptionId });
 
         //Saving user booking 
         let booking = await db.BookedSlot.saveBooking({ channelId, cityId, dayId, timeslotId, userId: user.id });
@@ -73,55 +77,55 @@ exports.createUser = async (req, res) => {
             candidateLastName
         });
 
-        //sending slack alert for new slot booking
-        slack.newUserMsg({
-            userId: user.id,
-            email: email,
-            city: bookingDetails.cityName,
-            state: bookingDetails.stateName,
-            timeslot: `${startTime} - ${endTime}`,
-            channel: bookingDetails.channelName
-        });
+        // //sending slack alert for new slot booking
+        // slack.newUserMsg({
+        //     userId: user.id,
+        //     email: email,
+        //     city: bookingDetails.cityName,
+        //     state: bookingDetails.stateName,
+        //     timeslot: `${startTime} - ${endTime}`,
+        //     channel: bookingDetails.channelName
+        // });
 
-        //sending email alert for new slot booking
-        mailgun.sendEmail('newUser', {
-            userId: user.id,
-            email: email,
-            city: bookingDetails.cityName,
-            state: bookingDetails.stateName,
-            timeslot: `${startTime} - ${endTime}`,
-            channel: bookingDetails.channelName
-        });
+        // //sending email alert for new slot booking
+        // mailgun.sendEmail('newUser', {
+        //     userId: user.id,
+        //     email: email,
+        //     city: bookingDetails.cityName,
+        //     state: bookingDetails.stateName,
+        //     timeslot: `${startTime} - ${endTime}`,
+        //     channel: bookingDetails.channelName
+        // });
 
-        //Checking if city channels are created in mediacp
-        let channels = await db.CityChannelStatus.getCityChannels(cityId);
-        if (channels) {
-            let body = {
-                city: bookingDetails.cityName,
-                state: bookingDetails.stateName,
-                stateCode: bookingDetails.stateCode,
-                channels
-            }
+        // //Checking if city channels are created in mediacp
+        // let channels = await db.CityChannelStatus.getCityChannels(cityId);
+        // if (channels) {
+        //     let body = {
+        //         city: bookingDetails.cityName,
+        //         state: bookingDetails.stateName,
+        //         stateCode: bookingDetails.stateCode,
+        //         channels
+        //     }
 
-            // creating channel
-            mediacp.createChannel(body);
+        //     // creating channel
+        //     mediacp.createChannel(body);
 
-            // updating city channel status in db
-            await db.CityChannelStatus.updateChannelStatus(cityId);
+        //     // updating city channel status in db
+        //     await db.CityChannelStatus.updateChannelStatus(cityId);
 
-            //Example hsl url https://5e1d043cba697.streamlock.net:443/nv-testcity-community/nv-testcity-community/playlist.m3u8
-            //updating hsl url in "CityChannelStatus" table for each channel that is created 
-            body.channels.forEach(async channel => {
-                let cityName = body.city;
-                cityName = cityName.split(' ').join('').toLowerCase();
-                let channelName = `${(body.stateCode).toLowerCase() + '-' + cityName + '-' + (channel.channelName).toLowerCase()}`
-                channelName = channelName.split(' ');
-                channelName = channelName[0];
+        //     //Example hsl url https://5e1d043cba697.streamlock.net:443/nv-testcity-community/nv-testcity-community/playlist.m3u8
+        //     //updating hsl url in "CityChannelStatus" table for each channel that is created 
+        //     body.channels.forEach(async channel => {
+        //         let cityName = body.city;
+        //         cityName = cityName.split(' ').join('').toLowerCase();
+        //         let channelName = `${(body.stateCode).toLowerCase() + '-' + cityName + '-' + (channel.channelName).toLowerCase()}`
+        //         channelName = channelName.split(' ');
+        //         channelName = channelName[0];
 
-                let HLS_URL = `https://5e1d043cba697.streamlock.net:443/${channelName}/${channelName}/playlist.m3u8`;
-                await db.CityChannelStatus.updateChannelHslUrl(cityId, channel.channelName, HLS_URL);
-            });
-        }
+        //         let HLS_URL = `https://5e1d043cba697.streamlock.net:443/${channelName}/${channelName}/playlist.m3u8`;
+        //         await db.CityChannelStatus.updateChannelHslUrl(cityId, channel.channelName, HLS_URL);
+        //     });
+        // }
 
         //checking if user has referral code
         if (chargify_customerId) {
@@ -139,7 +143,7 @@ exports.createUser = async (req, res) => {
             }
         }
 
-        return res.json('successful');
+        return res.json({ message: 'successful', userId: user.id });
 
     } catch (error) {
         console.log(error);
