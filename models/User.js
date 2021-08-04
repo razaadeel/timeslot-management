@@ -17,6 +17,9 @@ module.exports = (sequelize, DataTypes) => {
         password: {
             type: DataTypes.STRING
         },
+        bubbleId: {
+            type: DataTypes.STRING
+        },
         createdAt: {
             allowNull: false,
             defaultValue: sequelize.fn('now'),
@@ -58,7 +61,8 @@ module.exports = (sequelize, DataTypes) => {
             email: data.email,
             chargifyCustomerId: data.chargify_customerId,
             chargifySubscriptionId: data.chargify_subscriptionId,
-            password: data.password
+            password: data.password,
+            bubbleId: data.bubbleId
         });
         return user
     }

@@ -21,7 +21,8 @@ exports.createUser = async (req, res) => {
             offcialTitle, officialFirstName,
             officialLastName, candidateFirstName,
             candidateLastName,
-            chargify_customerId, chargify_subscriptionId
+            chargify_customerId, chargify_subscriptionId,
+            bubbleId
         } = req.body;
         let { channelId } = req.params;
 
@@ -34,7 +35,7 @@ exports.createUser = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         password = await bcrypt.hash(password, salt)
 
-        let user = await db.User.createUser({ firstName, lastName, email, password, chargify_customerId, chargify_subscriptionId });
+        let user = await db.User.createUser({ firstName, lastName, email, password, bubbleId, chargify_customerId, chargify_subscriptionId });
 
         //Saving user booking 
         let booking = await db.BookedSlot.saveBooking({ channelId, cityId, dayId, timeslotId, userId: user.id });
