@@ -20,6 +20,10 @@ module.exports = (sequelize, DataTypes) => {
         bubbleId: {
             type: DataTypes.STRING
         },
+        userStatus: {
+            type: DataTypes.INTEGER,
+            default: 1
+        },
         createdAt: {
             allowNull: false,
             defaultValue: sequelize.fn('now'),
@@ -41,6 +45,7 @@ module.exports = (sequelize, DataTypes) => {
             foreignKey: "userId"
         });
         User.hasMany(models.ContentVideoUpload, { as: 'videos', foreignKey: "userId" });
+        User.hasOne(models.UserStatus, { foreignKey: 'userStatus' });
     }
 
     User.checkEmail = async (email) => {
