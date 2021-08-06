@@ -78,55 +78,55 @@ exports.createUser = async (req, res) => {
             candidateLastName
         });
 
-        // //sending slack alert for new slot booking
-        // slack.newUserMsg({
-        //     userId: user.id,
-        //     email: email,
-        //     city: bookingDetails.cityName,
-        //     state: bookingDetails.stateName,
-        //     timeslot: `${startTime} - ${endTime}`,
-        //     channel: bookingDetails.channelName
-        // });
+        //sending slack alert for new slot booking
+        slack.newUserMsg({
+            userId: user.id,
+            email: email,
+            city: bookingDetails.cityName,
+            state: bookingDetails.stateName,
+            timeslot: `${startTime} - ${endTime}`,
+            channel: bookingDetails.channelName
+        });
 
-        // //sending email alert for new slot booking
-        // mailgun.sendEmail('newUser', {
-        //     userId: user.id,
-        //     email: email,
-        //     city: bookingDetails.cityName,
-        //     state: bookingDetails.stateName,
-        //     timeslot: `${startTime} - ${endTime}`,
-        //     channel: bookingDetails.channelName
-        // });
+        //sending email alert for new slot booking
+        mailgun.sendEmail('newUser', {
+            userId: user.id,
+            email: email,
+            city: bookingDetails.cityName,
+            state: bookingDetails.stateName,
+            timeslot: `${startTime} - ${endTime}`,
+            channel: bookingDetails.channelName
+        });
 
-        // //Checking if city channels are created in mediacp
-        // let channels = await db.CityChannelStatus.getCityChannels(cityId);
-        // if (channels) {
-        //     let body = {
-        //         city: bookingDetails.cityName,
-        //         state: bookingDetails.stateName,
-        //         stateCode: bookingDetails.stateCode,
-        //         channels
-        //     }
+        //Checking if city channels are created in mediacp
+        let channels = await db.CityChannelStatus.getCityChannels(cityId);
+        if (channels) {
+            let body = {
+                city: bookingDetails.cityName,
+                state: bookingDetails.stateName,
+                stateCode: bookingDetails.stateCode,
+                channels
+            }
 
-        //     // creating channel
-        //     mediacp.createChannel(body);
+            // creating channel
+            mediacp.createChannel(body);
 
-        //     // updating city channel status in db
-        //     await db.CityChannelStatus.updateChannelStatus(cityId);
+            // updating city channel status in db
+            await db.CityChannelStatus.updateChannelStatus(cityId);
 
-        //     //Example hsl url https://5e1d043cba697.streamlock.net:443/nv-testcity-community/nv-testcity-community/playlist.m3u8
-        //     //updating hsl url in "CityChannelStatus" table for each channel that is created 
-        //     body.channels.forEach(async channel => {
-        //         let cityName = body.city;
-        //         cityName = cityName.split(' ').join('').toLowerCase();
-        //         let channelName = `${(body.stateCode).toLowerCase() + '-' + cityName + '-' + (channel.channelName).toLowerCase()}`
-        //         channelName = channelName.split(' ');
-        //         channelName = channelName[0];
+            //Example hsl url https://5e1d043cba697.streamlock.net:443/nv-testcity-community/nv-testcity-community/playlist.m3u8
+            //updating hsl url in "CityChannelStatus" table for each channel that is created 
+            body.channels.forEach(async channel => {
+                let cityName = body.city;
+                cityName = cityName.split(' ').join('').toLowerCase();
+                let channelName = `${(body.stateCode).toLowerCase() + '-' + cityName + '-' + (channel.channelName).toLowerCase()}`
+                channelName = channelName.split(' ');
+                channelName = channelName[0];
 
-        //         let HLS_URL = `https://5e1d043cba697.streamlock.net:443/${channelName}/${channelName}/playlist.m3u8`;
-        //         await db.CityChannelStatus.updateChannelHslUrl(cityId, channel.channelName, HLS_URL);
-        //     });
-        // }
+                let HLS_URL = `https://5e1d043cba697.streamlock.net:443/${channelName}/${channelName}/playlist.m3u8`;
+                await db.CityChannelStatus.updateChannelHslUrl(cityId, channel.channelName, HLS_URL);
+            });
+        }
 
         //checking if user has referral code
         if (chargify_customerId) {
