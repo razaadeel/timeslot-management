@@ -110,12 +110,20 @@ module.exports = (sequelize, DataTypes) => {
         update "BookedSlots"
         set "isActive" = false,
         "updatedAt" = now()
-        where "userId" in (select id from updated_users);`
-        
-        let updatedRecord = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
-        return updatedRecord;
+        where "userId" in (select id from updated_users)
+        returning "userId";`
+
+        let updatedRecords = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+        return updatedRecords;
     }
 
+    User.getBubbleIds = async (userIds) => {
+        let bubbleIds = await User.findAll({
+            where: { id: userIds },
+            attributes: ['bubbleId']
+        });
+        return bubbleIds;
+    }
 
     return User;
 }
