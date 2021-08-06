@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         userStatus: {
             type: DataTypes.INTEGER,
-            default: 1
+            defaultValue: 1
         },
         createdAt: {
             allowNull: false,
@@ -45,7 +45,6 @@ module.exports = (sequelize, DataTypes) => {
             foreignKey: "userId"
         });
         User.hasMany(models.ContentVideoUpload, { as: 'videos', foreignKey: "userId" });
-        User.hasOne(models.UserStatus, { foreignKey: 'userStatus' });
     }
 
     User.checkEmail = async (email) => {
@@ -72,6 +71,15 @@ module.exports = (sequelize, DataTypes) => {
         return user
     }
 
+    User.updateStatus = async (userId, status) => {
+        await User.update({
+            userStatus: status
+        }, {
+            where: { id: userId }
+        });
+        return true
+    }
+
     //getting user by email
     User.userByEmail = async (email) => {
         let user = await User.findOne({
@@ -89,6 +97,25 @@ module.exports = (sequelize, DataTypes) => {
         });
         return user;
     }
+
+    User.suspendUser = async () => {
+        let query = `with updated_users as(
+            update "Users"
+            set "userStatus" = 3,
+            "updatedAt" = now()
+            where "createdAt" <= now() - interval '24 hours'
+            and "userStatus" = 1
+            returning *
+        )
+        update "BookedSlots"
+        set "isActive" = false,
+        "updatedAt" = now()
+        where "userId" in (select id from updated_users);`
+        
+        let updatedRecord = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+        return updatedRecord;
+    }
+
 
     return User;
 }

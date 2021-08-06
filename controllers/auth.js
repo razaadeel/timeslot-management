@@ -148,7 +148,20 @@ exports.createUser = async (req, res) => {
 
     } catch (error) {
         console.log(error);
-        console.error(error, 'Error while creating new user');
+        // console.error(error, 'Error while creating new user');
+        return res.status(500).json({
+            message: "Something went wrong"
+        });
+    }
+}
+
+//Updating user status when user verified his email
+exports.updateUserStatus = async (req, res) => {
+    try {
+        let { userId, status } = req.body;
+        await db.User.updateStatus(userId, status);
+        res.json({ message: 'Successfully updated user status.' })
+    } catch (error) {
         return res.status(500).json({
             message: "Something went wrong"
         });

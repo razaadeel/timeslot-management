@@ -146,7 +146,7 @@ module.exports = (sequelize, DataTypes) => {
             select from "ContentVideoUploads" cv
             where "BookedSlots"."userId" = cv."userId"
         )
-        and DATE_PART('day', Current_date - "BookedSlots"."createdAt")  >= 15
+        and "BookedSlots"."createdAt" <= now() - interval '15 days'
         and "BookedSlots"."isActive" = 'true'
         RETURNING *`
 
@@ -163,7 +163,7 @@ module.exports = (sequelize, DataTypes) => {
             select distinct on ("userId") "userId", id, "createdAt" from "ContentVideoUploads"
             order by "userId", "createdAt" desc
         ) cv using ("userId")
-        where DATE_PART('day', Current_date - cv."createdAt")  >= 15
+        where "BookedSlots"."createdAt" <= now() - interval '15 days'
         )`
 
         let updatedRecord = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
