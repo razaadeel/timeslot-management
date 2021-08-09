@@ -7,7 +7,7 @@ const config = env === 'development' ?
     require(__dirname + '/../config/configDev.js') //import in dev 
     : require(__dirname + '/../config/config.js'); // imp in production
 
-cron.schedule('57 16 * * *', async () => {
+cron.schedule('0 6 * * *', async () => {
     try {
         // cancelling booking of new users who have not uploaded a video in 15 days
         await db.BookedSlot.canncelBookingNoVideo();
@@ -24,7 +24,7 @@ cron.schedule('57 16 * * *', async () => {
 });
 
 
-cron.schedule('0 9 * * *', async () => {
+cron.schedule('0 7 * * *', async () => {
     try {
         // cancelling booking of old users who have not uploaded a video new video in 15 days
         await db.BookedSlot.canncelBookingWithVideo();
@@ -36,18 +36,18 @@ cron.schedule('0 9 * * *', async () => {
 
 const updateBubbleUser = async (userIds) => {
     try {
-        console.log(userIds);
-        userIds = userIds.map(item => item.userId);
-        console.log(userIds);
-        let users = await db.User.getBubbleIds(userIds);
-        let body = {
-            signup_step_number: 1
-        }
+        if (userIds.length > 0) {
+            userIds = userIds.map(item => item.userId);
+            let users = await db.User.getBubbleIds(userIds);
+            let body = {
+                signup_step_number: 1
+            }
 
-        let api_token = config.bubbleApiToken;
-        users.forEach(async user => {
-            await axios.patch(`https://citystvsignup.com/version-test/api/1.1/obj/user/${user.bubbleId}?api_token=${api_token}`, body);
-        });
+            let api_token = config.bubbleApiToken;
+            users.forEach(async user => {
+                await axios.patch(`https://citystvsignup.com/version-test/api/1.1/obj/user/${user.bubbleId}?api_token=${api_token}`, body);
+            });
+        }
     } catch (error) {
         console.log(error)
     }

@@ -50,7 +50,6 @@ module.exports = (sequelize, DataTypes) => {
     User.checkEmail = async (email) => {
         let user = await User.findOne({ where: { email: email } });
         if (user) {
-            console.log(user)
             //return true if user email already exists
             return true
         } else {
