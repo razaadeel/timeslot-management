@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const db = require('../models/index.js');
 const axios = require('axios');
+const slack = require('../utils/slack_logs');
 
 const env = process.env.NODE_ENV || 'development';
 const config = env === 'development' ?
@@ -20,6 +21,7 @@ cron.schedule('0 6 * * *', async () => {
     } catch (error) {
         console.log('Error in cron job ===> cancelBooking at', Date.now());
         console.log(error);
+        slack.error(error, 'Cron Job Error 1');
     }
 });
 
@@ -50,5 +52,6 @@ const updateBubbleUser = async (userIds) => {
         }
     } catch (error) {
         console.log(error)
+        slack.error(error, 'Cron Job Error 2');
     }
 }
