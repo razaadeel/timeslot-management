@@ -12,6 +12,7 @@ const config = env === 'development' ?
     require(__dirname + '/../config/configDev.js')//import in dev 
     : require(__dirname + '/../config/config.js'); // import in prod
 
+//Video upload 
 exports.uploadVideo = async (req, res) => {
     try {
         // service created to upload videos to aws s3
@@ -132,6 +133,119 @@ exports.uploadVideo = async (req, res) => {
             }
         });
 
+    } catch (error) {
+        console.log(error)
+        console.error(error, 'Error in video upload route');;
+        return res.status(401).json({ message: 'something went wrong' });
+    }
+}
+
+// Video uploaded from bubble
+exports.uploadVideoFromBubble = async (req, res) => {
+    try {
+
+        const videoName = req.body.videoName;
+        const videoLocation = req.body.videoUrl;
+        let userId = req.body.userId;
+        
+        let user = await db.User.userById(userId);
+
+        let userBooking = await db.BookedSlot.getBookingByUserId(userId);
+
+        //below call for getting data for showName
+        let channelName = `${userBooking.channelName}`.split(' ');
+        channelName = channelName[0];
+        let bookingDetails = await db.BookedSlot.getBookingDetailsByEmail(user.email, channelName);
+
+        let day = userBooking.day.slice(0, 3); //Reducing day to 3 letters i.e Monday to Mon
+
+        let slotTime = `${userBooking.startTime}`.split(':');
+        if (Number(slotTime[0]) < 10) slotTime[0] = `0${slotTime[0]}`;
+        slotTime = `${slotTime[0]}${slotTime[1]}`;
+
+        let destination;
+        if (userBooking.channelName === 'Entertainment') {
+            //Entertainment channel is named as public in s3 bucket
+            destination = `stv-curated-data/${userBooking.stateCode}/${userBooking.cityName}/Public/${day}/${slotTime}`;
+
+        } else if (userBooking.channelName === 'Elected Officials') {
+            // Elected Officials channel is named as Elected in s3 bucket
+            destination = `stv-curated-data/${userBooking.stateCode}/${userBooking.cityName}/Elected/${day}/${slotTime}`;
+
+        } else {
+            destination = `stv-curated-data/${userBooking.stateCode}/${userBooking.cityName}/${userBooking.channelName}/${day}/${slotTime}`;
+        }
+
+        let outputVideoName;
+        if (user.chargifyCustomerId) {
+
+            //geting user subscription type
+            let subscription = await chargify.getCustomerSubscription(user.chargifyCustomerId);
+
+            //adding [adins] in outputVideoName if subscription is not "ads removed"
+            if (subscription.handle.includes('ads_removed')) {
+                outputVideoName = `${bookingDetails.showName}-${userId}-28-a.mp4`;
+            } else {
+                outputVideoName = `${bookingDetails.showName}-${userId}-28-a-[adins].mp4`;
+            }
+
+        } else {
+            outputVideoName = `${bookingDetails.showName}-${userId}-28-a-[adins].mp4`
+        }
+
+        //saving video data to ContentVideoUpload
+        let videoData = await db.ContentVideoUpload.saveVideoDetails({
+            userId,
+            inputName: videoName,
+            outputName: outputVideoName,
+            destination: destination
+        });
+
+        //sending response to front end for video upload
+        res.json({ message: 'successful' });
+
+        let chn = userBooking.channelName === 'Entertainment' ? 'Ent' : userBooking.channelName;
+        let channel = await db.CityChannelStatus.getChannelStatus(userBooking.cityId, chn);
+
+        //sending email alert for video upload
+        mailgun.sendEmail('contentVideoUpload', {
+            email: user.email,
+            inputName: videoName,
+            outputName: outputVideoName,
+            destination: destination,
+            scheduling: channel.scheduling
+        });
+
+        //sending slack alert for video upload
+        slack.videoUploadMsg({
+            email: user.email,
+            inputName: videoName,
+            outputName: outputVideoName,
+            destination: destination,
+            scheduling: channel.scheduling
+        });
+
+        if (channel) {
+            if (channel.scheduling === 'automated') {
+                console.log(channel.scheduling);
+                //sending file for transcoding for automated system
+                transcode.automatedSystem(videoLocation, destination, outputVideoName);
+
+                // for uploading crawl file to aws
+                s3.fileUpload(bookingDetails.showName, destination);
+
+            } else {
+                //sending file for transcoding for manual system
+                transcode.manualSystem(videoLocation, destination, outputVideoName, userId, videoData.id);
+            }
+        } else {
+
+            //if channel is not found in "CityChannelStatus" (table)
+            // temporary we are sending them to manual system
+            transcode.manualSystem(videoLocation, destination, outputVideoName, userId, videoData.id);
+        }
+
+        return true;
     } catch (error) {
         console.log(error)
         console.error(error, 'Error in video upload route');;

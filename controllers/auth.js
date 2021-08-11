@@ -26,6 +26,8 @@ exports.createUser = async (req, res) => {
         } = req.body;
         let { channelId } = req.params;
 
+        console.log(req.body)
+
         //checking if email is already exists
         let emailExists = await db.User.checkEmail(email);
         if (emailExists) {
@@ -77,6 +79,9 @@ exports.createUser = async (req, res) => {
             officialLastName, candidateFirstName,
             candidateLastName
         });
+
+        //sending response
+        res.json({ message: 'successful', userId: user.id });
 
         //sending slack alert for new slot booking
         slack.newUserMsg({
@@ -144,7 +149,7 @@ exports.createUser = async (req, res) => {
             }
         }
 
-        return res.json({ message: 'successful', userId: user.id });
+        return true
 
     } catch (error) {
         console.log(error);

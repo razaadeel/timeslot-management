@@ -17,6 +17,7 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
+        console.log(req.body);
         res.json({ message: 'success', userId: 1 });
     } catch (error) {
         console.error(error, 'testing error');
