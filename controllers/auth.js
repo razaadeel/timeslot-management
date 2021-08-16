@@ -26,8 +26,6 @@ exports.createUser = async (req, res) => {
         } = req.body;
         let { channelId } = req.params;
 
-        console.log(req.body)
-
         //checking if email is already exists
         let emailExists = await db.User.checkEmail(email);
         if (emailExists) {

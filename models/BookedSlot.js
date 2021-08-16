@@ -155,10 +155,10 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     BookedSlot.canncelBookingWithVideo = async () => {
-        let query = `update "BookedSlots" bs
+        let query = `update "BookedSlots"
         set "isActive" = 'false'
-        where bs."userId" in (
-        select distinct on (cv."userId") bs."userId" from "BookedSlots" bs
+        where "BookedSlots"."userId" in (
+        select distinct on (cv."userId") "BookedSlots"."userId" from "BookedSlots"
         inner join (
             select distinct on ("userId") "userId", id, "createdAt" from "ContentVideoUploads"
             order by "userId", "createdAt" desc
