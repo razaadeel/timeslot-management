@@ -179,7 +179,8 @@ exports.uploadVideoFromBubble = async (req, res) => {
 
         //checking user plan for adding/removing adds
         let outputVideoName;
-        let plans = ['price_1ImLcZAvKKZkQiDeqjhX3VqF'];
+        //index 0=community, 1=entertainment, 2=candidate ,3=elected ,4=faith
+        let plans = ['price_1JPXsxAvKKZkQiDeN6vpCPJJ','price_1ImDFKAvKKZkQiDevEUerm0g','price_1Iba7jAvKKZkQiDe805f52qA','price_1Iba76AvKKZkQiDevwPLCVXH','price_1Iba5cAvKKZkQiDenqyzd5ns'];
 
         if (plans.includes(planId)) {
             outputVideoName = `${bookingDetails.showName}-${userId}-28-a.mp4`;
