@@ -147,7 +147,8 @@ exports.uploadVideoFromBubble = async (req, res) => {
         const videoName = req.body.videoName;
         const videoLocation = req.body.videoUrl;
         let userId = req.body.userId;
-        
+        let planId = req.body.planId; //user plan id
+
         let user = await db.User.userById(userId);
 
         let userBooking = await db.BookedSlot.getBookingByUserId(userId);
@@ -176,22 +177,33 @@ exports.uploadVideoFromBubble = async (req, res) => {
             destination = `stv-curated-data/${userBooking.stateCode}/${userBooking.cityName}/${userBooking.channelName}/${day}/${slotTime}`;
         }
 
+        //checking user plan for adding/removing adds
         let outputVideoName;
-        if (user.chargifyCustomerId) {
+        let plans = ['price_1ImLcZAvKKZkQiDeqjhX3VqF'];
 
-            //geting user subscription type
-            let subscription = await chargify.getCustomerSubscription(user.chargifyCustomerId);
-
-            //adding [adins] in outputVideoName if subscription is not "ads removed"
-            if (subscription.handle.includes('ads_removed')) {
-                outputVideoName = `${bookingDetails.showName}-${userId}-28-a.mp4`;
-            } else {
-                outputVideoName = `${bookingDetails.showName}-${userId}-28-a-[adins].mp4`;
-            }
-
+        if (plans.includes(planId)) {
+            outputVideoName = `${bookingDetails.showName}-${userId}-28-a.mp4`;
         } else {
-            outputVideoName = `${bookingDetails.showName}-${userId}-28-a-[adins].mp4`
+            outputVideoName = `${bookingDetails.showName}-${userId}-28-a-[adins].mp4`;
         }
+        console.log(outputVideoName);
+
+        // let outputVideoName;
+        // if (user.chargifyCustomerId) {
+
+        //     //geting user subscription type
+        //     let subscription = await chargify.getCustomerSubscription(user.chargifyCustomerId);
+
+        //     //adding [adins] in outputVideoName if subscription is not "ads removed"
+        //     if (subscription.handle.includes('ads_removed')) {
+        //         outputVideoName = `${bookingDetails.showName}-${userId}-28-a.mp4`;
+        //     } else {
+        //         outputVideoName = `${bookingDetails.showName}-${userId}-28-a-[adins].mp4`;
+        //     }
+
+        // } else {
+        //     outputVideoName = `${bookingDetails.showName}-${userId}-28-a-[adins].mp4`
+        // }
 
         //saving video data to ContentVideoUpload
         let videoData = await db.ContentVideoUpload.saveVideoDetails({
@@ -204,46 +216,46 @@ exports.uploadVideoFromBubble = async (req, res) => {
         //sending response to front end for video upload
         res.json({ message: 'successful' });
 
-        let chn = userBooking.channelName === 'Entertainment' ? 'Ent' : userBooking.channelName;
-        let channel = await db.CityChannelStatus.getChannelStatus(userBooking.cityId, chn);
+        // let chn = userBooking.channelName === 'Entertainment' ? 'Ent' : userBooking.channelName;
+        // let channel = await db.CityChannelStatus.getChannelStatus(userBooking.cityId, chn);
 
-        //sending email alert for video upload
-        mailgun.sendEmail('contentVideoUpload', {
-            email: user.email,
-            inputName: videoName,
-            outputName: outputVideoName,
-            destination: destination,
-            scheduling: channel.scheduling
-        });
+        // //sending email alert for video upload
+        // mailgun.sendEmail('contentVideoUpload', {
+        //     email: user.email,
+        //     inputName: videoName,
+        //     outputName: outputVideoName,
+        //     destination: destination,
+        //     scheduling: channel.scheduling
+        // });
 
-        //sending slack alert for video upload
-        slack.videoUploadMsg({
-            email: user.email,
-            inputName: videoName,
-            outputName: outputVideoName,
-            destination: destination,
-            scheduling: channel.scheduling
-        });
+        // //sending slack alert for video upload
+        // slack.videoUploadMsg({
+        //     email: user.email,
+        //     inputName: videoName,
+        //     outputName: outputVideoName,
+        //     destination: destination,
+        //     scheduling: channel.scheduling
+        // });
 
-        if (channel) {
-            if (channel.scheduling === 'automated') {
-                console.log(channel.scheduling);
-                //sending file for transcoding for automated system
-                transcode.automatedSystem(videoLocation, destination, outputVideoName);
+        // if (channel) {
+        //     if (channel.scheduling === 'automated') {
+        //         console.log(channel.scheduling);
+        //         //sending file for transcoding for automated system
+        //         transcode.automatedSystem(videoLocation, destination, outputVideoName);
 
-                // for uploading crawl file to aws
-                s3.fileUpload(bookingDetails.showName, destination);
+        //         // for uploading crawl file to aws
+        //         s3.fileUpload(bookingDetails.showName, destination);
 
-            } else {
-                //sending file for transcoding for manual system
-                transcode.manualSystem(videoLocation, destination, outputVideoName, userId, videoData.id);
-            }
-        } else {
+        //     } else {
+        //         //sending file for transcoding for manual system
+        //         transcode.manualSystem(videoLocation, destination, outputVideoName, userId, videoData.id);
+        //     }
+        // } else {
 
-            //if channel is not found in "CityChannelStatus" (table)
-            // temporary we are sending them to manual system
-            transcode.manualSystem(videoLocation, destination, outputVideoName, userId, videoData.id);
-        }
+        //     //if channel is not found in "CityChannelStatus" (table)
+        //     // temporary we are sending them to manual system
+        //     transcode.manualSystem(videoLocation, destination, outputVideoName, userId, videoData.id);
+        // }
 
         return true;
     } catch (error) {
