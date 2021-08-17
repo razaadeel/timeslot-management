@@ -216,46 +216,46 @@ exports.uploadVideoFromBubble = async (req, res) => {
         //sending response to front end for video upload
         res.json({ message: 'successful' });
 
-        // let chn = userBooking.channelName === 'Entertainment' ? 'Ent' : userBooking.channelName;
-        // let channel = await db.CityChannelStatus.getChannelStatus(userBooking.cityId, chn);
+        let chn = userBooking.channelName === 'Entertainment' ? 'Ent' : userBooking.channelName;
+        let channel = await db.CityChannelStatus.getChannelStatus(userBooking.cityId, chn);
 
-        // //sending email alert for video upload
-        // mailgun.sendEmail('contentVideoUpload', {
-        //     email: user.email,
-        //     inputName: videoName,
-        //     outputName: outputVideoName,
-        //     destination: destination,
-        //     scheduling: channel.scheduling
-        // });
+        //sending email alert for video upload
+        mailgun.sendEmail('contentVideoUpload', {
+            email: user.email,
+            inputName: videoName,
+            outputName: outputVideoName,
+            destination: destination,
+            scheduling: channel.scheduling
+        });
 
-        // //sending slack alert for video upload
-        // slack.videoUploadMsg({
-        //     email: user.email,
-        //     inputName: videoName,
-        //     outputName: outputVideoName,
-        //     destination: destination,
-        //     scheduling: channel.scheduling
-        // });
+        //sending slack alert for video upload
+        slack.videoUploadMsg({
+            email: user.email,
+            inputName: videoName,
+            outputName: outputVideoName,
+            destination: destination,
+            scheduling: channel.scheduling
+        });
 
-        // if (channel) {
-        //     if (channel.scheduling === 'automated') {
-        //         console.log(channel.scheduling);
-        //         //sending file for transcoding for automated system
-        //         transcode.automatedSystem(videoLocation, destination, outputVideoName);
+        if (channel) {
+            if (channel.scheduling === 'automated') {
+                console.log(channel.scheduling);
+                //sending file for transcoding for automated system
+                transcode.automatedSystem(videoLocation, destination, outputVideoName);
 
-        //         // for uploading crawl file to aws
-        //         s3.fileUpload(bookingDetails.showName, destination);
+                // for uploading crawl file to aws
+                s3.fileUpload(bookingDetails.showName, destination);
 
-        //     } else {
-        //         //sending file for transcoding for manual system
-        //         transcode.manualSystem(videoLocation, destination, outputVideoName, userId, videoData.id);
-        //     }
-        // } else {
+            } else {
+                //sending file for transcoding for manual system
+                transcode.manualSystem(videoLocation, destination, outputVideoName, userId, videoData.id);
+            }
+        } else {
 
-        //     //if channel is not found in "CityChannelStatus" (table)
-        //     // temporary we are sending them to manual system
-        //     transcode.manualSystem(videoLocation, destination, outputVideoName, userId, videoData.id);
-        // }
+            //if channel is not found in "CityChannelStatus" (table)
+            // temporary we are sending them to manual system
+            transcode.manualSystem(videoLocation, destination, outputVideoName, userId, videoData.id);
+        }
 
         return true;
     } catch (error) {
