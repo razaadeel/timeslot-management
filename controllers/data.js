@@ -35,8 +35,34 @@ exports.getAvailableTimeslots = async (req, res) => {
         let { day, city, channel } = req.query;
 
         // getAvailableSlots func created in Timeslot model
-        const timeslots = await db.Timeslot.getAvailableSlots(day, city, channel);
-        return res.json(timeslots);
+        // const timeslots = await db.Timeslot.getAvailableSlots(day, city, channel);
+        const timeslots = await db.Timeslot.getAvailableSlots(1, 1, 1);
+
+        //below conditions are for making timeslots in 12hrs format
+        let slots = timeslots.map(item => {
+            let startTime = `${item.startTime}`.split(':');
+            let endTime = `${item.endTime}`.split(':');
+
+            if (Number(startTime[0]) >= 12) {
+                if (startTime[0] != 12) startTime[0] = startTime[0] - 12
+                startTime = `${startTime[0]}:${startTime[1]}pm`
+            } else {
+                startTime = `${startTime[0]}:${startTime[1]}am`
+            }
+
+            if (Number(endTime[0]) > 11) {
+                if (endTime[0] != 12) endTime[0] = endTime[0] - 12
+
+                endTime = `${endTime[0]}:${endTime[1]}pm`
+
+            } else {
+                if (endTime[0] == '00') endTime[0] = '12'
+                endTime = `${endTime[0]}:${endTime[1]}am`
+            }
+            return { id: item.id, startTime, endTime }
+        });
+
+        return res.json(slots);
     } catch (error) {
         console.log(error)
         console.error(error, 'Error while getting available timeslots');;
