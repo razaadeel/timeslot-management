@@ -131,21 +131,21 @@ exports.createUser = async (req, res) => {
             });
         }
 
-        //checking if user has referral code
-        if (chargify_customerId) {
-            let metadata = await chargify.getCustomerMetadata(chargify_customerId);
-            let referralObj = metadata.find(obj => obj.name === 'Referral Code');
-            if (referralObj) {
+        // //checking if user has referral code
+        // if (chargify_customerId) {
+        //     let metadata = await chargify.getCustomerMetadata(chargify_customerId);
+        //     let referralObj = metadata.find(obj => obj.name === 'Referral Code');
+        //     if (referralObj) {
 
-                //geting user subscription type
-                let subscription = await chargify.getCustomerSubscription(chargify_customerId);
+        //         //geting user subscription type
+        //         let subscription = await chargify.getCustomerSubscription(chargify_customerId);
 
-                //create a customer in leaddyno if subscription is "ads removed"
-                if (subscription.handle.includes('ads_removed')) {
-                    leaddyno.createLead(email, referralObj.value);
-                }
-            }
-        }
+        //         //create a customer in leaddyno if subscription is "ads removed"
+        //         if (subscription.handle.includes('ads_removed')) {
+        //             leaddyno.createLead(email, referralObj.value);
+        //         }
+        //     }
+        // }
 
         return true
 

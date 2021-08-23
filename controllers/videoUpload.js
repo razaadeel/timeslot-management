@@ -147,7 +147,8 @@ exports.uploadVideoFromBubble = async (req, res) => {
         const videoName = req.body.videoName;
         const videoLocation = req.body.videoUrl;
         let userId = req.body.userId;
-        
+        let planId = req.body.planId; //user plan id
+
         let user = await db.User.userById(userId);
 
         let userBooking = await db.BookedSlot.getBookingByUserId(userId);
@@ -176,22 +177,34 @@ exports.uploadVideoFromBubble = async (req, res) => {
             destination = `stv-curated-data/${userBooking.stateCode}/${userBooking.cityName}/${userBooking.channelName}/${day}/${slotTime}`;
         }
 
+        //checking user plan for adding/removing adds
         let outputVideoName;
-        if (user.chargifyCustomerId) {
+        //index 0=community, 1=entertainment, 2=candidate ,3=elected ,4=faith
+        let plans = ['price_1JPXsxAvKKZkQiDeN6vpCPJJ','price_1ImDFKAvKKZkQiDevEUerm0g','price_1Iba7jAvKKZkQiDe805f52qA','price_1Iba76AvKKZkQiDevwPLCVXH','price_1Iba5cAvKKZkQiDenqyzd5ns'];
 
-            //geting user subscription type
-            let subscription = await chargify.getCustomerSubscription(user.chargifyCustomerId);
-
-            //adding [adins] in outputVideoName if subscription is not "ads removed"
-            if (subscription.handle.includes('ads_removed')) {
-                outputVideoName = `${bookingDetails.showName}-${userId}-28-a.mp4`;
-            } else {
-                outputVideoName = `${bookingDetails.showName}-${userId}-28-a-[adins].mp4`;
-            }
-
+        if (plans.includes(planId)) {
+            outputVideoName = `${bookingDetails.showName}-${userId}-28-a.mp4`;
         } else {
-            outputVideoName = `${bookingDetails.showName}-${userId}-28-a-[adins].mp4`
+            outputVideoName = `${bookingDetails.showName}-${userId}-28-a-[adins].mp4`;
         }
+        console.log(outputVideoName);
+
+        // let outputVideoName;
+        // if (user.chargifyCustomerId) {
+
+        //     //geting user subscription type
+        //     let subscription = await chargify.getCustomerSubscription(user.chargifyCustomerId);
+
+        //     //adding [adins] in outputVideoName if subscription is not "ads removed"
+        //     if (subscription.handle.includes('ads_removed')) {
+        //         outputVideoName = `${bookingDetails.showName}-${userId}-28-a.mp4`;
+        //     } else {
+        //         outputVideoName = `${bookingDetails.showName}-${userId}-28-a-[adins].mp4`;
+        //     }
+
+        // } else {
+        //     outputVideoName = `${bookingDetails.showName}-${userId}-28-a-[adins].mp4`
+        // }
 
         //saving video data to ContentVideoUpload
         let videoData = await db.ContentVideoUpload.saveVideoDetails({
