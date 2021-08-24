@@ -14,6 +14,16 @@ module.exports = (sequelize, DataTypes) => {
         chargifySubscriptionId: {
             type: DataTypes.STRING,
         },
+        password: {
+            type: DataTypes.STRING
+        },
+        bubbleId: {
+            type: DataTypes.STRING
+        },
+        userStatus: {
+            type: DataTypes.INTEGER,
+            defaultValue: 1
+        },
         createdAt: {
             allowNull: false,
             defaultValue: sequelize.fn('now'),
@@ -23,6 +33,10 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             defaultValue: sequelize.fn('now'),
             type: DataTypes.DATE
+        }
+    }, {
+        defaultScope: {
+            attributes: { exclude: ['password'] },
         }
     });
 
@@ -36,7 +50,6 @@ module.exports = (sequelize, DataTypes) => {
     User.checkEmail = async (email) => {
         let user = await User.findOne({ where: { email: email } });
         if (user) {
-            console.log(user)
             //return true if user email already exists
             return true
         } else {
@@ -50,9 +63,20 @@ module.exports = (sequelize, DataTypes) => {
             name: data.firstName + ' ' + data.lastName,
             email: data.email,
             chargifyCustomerId: data.chargify_customerId,
-            chargifySubscriptionId: data.chargify_subscriptionId
+            chargifySubscriptionId: data.chargify_subscriptionId,
+            password: data.password,
+            bubbleId: data.bubbleId
         });
         return user
+    }
+
+    User.updateStatus = async (userId, status) => {
+        await User.update({
+            userStatus: status
+        }, {
+            where: { id: userId }
+        });
+        return true
     }
 
     //getting user by email
@@ -71,6 +95,33 @@ module.exports = (sequelize, DataTypes) => {
             where: { id: id },
         });
         return user;
+    }
+
+    User.suspendUser = async () => {
+        let query = `with updated_users as(
+            update "Users"
+            set "userStatus" = 3,
+            "updatedAt" = now()
+            where "createdAt" <= now() - interval '24 hours'
+            and "userStatus" = 1
+            returning *
+        )
+        update "BookedSlots"
+        set "isActive" = false,
+        "updatedAt" = now()
+        where "userId" in (select id from updated_users)
+        returning "userId";`
+
+        let updatedRecords = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+        return updatedRecords;
+    }
+
+    User.getBubbleIds = async (userIds) => {
+        let bubbleIds = await User.findAll({
+            where: { id: userIds },
+            attributes: ['bubbleId']
+        });
+        return bubbleIds;
     }
 
     return User;

@@ -1,3 +1,7 @@
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+
+
 const db = require('../models');
 const chargify = require('../services/chargify');
 const mailgun = require('../services/mailgun');
@@ -9,7 +13,7 @@ exports.createUser = async (req, res) => {
     try {
         let {
             firstName, lastName,
-            email, cityId,
+            email, password, cityId,
             dayId, timeslotId, showName,
             showDescription, addon,
             slotExpansion, organizationName,
@@ -17,7 +21,8 @@ exports.createUser = async (req, res) => {
             offcialTitle, officialFirstName,
             officialLastName, candidateFirstName,
             candidateLastName,
-            chargify_customerId, chargify_subscriptionId
+            chargify_customerId, chargify_subscriptionId,
+            bubbleId
         } = req.body;
         let { channelId } = req.params;
 
@@ -27,7 +32,10 @@ exports.createUser = async (req, res) => {
             return res.status(409).json({ message: 'Email already exists' });
         }
 
-        let user = await db.User.createUser({ firstName, lastName, email, chargify_customerId, chargify_subscriptionId });
+        const salt = await bcrypt.genSalt(10);
+        password = await bcrypt.hash(password, salt)
+
+        let user = await db.User.createUser({ firstName, lastName, email, password, bubbleId, chargify_customerId, chargify_subscriptionId });
 
         //Saving user booking 
         let booking = await db.BookedSlot.saveBooking({ channelId, cityId, dayId, timeslotId, userId: user.id });
@@ -69,6 +77,9 @@ exports.createUser = async (req, res) => {
             officialLastName, candidateFirstName,
             candidateLastName
         });
+
+        //sending response
+        res.json({ message: 'successful', userId: user.id });
 
         //sending slack alert for new slot booking
         slack.newUserMsg({
@@ -120,30 +131,71 @@ exports.createUser = async (req, res) => {
             });
         }
 
-        //checking if user has referral code
-        if (chargify_customerId) {
-            let metadata = await chargify.getCustomerMetadata(chargify_customerId);
-            let referralObj = metadata.find(obj => obj.name === 'Referral Code');
-            if (referralObj) {
+        // //checking if user has referral code
+        // if (chargify_customerId) {
+        //     let metadata = await chargify.getCustomerMetadata(chargify_customerId);
+        //     let referralObj = metadata.find(obj => obj.name === 'Referral Code');
+        //     if (referralObj) {
 
-                //geting user subscription type
-                let subscription = await chargify.getCustomerSubscription(chargify_customerId);
+        //         //geting user subscription type
+        //         let subscription = await chargify.getCustomerSubscription(chargify_customerId);
 
-                //create a customer in leaddyno if subscription is "ads removed"
-                if (subscription.handle.includes('ads_removed')) {
-                    leaddyno.createLead(email, referralObj.value);
-                }
-            }
-        }
+        //         //create a customer in leaddyno if subscription is "ads removed"
+        //         if (subscription.handle.includes('ads_removed')) {
+        //             leaddyno.createLead(email, referralObj.value);
+        //         }
+        //     }
+        // }
 
-        return res.json('successful');
+        return true
 
     } catch (error) {
         console.log(error);
-        console.error(error, 'Error while creating new user');
+        // console.error(error, 'Error while creating new user');
         return res.status(500).json({
             message: "Something went wrong"
         });
+    }
+}
+
+//Updating user status when user verified his email
+exports.updateUserStatus = async (req, res) => {
+    try {
+        let { userId, status } = req.body;
+        await db.User.updateStatus(userId, status);
+        res.json({ message: 'Successfully updated user status.' })
+    } catch (error) {
+        return res.status(500).json({
+            message: "Something went wrong"
+        });
+    }
+}
+
+// register user from email and password (comming from bubble.io)
+exports.signup = async (req, res) => {
+    try {
+        console.log('working')
+        console.log(req.body)
+        // let {
+        //     email, password,
+        //     chargify_customerId, chargify_subscriptionId,
+        // } = req.body;
+
+        // //checking if email is already exists
+        // let emailExists = await db.User.checkEmail(email);
+        // if (emailExists) {
+        //     return res.status(409).json({ message: 'Email already exists' });
+        // }
+        // const salt = await bcrypt.genSalt(10);
+        // password = await bcrypt.hash(password, salt);
+
+        // let user = await db.User.createUser({ email, password, chargify_customerId, chargify_subscriptionId });
+
+        return res.json({ msg: 'success' });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(400).json({ msg: 'internal server error' });
     }
 }
 

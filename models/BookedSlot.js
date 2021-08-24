@@ -1,5 +1,6 @@
 // const { QueryTypes } = require('sequelize')
-// QueryTypes.
+// const db = require('./index');
+
 module.exports = (sequelize, DataTypes) => {
     const BookedSlot = sequelize.define('BookedSlot', {
         isActive: {
@@ -28,6 +29,17 @@ module.exports = (sequelize, DataTypes) => {
             isActive: true
         });
         return booking;
+    }
+
+    //Checking User Booking (exist or not)
+    BookedSlot.checkBooking = async (email) => {
+        let query = `select * from "BookedSlots" bs
+        join "Users" u on bs."userId"= u.id
+        where u.email = '${email}'`;
+
+        let booking = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+
+        return booking[0];
     }
 
     // get booking detials by booking id
@@ -134,7 +146,7 @@ module.exports = (sequelize, DataTypes) => {
             select from "ContentVideoUploads" cv
             where "BookedSlots"."userId" = cv."userId"
         )
-        and DATE_PART('day', Current_date - "BookedSlots"."createdAt")  >= 15
+        and "BookedSlots"."createdAt" <= now() - interval '15 days'
         and "BookedSlots"."isActive" = 'true'
         RETURNING *`
 
@@ -143,15 +155,15 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     BookedSlot.canncelBookingWithVideo = async () => {
-        let query = `update "BookedSlots" bs
+        let query = `update "BookedSlots"
         set "isActive" = 'false'
-        where bs."userId" in (
-        select distinct on (cv."userId") bs."userId" from "BookedSlots" bs
+        where "BookedSlots"."userId" in (
+        select distinct on (cv."userId") "BookedSlots"."userId" from "BookedSlots"
         inner join (
             select distinct on ("userId") "userId", id, "createdAt" from "ContentVideoUploads"
             order by "userId", "createdAt" desc
         ) cv using ("userId")
-        where DATE_PART('day', Current_date - cv."createdAt")  >= 15
+        where "BookedSlots"."createdAt" <= now() - interval '15 days'
         )`
 
         let updatedRecord = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
