@@ -1,5 +1,6 @@
 const db = require('../models');
 const chargify = require('../services/chargify');
+const moment = require('moment');
 
 // sending intial data i.e states and days
 exports.daysAndStates = async (req, res) => {
@@ -66,6 +67,23 @@ exports.getAvailableTimeslots = async (req, res) => {
     } catch (error) {
         console.log(error)
         console.error(error, 'Error while getting available timeslots');;
+        return res.status(500).json({
+            message: "Something went wrong"
+        });
+    }
+}
+
+// for getting user next schedule video
+exports.getScheduledVideo = async (req, res) => {
+    try {
+        let { userId } = req.params;
+        let { day } = req.query;
+        let video = await db.ContentVideoUpload.getUserScheduleVideo(userId);
+
+        return res.json({ video });
+
+    } catch (error) {
+        console.log(error);
         return res.status(500).json({
             message: "Something went wrong"
         });
