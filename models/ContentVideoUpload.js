@@ -36,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
         let video = await ContentVideoUpload.findOne({
             where: {
                 userId,
-                createdAt: { [Op.gte]: Date.now() }
+                airDate: { [Op.gte]: Date.now() }
             }
         });
 
