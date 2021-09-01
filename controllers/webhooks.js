@@ -26,3 +26,17 @@ exports.subscriptionComponentUpdate = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
+
+exports.stripeSubscriptionCreated = async (req, res) => {
+    try {
+        let { item } = req.body;
+        console.log(item);
+        console.log(item.price);
+
+        res.sendStatus(200);
+    } catch (error) {
+        console.error(error, 'Error in subscription create / Stripe webhook');
+        console.log(error);
+        res.sendStatus(400);
+    }
+}
