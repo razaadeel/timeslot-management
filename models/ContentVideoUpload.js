@@ -1,3 +1,5 @@
+const { Op } = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
     const ContentVideoUpload = sequelize.define('ContentVideoUpload', {
         id: {
@@ -9,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
         inputName: DataTypes.STRING,
         outputName: DataTypes.STRING,
         destination: DataTypes.STRING,
+        airDate: DataTypes.DATE,
     }, {
         timestamps: true
     });
@@ -23,9 +26,22 @@ module.exports = (sequelize, DataTypes) => {
             inputName: data.inputName,
             outputName: data.outputName,
             destination: data.destination,
-            userId: data.userId
+            userId: data.userId,
+            airDate: data.airDate
         });
         return video
+    }
+
+    ContentVideoUpload.getUserScheduleVideo = async (userId) => {
+        let video = await ContentVideoUpload.findOne({
+            where: {
+                userId,
+                airDate: { [Op.gte]: Date.now() }
+            }
+        });
+
+        return video;
+
     }
 
     return ContentVideoUpload;

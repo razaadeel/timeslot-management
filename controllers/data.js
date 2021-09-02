@@ -1,5 +1,6 @@
 const db = require('../models');
 const chargify = require('../services/chargify');
+const moment = require('moment');
 
 // sending intial data i.e states and days
 exports.daysAndStates = async (req, res) => {
@@ -66,6 +67,43 @@ exports.getAvailableTimeslots = async (req, res) => {
     } catch (error) {
         console.log(error)
         console.error(error, 'Error while getting available timeslots');;
+        return res.status(500).json({
+            message: "Something went wrong"
+        });
+    }
+}
+
+// for getting user next schedule video
+exports.getScheduledVideo = async (req, res) => {
+    try {
+        let { userId } = req.params;
+
+        if (!userId) {
+            return res.status(400).json({ message: 'userId is required' });
+        }
+
+        let video = await db.ContentVideoUpload.getUserScheduleVideo(userId);
+        let airDate = await moment(video.airDate).format('MMMM Do, YYYY');
+
+        //formating time in 12hrs date
+        // airDate = airDate.split(' ');
+        // let time = airDate[1].split(':')
+        // if (time[0] > 12) {
+        //     time = `${time[0] - 12}:${time[1]}pm`
+        //     console.log('1', time)
+        // } else if (time[0] === 12) {
+        //     time = `${time[0]}:${time[1]}pm`
+        //     console.log('2', time)
+        // } else {
+        //     time = `${time[0]}:${time[1]}am`
+        // }
+
+        // airDate = airDate[0] + ' ' + time
+
+        return res.json({ video, airDate });
+
+    } catch (error) {
+        console.log(error);
         return res.status(500).json({
             message: "Something went wrong"
         });

@@ -28,19 +28,18 @@ exports.createLead = async (email, referalCode) => {
 
     } catch (error) {
         console.log(error)
-console.error(error, 'testing error');;
+        console.error(error, 'testing error');;
         return true;
     }
 };
 
 exports.createPurchase = async (email, amount) => {
     try {
-        console.log(email, amount);
         await api.post('/purchases', { email, purchase_amount: amount });
         return true;
 
     } catch (error) {
-        console.log(error)
-console.error(error, 'testing error');
+        console.log(error.response.data)
+        // console.error(error, 'leaddyno create purchase');
     }
 }

@@ -180,42 +180,33 @@ exports.uploadVideoFromBubble = async (req, res) => {
         //checking user plan for adding/removing adds
         let outputVideoName;
         //index 0=community, 1=entertainment, 2=candidate ,3=elected ,4=faith
-        let plans = ['price_1JPXsxAvKKZkQiDeN6vpCPJJ','price_1ImDFKAvKKZkQiDevEUerm0g','price_1Iba7jAvKKZkQiDe805f52qA','price_1Iba76AvKKZkQiDevwPLCVXH','price_1Iba5cAvKKZkQiDenqyzd5ns'];
+        let plans = ['price_1JPXsxAvKKZkQiDeN6vpCPJJ', 'price_1ImDFKAvKKZkQiDevEUerm0g', 'price_1Iba7jAvKKZkQiDe805f52qA', 'price_1Iba76AvKKZkQiDevwPLCVXH', 'price_1Iba5cAvKKZkQiDenqyzd5ns'];
 
         if (plans.includes(planId)) {
             outputVideoName = `${bookingDetails.showName}-${userId}-28-a.mp4`;
         } else {
             outputVideoName = `${bookingDetails.showName}-${userId}-28-a-[adins].mp4`;
         }
-        console.log(outputVideoName);
 
-        // let outputVideoName;
-        // if (user.chargifyCustomerId) {
-
-        //     //geting user subscription type
-        //     let subscription = await chargify.getCustomerSubscription(user.chargifyCustomerId);
-
-        //     //adding [adins] in outputVideoName if subscription is not "ads removed"
-        //     if (subscription.handle.includes('ads_removed')) {
-        //         outputVideoName = `${bookingDetails.showName}-${userId}-28-a.mp4`;
-        //     } else {
-        //         outputVideoName = `${bookingDetails.showName}-${userId}-28-a-[adins].mp4`;
-        //     }
-
-        // } else {
-        //     outputVideoName = `${bookingDetails.showName}-${userId}-28-a-[adins].mp4`
-        // }
+        let dayValue = { Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6, Sun: 7 };
+        const dayINeed = dayValue[day];
+        const today = moment().isoWeekday();
+        let date;
+        if (today < dayINeed) date = moment().isoWeekday(dayINeed).format("YYYY-MM-DD"); //If day is in current week
+        else date = moment().add(1, 'weeks').isoWeekday(dayINeed).format("YYYY-MM-DD");
+        let airDate = moment(date + ' ' + `${userBooking.startTime}`).format();
 
         //saving video data to ContentVideoUpload
         let videoData = await db.ContentVideoUpload.saveVideoDetails({
             userId,
             inputName: videoName,
             outputName: outputVideoName,
-            destination: destination
+            destination: destination,
+            airDate
         });
 
-        //sending response to front end for video upload
-        res.json({ message: 'successful' });
+        // //sending response to front end for video upload
+        res.json({ message: 'successful', airDate, userBooking });
 
         let chn = userBooking.channelName === 'Entertainment' ? 'Ent' : userBooking.channelName;
         let channel = await db.CityChannelStatus.getChannelStatus(userBooking.cityId, chn);
