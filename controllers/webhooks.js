@@ -29,14 +29,12 @@ exports.subscriptionComponentUpdate = async (req, res) => {
 
 exports.stripeSubscriptionCreated = async (req, res) => {
     try {
-        let { item } = req.body;
-        console.log(item);
-        console.log(item.price);
-
-        res.sendStatus(200);
+        let { email, price } = req.body;
+        leaddyno.createPurchase(email, price);
+        res.json({ message: 'success' });
     } catch (error) {
-        console.error(error, 'Error in subscription create / Stripe webhook');
-        console.log(error);
+        // console.error(error, 'Error in subscription create / Stripe webhook');
+        console.log(error.message);
         res.sendStatus(400);
     }
 }
