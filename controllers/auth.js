@@ -88,7 +88,8 @@ exports.createUser = async (req, res) => {
             city: bookingDetails.cityName,
             state: bookingDetails.stateName,
             timeslot: `${startTime} - ${endTime}`,
-            channel: bookingDetails.channelName
+            channel: bookingDetails.channelName,
+            showName: showName
         });
 
         //sending email alert for new slot booking
@@ -98,7 +99,8 @@ exports.createUser = async (req, res) => {
             city: bookingDetails.cityName,
             state: bookingDetails.stateName,
             timeslot: `${startTime} - ${endTime}`,
-            channel: bookingDetails.channelName
+            channel: bookingDetails.channelName,
+            showName: showName
         });
 
         //Checking if city channels are created in mediacp
