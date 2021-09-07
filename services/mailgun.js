@@ -40,7 +40,7 @@ exports.sendEmail = (type, body) => {
                     <div>City: <b>${body.city},${body.state}</b></div>
                     <div>Channel: <b>${body.channel}</b></div>
                     <div>Timeslot: <b>${body.timeslot}</b></div>
-                    <div>Timeslot: <b>${body.showName}</b></div>
+                    <div>Show Name: <b>${body.showName}</b></div>
             `;
         } else if (type === 'contentVideoUpload') {
             subject = 'Content Video Upload Alert';
