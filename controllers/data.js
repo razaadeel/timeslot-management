@@ -83,7 +83,10 @@ exports.getScheduledVideo = async (req, res) => {
         }
 
         let video = await db.ContentVideoUpload.getUserScheduleVideo(userId);
-        let airDate = await moment(video.airDate).format('MMMM Do, YYYY');
+        let airDate;
+        if (video) {
+            airDate = await moment(video.airDate).format('MMMM Do, YYYY');
+        }
 
         //formating time in 12hrs date
         // airDate = airDate.split(' ');
