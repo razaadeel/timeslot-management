@@ -197,11 +197,11 @@ exports.stitchVideos = async (destination, ftp, outputVideoName, firstAdSlot, se
                         //     "key": "w1s_adeel-test-channel@162.244.81.156",
                         //     "secret": "12345678"
                         // }
-                        // {
-                        //     "url": 'ftp://' + ftp.ftpURL + '/' + videoNameForFtp,
-                        //     "key": ftp.ftpUsername,
-                        //     "secret": ftp.secret
-                        // }
+                        {
+                            "url": 'ftp://' + ftp.ftpURL + '/' + videoNameForFtp,
+                            "key": ftp.ftpUsername,
+                            "secret": ftp.secret
+                        }
                     ]
                 }
             ],
@@ -210,20 +210,26 @@ exports.stitchVideos = async (destination, ftp, outputVideoName, firstAdSlot, se
         }
 
         let task = qencode.CreateTask();
-        let i = 0;
-        while (true) {
-            if (i < 2) {
-                let transcode = await task.StartCustom(transcodingParams);
-                i++;
-                if (transcode.error == 0) {
-                    console.log('video sent for stitching');
-                    break;
-                }
-            }
-            else {
-                break;
-            }
+        let transcode = await task.StartCustom(transcodingParams);
+        if (transcode.error == 0) {
+            console.log('video sent for stitching');
+        } else {
+            console.log('Error while sending video for transcoding');
         }
+        // let i = 0;
+        // while (true) {
+        //     if (i < 2) {
+        //         let transcode = await task.StartCustom(transcodingParams);
+        //         i++;
+        //         if (transcode.error == 0) {
+        //             console.log('video sent for stitching');
+        //             break;
+        //         }
+        //     }
+        //     else {
+        //         break;
+        //     }
+        // }
     } catch (error) {
         console.log(error);
         console.error(error, 'Error while sending video to qencode');

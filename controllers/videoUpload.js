@@ -194,7 +194,7 @@ exports.uploadVideoFromBubble = async (req, res) => {
         let date;
         if (today < dayINeed) date = moment().isoWeekday(dayINeed).format("YYYY-MM-DD"); //If day is in current week
         else date = moment().add(1, 'weeks').isoWeekday(dayINeed).format("YYYY-MM-DD");
-        let airDate = moment(date + ' ' + `${userBooking.startTime}`).format();
+        let airDate = moment(`${date} ${userBooking.startTime}`).format();
 
         //saving video data to ContentVideoUpload
         let videoData = await db.ContentVideoUpload.saveVideoDetails({
@@ -253,7 +253,7 @@ exports.uploadVideoFromBubble = async (req, res) => {
     } catch (error) {
         console.log(error)
         console.error(error, 'Error in video upload route');;
-        return res.status(401).json({ message: 'something went wrong' });
+        return res.status(500).json({ message: 'something went wrong' });
     }
 }
 
