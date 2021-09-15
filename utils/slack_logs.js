@@ -91,7 +91,7 @@ exports.newUserMsg = (body) => {
                 author: 'adeel',
                 color: '#38d67a',
                 title: 'Following are the details',
-                text: `Email: ${body.email} \n City: ${body.city} \n State: ${body.state} \n timeslot: ${body.timeslot} \n Channel: ${body.channel} \n Show Name: ${body.showName}`,
+                text: `Email: ${body.email} \n City: ${body.city} \n State: ${body.state}\n Day: ${body.day} \n Timeslot: ${body.timeslot} \n Channel: ${body.channel} \n Show Name: ${body.showName}`,
             }]
         }, function (err, response) {
             // if (err) {
