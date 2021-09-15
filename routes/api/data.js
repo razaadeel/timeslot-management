@@ -13,6 +13,9 @@ router.get('/cities/:stateCode', dataController.citiesOfState);
 // //GET timeslots by city, day, channel 
 router.get('/timeslots', dataController.getAvailableTimeslots);
 
+// //GET timeslots by city, channel 
+router.get('/city-timeslots', dataController.getAvailableTimeslotsByCity);
+
 //get details of chargify user
 router.get('/chargify-user', dataController.getChargifyUser);
 

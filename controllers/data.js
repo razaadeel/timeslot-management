@@ -36,8 +36,7 @@ exports.getAvailableTimeslots = async (req, res) => {
         let { day, city, channel } = req.query;
 
         // getAvailableSlots func created in Timeslot model
-        // const timeslots = await db.Timeslot.getAvailableSlots(day, city, channel);
-        const timeslots = await db.Timeslot.getAvailableSlots(1, 1, 1);
+        const timeslots = await db.Timeslot.getAvailableSlots(day, city, channel);
 
         //below conditions are for making timeslots in 12hrs format
         let slots = timeslots.map(item => {
@@ -67,6 +66,34 @@ exports.getAvailableTimeslots = async (req, res) => {
     } catch (error) {
         console.log(error)
         console.error(error, 'Error while getting available timeslots');;
+        return res.status(500).json({
+            message: "Something went wrong"
+        });
+    }
+}
+
+exports.getAvailableTimeslotsByCity = async (req, res) => {
+    try {
+        let { day, city, channel } = req.query;
+        let days = await db.Day.allDays();
+
+        let data = [];
+        days.map(async item => {
+            // getAvailableSlots func created in Timeslot model
+            const timeslots = await db.Timeslot.getAvailableSlots(item.id, city, channel);
+            data.push({
+                day: item.day,
+                dayId: item.id,
+                availableSlots: timeslots.length
+            });
+
+            if (data.length === days.length) {
+                res.json(data);
+            }
+        });
+
+    } catch (error) {
+        console.log(error);
         return res.status(500).json({
             message: "Something went wrong"
         });
