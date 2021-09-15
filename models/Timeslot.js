@@ -35,5 +35,22 @@ module.exports = (sequelize, DataTypes) => {
         return availableTimeslots;
     }
 
+    // db query func for getting available slots according to channelId, cityId, dayId, timeslotId
+    Timeslot.getAvailableSlotsByCity = async (cityId, channelId) => {
+        let query = `
+        select * from "Timeslots" tm
+        where NOT EXISTS (
+            select * from "BookedSlots" b
+            where b."timeslotId" = tm.id
+            and b."channelId" = ${channelId}
+            and b."cityId" = ${cityId}
+            and b."isActive" = 'true' 
+        )
+        order by tm.id asc`
+
+        let availableTimeslots = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT })
+        return availableTimeslots;
+    }
+
     return Timeslot;
 };
