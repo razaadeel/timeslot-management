@@ -39,6 +39,7 @@ exports.sendEmail = (type, body) => {
                     <div>Email: <b>${body.email}</b></div>
                     <div>City: <b>${body.city},${body.state}</b></div>
                     <div>Channel: <b>${body.channel}</b></div>
+                    <div>Day: <b>${body.day}</b></div>
                     <div>Timeslot: <b>${body.timeslot}</b></div>
                     <div>Show Name: <b>${body.showName}</b></div>
             `;

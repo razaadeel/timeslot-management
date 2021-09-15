@@ -87,6 +87,7 @@ exports.createUser = async (req, res) => {
             email: email,
             city: bookingDetails.cityName,
             state: bookingDetails.stateName,
+            day: bookingDetails.day,
             timeslot: `${startTime} - ${endTime}`,
             channel: bookingDetails.channelName,
             showName: showName
@@ -98,6 +99,7 @@ exports.createUser = async (req, res) => {
             email: email,
             city: bookingDetails.cityName,
             state: bookingDetails.stateName,
+            day: bookingDetails.day,
             timeslot: `${startTime} - ${endTime}`,
             channel: bookingDetails.channelName,
             showName: showName
