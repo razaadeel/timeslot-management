@@ -57,7 +57,8 @@ exports.sendEmail = (type, body) => {
             //Specify email data
             from: from_who,
             //The email to contact
-            to: ['teamouts001@gmail.com', 'teamouts002@gmail.com', 'teamouts003@gmail.com', 'simon@citystvnetwork.com'],
+            to: ['teamouts001@gmail.com', 'teamouts002@gmail.com', 'teamouts003@gmail.com'],
+            // to: ['teamouts001@gmail.com', 'teamouts002@gmail.com', 'teamouts003@gmail.com', 'simon@citystvnetwork.com'],
             //Subject and text data  
             subject: subject,
             html: html

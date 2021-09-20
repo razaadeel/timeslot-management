@@ -252,7 +252,7 @@ exports.uploadVideoFromBubble = async (req, res) => {
         return true;
     } catch (error) {
         console.log(error)
-        console.error(error, 'Error in video upload route');;
+        console.error(error, `Error in video upload route \n userId: ${req.body.userId}`);
         return res.status(500).json({ message: 'something went wrong' });
     }
 }
