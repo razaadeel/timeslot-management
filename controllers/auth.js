@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const moment = require('moment');
 
 
 const db = require('../models');
@@ -39,7 +40,6 @@ exports.createUser = async (req, res) => {
 
         //Saving user booking 
         let booking = await db.BookedSlot.saveBooking({ channelId, cityId, dayId, timeslotId, userId: user.id });
-
         let bookingDetails = await db.BookedSlot.getBookingDetails(booking.id);
 
         //spliting name into first and last name
@@ -81,6 +81,16 @@ exports.createUser = async (req, res) => {
         //sending response
         res.json({ message: 'successful', userId: user.id });
 
+        //Converting time according to city timzone; base timezone is America/New_York
+        let t1 = moment.tz("America/New_York").format(); //this will give current date and time with timezone
+        let currentDate = t1.split('T')[0]; // extracting only current date
+        let utc = t1.split('T')[1].split('-')[1]; // extracting utc timezone 
+        let sTime = bookingDetails.startTime.split(':')[0] >= 12 ? bookingDetails.startTime : `0${bookingDetails.startTime}`;
+        sTime = moment.tz(`${currentDate}T${sTime}-${utc}`, bookingDetails.timezone).format("hh:mm A");
+        let eTime = bookingDetails.endTime.split(':')[0] >= 12 ? bookingDetails.endTime :
+            bookingDetails.endTime === '00:00' ? bookingDetails.endTime : `0${bookingDetails.endTime}`;
+        eTime = moment.tz(`${currentDate}T${eTime}-${utc}`, bookingDetails.timezone).format("hh:mm A");
+
         //sending slack alert for new slot booking
         slack.newUserMsg({
             userId: user.id,
@@ -88,7 +98,7 @@ exports.createUser = async (req, res) => {
             city: bookingDetails.cityName,
             state: bookingDetails.stateName,
             day: bookingDetails.day,
-            timeslot: `${startTime} - ${endTime}`,
+            timeslot: `${sTime} - ${eTime}`,
             channel: bookingDetails.channelName,
             showName: showName
         });
@@ -100,7 +110,7 @@ exports.createUser = async (req, res) => {
             city: bookingDetails.cityName,
             state: bookingDetails.stateName,
             day: bookingDetails.day,
-            timeslot: `${startTime} - ${endTime}`,
+            timeslot: `${sTime} - ${eTime}`,
             channel: bookingDetails.channelName,
             showName: showName
         });
