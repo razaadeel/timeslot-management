@@ -13,12 +13,23 @@ module.exports = (sequelize, DataTypes) => {
          */
         static associate(models) {
             // define association here
-            CampaignInfo.hasMany(models.AdsReporting, {
-                foreignKey: 'campaignId'
+            // CampaignInfo.hasMany(models.AdsReporting, {
+            //     foreignKey: 'campaignId'
+            // });
+
+            CampaignInfo.belongsTo(models.userAds, {
+                foreignKey: 'serverUserId'
             });
+
+
             CampaignInfo.hasMany(models.CampaignChannels, {
                 foreignKey: 'campaignId',
             });
+
+            CampaignInfo.hasMany(models.AdsReporting, {
+                foreignKey: 'campaignId',
+            });
+
         }
     };
     CampaignInfo.init({
@@ -81,7 +92,7 @@ module.exports = (sequelize, DataTypes) => {
             },
         },
         totalAmount: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.DOUBLE,
             allowNull: false,
             validate: {
                 notNull: { msg: "Campaign must have a Total Amount" },
@@ -89,7 +100,7 @@ module.exports = (sequelize, DataTypes) => {
             },
         },
         leftAmount: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.DOUBLE,
             allowNull: false,
             validate: {
                 notNull: { msg: "Campaign must have a Left Amount" },
@@ -123,10 +134,18 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: 1,
         },
         adsUserId: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
             allowNull: false,
             validate: {
                 notNull: { msg: "Camapign must have an UserID" },
+                notEmpty: { msg: "User ID must not be empty" },
+            },
+        },
+        serverUserId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                notNull: { msg: "Camapign must have an server UserID" },
                 notEmpty: { msg: "User ID must not be empty" },
             },
         },
@@ -161,16 +180,18 @@ module.exports = (sequelize, DataTypes) => {
                 organizationName: data.organizationName,
                 stateCode: data.state,
                 city: data.cityName,
-                channelName: data.channel,
+                // channelName: data.channel,
                 totalAmount: data.budget,
                 leftAmount: data.budget,
                 startDate: data.startDate,
                 endDate: data.endDate,
                 videoUrl: data.videoUrl,
-                adsUserId: data.adsUserId,
                 videoDuration: data.duration,
                 priority: data.priority,
-                CampaignChannels: JSON.parse(data.channels)
+                CampaignChannels: JSON.parse(data.channels),
+                // CampaignChannels: data.channels
+                adsUserId: data.adsUserId,
+                serverUserId: data.serverUserId,
             }, {
                 include: [CampaignChannels]
             });
@@ -200,10 +221,53 @@ module.exports = (sequelize, DataTypes) => {
                     [Op.gte]: new Date(),
                     [Op.gte]: airDate
                 },
-                leftAmount: {
-                    [Op.gte]: 0
-                },
+
+                [Op.or]: [
+                    {
+                        // 60
+                        [Op.and]: [
+                            {
+                                leftAmount:
+                                {
+                                    [Op.gte]: 6.25
+                                }
+                            },
+                            {
+                                videoDuration:
+                                {
+                                    [Op.eq]: 60
+                                }
+                            },
+                        ],
+                        //    
+                    },
+
+                    {
+                        // 30
+                        [Op.and]: [
+                            {
+                                leftAmount:
+                                {
+                                    [Op.gte]: 3.13
+                                }
+                            },
+                            {
+                                videoDuration:
+                                {
+                                    [Op.eq]: 30
+                                }
+                            },
+                        ],
+
+
+                    }
+                ],
+
+
+
             },
+
+
             include: {
                 model: CampaignChannels,
                 where: {
@@ -232,7 +296,11 @@ module.exports = (sequelize, DataTypes) => {
                     [Op.gte]: new Date(),
                     [Op.gte]: airDate
                 },
-                leftAmount: 0,
+
+
+                leftAmount: 0
+
+
             },
             include: {
                 model: CampaignChannels,
@@ -243,6 +311,230 @@ module.exports = (sequelize, DataTypes) => {
         });
         return adsInfo;
     }
+
+
+    // Check if ad is run and cut the charges
+    CampaignInfo.checkAdRun = async () => {
+        // let query = `update "BookedSlots"
+        // set "isActive" = 'false',
+        // "updatedAt" = now()
+        // where not exists (
+        //     select from "ContentVideoUploads" cv
+        //     where "BookedSlots"."userId" = cv."userId"
+        // )
+        // and "BookedSlots"."createdAt" <= now() - interval '15 days'
+        // and "BookedSlots"."isActive" = 'true'
+        // RETURNING *`
+
+        let query = `with u as (
+            update "AdsReporting"
+                set "adStatus"  = 'run'
+                where "adStatus"  = 'pending'and "airDate" < NOW()
+            RETURNING "AdsReporting"."campaignId"
+           )
+      update "CampaignInfo" ci
+          set "leftAmount"= (CASE WHEN "ci"."videoDuration" = '60' THEN "ci"."leftAmount" - "uc"."cnt" * 6.25 ELSE ci."leftAmount" - uc.cnt * 3.13 END)
+          from (select "u"."campaignId", count(*) as cnt
+                from u
+                group by "u"."campaignId"
+               ) uc
+           where "ci"."id" = "uc"."campaignId";`
+
+        let updatedRecord = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+        return updatedRecord;
+    }
+
+
+
+    CampaignInfo.getActiveCampaignByID = async (serverUserId) => {
+        try {
+            const db = require('./index.js');
+            const CampaignChannels = db.CampaignChannels;
+            const AdsReporting = db.AdsReporting;
+
+            const campaignReqData = await CampaignInfo.findAll({
+                where: {
+                    serverUserId: serverUserId,
+                    // startDate: {
+                    //     [Op.lte]: new Date(),
+                    // },
+                    endDate: {
+                        [Op.gte]: new Date(),
+                    },
+
+                    [Op.or]: [
+                        {
+                            // 60
+                            [Op.and]: [
+                                {
+                                    leftAmount:
+                                    {
+                                        [Op.gte]: 6.25
+                                    }
+                                },
+                                {
+                                    videoDuration:
+                                    {
+                                        [Op.eq]: 60
+                                    }
+                                },
+                            ],
+                            //    
+                        },
+
+                        {
+                            // 30
+                            [Op.and]: [
+                                {
+                                    leftAmount:
+                                    {
+                                        [Op.gte]: 3.13
+                                    }
+                                },
+                                {
+                                    videoDuration:
+                                    {
+                                        [Op.eq]: 30
+                                    }
+                                },
+                            ],
+
+
+                        }
+                    ],
+
+
+
+                },
+                include: [
+                    {
+
+                        model: CampaignChannels,
+                        // as: 'CampaignChannels',
+                        // required: false,
+                    },
+
+                    {
+                        model: AdsReporting,
+                        // as: 'CampaignChannels',
+                        required: false,
+                        where: { adStatus: "run" }
+                    }
+
+                ],
+
+
+
+            })
+
+            return campaignReqData
+        }
+        catch (error) {
+            console.log(error)
+            throw Error(error)
+        }
+    }
+
+
+    CampaignInfo.getUnActiveCampaignByID = async (serverUserId) => {
+        try {
+            const db = require('./index.js');
+            const CampaignChannels = db.CampaignChannels;
+            const AdsReporting = db.AdsReporting;
+            const campaignReqData = await CampaignInfo.findAll({
+                where: {
+                    serverUserId: serverUserId,
+
+
+                    [Op.or]: [
+                        {
+                            endDate:
+                            {
+                                [Op.lt]: new Date()
+                            }
+                        },
+                        {
+                            [Op.or]: [
+                                {
+                                    // 60
+                                    [Op.and]: [
+                                        {
+                                            leftAmount:
+                                            {
+                                                [Op.lt]: 6.25
+                                            }
+                                        },
+                                        {
+                                            videoDuration:
+                                            {
+                                                [Op.lt]: 60
+                                            }
+                                        },
+                                    ],
+                                    //    
+                                },
+
+                                {
+                                    // 30
+                                    [Op.and]: [
+                                        {
+                                            leftAmount:
+                                            {
+                                                [Op.lt]: 3.13
+                                            }
+                                        },
+                                        {
+                                            videoDuration:
+                                            {
+                                                [Op.eq]: 30
+                                            }
+                                        },
+                                    ],
+
+
+                                }
+                            ],
+
+                        }
+                    ]
+
+                },
+                // include: CampaignChannels,
+                include: [
+                    {
+
+                        model: CampaignChannels,
+                        // as: 'CampaignChannels',
+                        // required: false,
+                    },
+
+                    {
+                        model: AdsReporting,
+                        // as: 'CampaignChannels',
+                        required: false,
+                        where: { adStatus: "run" }
+                    }
+
+                ],
+
+                // include: [{
+                //     model: AdsReporting,
+                //     // as: 'CampaignChannels',
+                //     required: false,
+                //     where: { adStatus: "run" }
+                // }]
+
+
+            })
+            return campaignReqData
+        }
+        catch (error) {
+            console.log(error)
+            throw Error(error)
+        }
+    }
+
+
 
     CampaignInfo.pauseCampaign = async (campaignId) => {
         await CampaignInfo.update(

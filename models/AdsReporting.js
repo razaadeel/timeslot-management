@@ -89,6 +89,15 @@ module.exports = (sequelize, DataTypes) => {
                 notEmpty: { msg: "channel Name must not be empty" },
             },
         },
+        adStatus: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                notNull: { msg: "Campaign must have a status Name" },
+                notEmpty: { msg: "status Name must not be empty" },
+            },
+        },
+
         campaignId: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -115,7 +124,8 @@ module.exports = (sequelize, DataTypes) => {
                 campaignId: data.campaignID,
                 stateCode: data.state,
                 city: data.city,
-                channelName: data.channel
+                channelName: data.channel,
+                adStatus: "pending"
             });
         } catch (error) {
             throw Error(error)
