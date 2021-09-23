@@ -207,6 +207,7 @@ module.exports = (sequelize, DataTypes) => {
     CampaignInfo.getCampaignName = async (stateCode, city, channelName, duration, priority, airDate) => {
         const db = require('./index.js');
         const CampaignChannels = db.CampaignChannels;
+        console.log('getCampaignName model', stateCode, city, channelName, duration, priority, airDate)
         let adsInfo = await CampaignInfo.findAll({
             where: {
                 stateCode: { [Op.iLike]: stateCode },
