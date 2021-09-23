@@ -297,14 +297,18 @@ exports.qencodeRequest = async (req, res) => {
             let secondInternalCheck60 = true;
 
 
-            let adsObjects1 = await db.CampaignInfo.getCampaignName(state, city, channel, 30, "high", airDate); //35
-            let adsObjects2 = await db.CampaignInfo.getCampaignName(state, city, channel, 60, "high", airDate); //35
+            let cn = channel === 'entertainment' ? 'Ent' : channel;
+            let adsObjects1 = await db.CampaignInfo.getCampaignName(state, city, cn, 30, "high", airDate); //35
+            console.log(state, city, cn, airDate);
+            console.log('adsObjects1', adsObjects1);
+            let adsObjects2 = await db.CampaignInfo.getCampaignName(state, city, cn, 60, "high", airDate); //35
+            console.log('adsObjects2', adsObjects2);
 
-            let adsObjects3 = await db.CampaignInfo.getInternalCampaignName(state, city, channel, 30, "low", airDate); //10
-            let adsObjects4 = await db.CampaignInfo.getInternalCampaignName(state, city, channel, 60, "low", airDate); //10
+            let adsObjects3 = await db.CampaignInfo.getInternalCampaignName(state, city, cn, 30, "low", airDate); //10
+            let adsObjects4 = await db.CampaignInfo.getInternalCampaignName(state, city, cn, 60, "low", airDate); //10
 
-            let adsObjects5 = await db.CampaignInfo.getInternalCampaignName("0", "0", channel, 30, "low", airDate); //5
-            let adsObjects6 = await db.CampaignInfo.getInternalCampaignName("0", "0", channel, 60, "low", airDate); //5
+            let adsObjects5 = await db.CampaignInfo.getInternalCampaignName("0", "0", cn, 30, "low", airDate); //5
+            let adsObjects6 = await db.CampaignInfo.getInternalCampaignName("0", "0", cn, 60, "low", airDate); //5
 
             // console.log(adsObjects1)
             // console.log(adsObjects2)
