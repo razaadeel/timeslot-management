@@ -166,9 +166,6 @@ module.exports = (sequelize, DataTypes) => {
                     .then((u) => { return result });
             });
 
-
-            let delCampaignID = await AdsReporting.destroy({ where: { userId, airDate } })
-
             //////////////////////
             await CampaignInfo.update(
                 { stitchingAmount: stitchingAmount + 6.25 },
