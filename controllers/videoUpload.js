@@ -572,38 +572,43 @@ exports.qencodeRequest = async (req, res) => {
                 let adSlot = "First Slot";
                 let viewers = 0;
                 let campaignID = firstAdSlot[i].id;
+                let priority = firstAdSlot[i].priority;
 
-                const stitchInfo = await db.StitchAdsInfo.saveStitchInfo({
-                    userId, videoId,
-                    campaignID, airDate,
-                    state, city,
-                    channel
-                });
-                const reportingInfo = await db.AdsReporting.saveAdsReport({
-                    adSlot, viewers,
-                    videoId, showName: 'Not available',
-                    userId, airDate,
-                    campaignID, state,
-                    city, channel
-                });
+                if (campaignID !== 0) {
+                    const stitchInfo = await db.StitchAdsInfo.saveStitchInfo({
+                        userId, videoId,
+                        campaignID, airDate,
+                        state, city,
+                        channel
+                    });
+                    const reportingInfo = await db.AdsReporting.saveAdsReport({
+                        adSlot, viewers,
+                        videoId, showName: 'Not available',
+                        userId, airDate,
+                        campaignID, state,
+                        city, channel
+                    });
+                }
             }
             for (let i = 0; i < secondAdSlot.length; i++) {
                 let adSlot = "Second Slot";
                 let viewers = 0;
                 let campaignID = secondAdSlot[i].id;
-                const stitchInfo = await db.StitchAdsInfo.saveStitchInfo({
-                    userId, videoId,
-                    campaignID, airDate,
-                    state, city,
-                    channel
-                });
-                const reportingInfo = await db.AdsReporting.saveAdsReport({
-                    adSlot, viewers,
-                    videoId, showName: 'Not available',
-                    userId, airDate,
-                    campaignID, state,
-                    city, channel
-                });
+                if (campaignID !== 0) {
+                    const stitchInfo = await db.StitchAdsInfo.saveStitchInfo({
+                        userId, videoId,
+                        campaignID, airDate,
+                        state, city,
+                        channel
+                    });
+                    const reportingInfo = await db.AdsReporting.saveAdsReport({
+                        adSlot, viewers,
+                        videoId, showName: 'Not available',
+                        userId, airDate,
+                        campaignID, state,
+                        city, channel
+                    });
+                }
             }
 
             channel.split(' ').join('')

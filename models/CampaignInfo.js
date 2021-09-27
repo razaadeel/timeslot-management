@@ -324,11 +324,6 @@ module.exports = (sequelize, DataTypes) => {
                     [Op.gte]: new Date(),
                     [Op.gte]: airDate
                 },
-
-
-                leftAmount: 0
-
-
             },
             include: {
                 model: CampaignChannels,

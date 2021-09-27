@@ -131,7 +131,7 @@ module.exports = (sequelize, DataTypes) => {
             });
 
             await CampaignInfo.update(
-                { stitchingAmount: stitchingAmount - 6.25 },
+                { stitchingAmount: CampaignInfo.stitchingAmount - 6.25 },
                 {
                     where: {
                         id: data.campaignID,
@@ -140,7 +140,7 @@ module.exports = (sequelize, DataTypes) => {
                 }
             );
             await CampaignInfo.update(
-                { stitchingAmount: stitchingAmount - 3.13 },
+                { stitchingAmount: CampaignInfo.stitchingAmount - 3.13 },
                 {
                     where: {
                         id: data.campaignID,
@@ -170,7 +170,7 @@ module.exports = (sequelize, DataTypes) => {
 
             //////////////////////
             await CampaignInfo.update(
-                { stitchingAmount: stitchingAmount + 6.25 },
+                { stitchingAmount: CampaignInfo.stitchingAmount + 6.25 },
                 {
                     where: {
                         // id: [delCampaignID.campaignId],
@@ -182,7 +182,7 @@ module.exports = (sequelize, DataTypes) => {
                 }
             );
             await CampaignInfo.update(
-                { stitchingAmount: stitchingAmount + 3.13 },
+                { stitchingAmount: CampaignInfo.stitchingAmount + 3.13 },
                 {
                     where: {
                         // id: delCampaignID.campaignId,
