@@ -113,6 +113,8 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     AdsReporting.saveAdsReport = async (data) => {
+        const db = require('./index.js');
+        const CampaignInfo = db.CampaignInfo;
         try {
             await AdsReporting.create({
                 adSlot: data.adSlot,
@@ -127,6 +129,26 @@ module.exports = (sequelize, DataTypes) => {
                 channelName: data.channel,
                 adStatus: "pending"
             });
+
+            await CampaignInfo.update(
+                { stitchingAmount: stitchingAmount - 6.25 },
+                {
+                    where: {
+                        id: data.campaignID,
+                        videoDuration: 60
+                    }
+                }
+            );
+            await CampaignInfo.update(
+                { stitchingAmount: stitchingAmount - 3.13 },
+                {
+                    where: {
+                        id: data.campaignID,
+                        videoDuration: 30
+                    }
+                }
+            );
+
         } catch (error) {
             throw Error(error)
         }
@@ -134,11 +156,64 @@ module.exports = (sequelize, DataTypes) => {
 
     AdsReporting.removeAdReport = async (userId, airDate) => {
         try {
-            await AdsReporting.destroy({ where: { userId, airDate } });
+            // await AdsReporting.destroy({ where: { userId, airDate } });
+            //////////////
+
+            let delCampaignID = await AdsReporting.findAll({
+                where: { userId, airDate }
+            }).then(async (result) => {
+                return await AdsReporting.destroy({ where: { userId, airDate } })
+                    .then((u) => { return result });
+            });
+
+
+            let delCampaignID = await AdsReporting.destroy({ where: { userId, airDate } })
+
+            //////////////////////
+            await CampaignInfo.update(
+                { stitchingAmount: stitchingAmount + 6.25 },
+                {
+                    where: {
+                        // id: [delCampaignID.campaignId],
+                        id: {
+                            [Op.in]: [delCampaignID.campaignId]
+                        },
+                        videoDuration: 60
+                    }
+                }
+            );
+            await CampaignInfo.update(
+                { stitchingAmount: stitchingAmount + 3.13 },
+                {
+                    where: {
+                        // id: delCampaignID.campaignId,
+                        id: {
+                            [Op.in]: [delCampaignID.campaignId]
+                        },
+                        videoDuration: 30
+                    }
+                }
+            );
+
+
         } catch (error) {
             throw Error(error)
         }
     }
+
+
+    // AdsReporting.removeAdReport = async (userId, airDate) => {
+    //     try {
+    //         await AdsReporting.destroy({ where: { userId, airDate } });
+    //     } catch (error) {
+    //         throw Error(error)
+    //     }
+    // }
+
+
+
+
+
 
     return AdsReporting;
 };

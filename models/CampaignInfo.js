@@ -30,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
                 foreignKey: 'campaignId',
             });
 
+
         }
     };
     CampaignInfo.init({
@@ -108,6 +109,16 @@ module.exports = (sequelize, DataTypes) => {
             },
 
         },
+        stitchingAmount: {
+            type: DataTypes.DOUBLE,
+            allowNull: false,
+            validate: {
+                notNull: { msg: "Campaign must have a Stitching Amount" },
+                notEmpty: { msg: "Stitching Amount must not be empty" },
+            },
+            defaultValue: "0",
+
+        },
         videoUrl: {
             type: DataTypes.STRING,
             allowNull: false,
@@ -183,6 +194,7 @@ module.exports = (sequelize, DataTypes) => {
                 // channelName: data.channel,
                 totalAmount: data.budget,
                 leftAmount: data.budget,
+                stitchingAmount: data.budget,
                 startDate: data.startDate,
                 endDate: data.endDate,
                 videoUrl: data.videoUrl,
@@ -207,7 +219,6 @@ module.exports = (sequelize, DataTypes) => {
     CampaignInfo.getCampaignName = async (stateCode, city, channelName, duration, priority, airDate) => {
         const db = require('./index.js');
         const CampaignChannels = db.CampaignChannels;
-        console.log('getCampaignName model', stateCode, city, channelName, duration, priority, airDate)
         let adsInfo = await CampaignInfo.findAll({
             where: {
                 stateCode: { [Op.iLike]: stateCode },
@@ -223,6 +234,8 @@ module.exports = (sequelize, DataTypes) => {
                     [Op.gte]: airDate
                 },
 
+
+
                 [Op.or]: [
                     {
                         // 60
@@ -237,6 +250,13 @@ module.exports = (sequelize, DataTypes) => {
                                 videoDuration:
                                 {
                                     [Op.eq]: 60
+                                }
+                            },
+                            {
+                                stitchingAmount:
+                                {
+                                    [Op.gte]: 6.25
+
                                 }
                             },
                         ],
@@ -256,6 +276,13 @@ module.exports = (sequelize, DataTypes) => {
                                 videoDuration:
                                 {
                                     [Op.eq]: 30
+                                }
+                            },
+                            {
+                                stitchingAmount:
+                                {
+                                    [Op.gte]: 3.13
+
                                 }
                             },
                         ],
