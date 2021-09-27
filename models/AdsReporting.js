@@ -156,6 +156,8 @@ module.exports = (sequelize, DataTypes) => {
 
     AdsReporting.removeAdReport = async (userId, airDate) => {
         try {
+            const db = require('./index.js');
+            const CampaignInfo = db.CampaignInfo;
             // await AdsReporting.destroy({ where: { userId, airDate } });
             //////////////
 
