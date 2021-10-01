@@ -122,7 +122,7 @@ exports.manualSystem = async (videoUrl, destination, outputVideoName, userId, vi
             ],
             encoder_version: "2",
             // callback_url: `http://tms-dev01.services.citystvnetwork.com/api/video/qencode-request?destination=${destination}&outputvideoname=${outputVideoName}&userId=${userId}&videoId=${videoId}`,
-            callback_url: `https://citystreamingtelevision.com/api/video/qencode-request?destination=${destination}&outputvideoname=${outputVideoName}&userId=${userId}&videoId=${videoId}`,
+            callback_url: `http://165.227.125.44/api/video/qencode-request?destination=${destination}&outputvideoname=${outputVideoName}&userId=${userId}&videoId=${videoId}`,
             source: videoUrl
         }
         // remove space in url
@@ -257,7 +257,7 @@ exports.transcodeAdVideo = async (videoUrl, destinations, duration, campaignId) 
             ],
             encoder_version: "2",
             // callback_url: `http://tms-dev01.services.citystvnetwork.com/api/video/callback/advideo-qencode-status?campaignId=${campaignId}`,
-            callback_url: `https://citystreamingtelevision.com/api/video/callback/advideo-qencode-status?campaignId=${campaignId}`,
+            callback_url: `http://165.227.125.44/api/video/callback/advideo-qencode-status?campaignId=${campaignId}`,
             source: videoUrl,
         }
 
